@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  db:
+    image: "postgres:13.0-alpine"
+    container_name: "db"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=informbob
+      - POSTGRES_USER=informbob-db-admin
+      - POSTGRES_PASSWORD=super-secure-babula
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./dev/db/data:/var/lib/postgresql/data
+    networks:
+      - db
+      - internet
+    deploy:
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 200M
+networks:
+  db:
+    driver: bridge
+    internal: true
+  internet:
+    driver: bridge
+
