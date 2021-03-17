@@ -1,3 +1,5 @@
+using NSubstitute;
+
 namespace Server
 {
     using System;
