@@ -1,11 +1,10 @@
-using Server.Data;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Server.Services
 {
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Server.Data;
+
     public static class DatabaseService
     {
         public static void AddDatabaseService(this IServiceCollection services, IConfiguration cfg)
