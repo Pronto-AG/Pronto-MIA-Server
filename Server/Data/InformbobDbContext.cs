@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Server.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class InformbobDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public InformbobDbContext(DbContextOptions<InformbobDbContext> options)
             : base(options)
         {
         }

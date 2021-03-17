@@ -10,7 +10,7 @@ namespace Server.Services
     {
         public static void AddDatabaseService(this IServiceCollection services, IConfiguration cfg)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<InformbobDbContext>(options =>
                 options.UseNpgsql(cfg.GetConnectionString("InformbobDBContext")));
         }
     }
