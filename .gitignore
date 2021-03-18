@@ -76,3 +76,4 @@ _[Ss]cripts
 # Dev directory for docker
 dev/
 Server/.idea/
+doc/

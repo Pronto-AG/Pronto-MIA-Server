@@ -4,8 +4,14 @@ namespace Server.Tests
     using Server.Data;
     using Xunit;
 
+    /// <summary>
+    /// Test suite for api Tests.
+    /// </summary>
     public class ApiTests
     {
+        /// <summary>
+        /// First Test.
+        /// </summary>
         [Fact]
         public void IsPrime_InputIs1_ReturnFalse()
         {
