@@ -7,10 +7,13 @@ namespace Server.Services
 
     public static class DatabaseService
     {
-        public static void AddDatabaseService(this IServiceCollection services, IConfiguration cfg)
+        public static void AddDatabaseService(
+            this IServiceCollection services,
+            IConfiguration cfg)
         {
             services.AddDbContext<InformbobDbContext>(options =>
-                options.UseNpgsql(cfg.GetConnectionString("InformbobDBContext")));
+                options.UseNpgsql(
+                    cfg.GetConnectionString("InformbobDBContext")));
         }
     }
 }
