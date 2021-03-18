@@ -8,7 +8,7 @@ namespace Tests
         [Fact]
         public void Test1()
         {
-            bool result = false;
+            const bool result = false;
             Assert.False(result, "Result should be false.");
         }
     }

@@ -9,8 +9,8 @@ namespace Pronto_MIA.Data
         {
         }
         
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=informbob;Username=informbob-db-admin;Password=super-secure-babula");
+       /* protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseNpgsql("Host=127.0.0.1;Database=informbob;Username=informbob-db-admin;Password=super-secure-babula");*/
 
         public DbSet<Speaker> Speakers { get; set; }
     }
