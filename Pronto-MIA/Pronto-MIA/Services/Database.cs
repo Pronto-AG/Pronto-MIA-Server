@@ -1,9 +1,9 @@
-namespace Server.Services
+namespace Pronto_MIA.Services
 {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Server.Data;
+    using Pronto_MIA.Data;
 
     public static class DatabaseService
     {

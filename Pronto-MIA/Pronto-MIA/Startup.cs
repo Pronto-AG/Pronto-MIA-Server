@@ -1,4 +1,4 @@
-namespace Server
+namespace Pronto_MIA
 {
     using System;
     using Microsoft.AspNetCore.Builder;
@@ -6,8 +6,8 @@ namespace Server
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Server.Data;
-    using Server.Services;
+    using Pronto_MIA.Data;
+    using Pronto_MIA.Services;
 
     public class Startup
     {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Server.Data
+namespace Pronto_MIA.Data
 {
 
     public class Speaker

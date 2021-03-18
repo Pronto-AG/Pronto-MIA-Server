@@ -2,7 +2,7 @@ using System.Linq;
 using HotChocolate;
 using Microsoft.Extensions.Configuration;
 
-namespace Server.Data
+namespace Pronto_MIA.Data
 {
     public class Query
     {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Server.Data
+namespace Pronto_MIA.Data
 {
     public class InformbobDbContext : DbContext
     {

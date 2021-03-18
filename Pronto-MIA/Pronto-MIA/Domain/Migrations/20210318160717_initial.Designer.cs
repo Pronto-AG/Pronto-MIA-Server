@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using Server.Data;
+using Pronto_MIA.Data;
 
-namespace Server.Migrations
+namespace Pronto_MIA.Domain.Migrations
 {
     [DbContext(typeof(InformbobDbContext))]
-    [Migration("20210312095142_Initial")]
-    partial class Initial
+    [Migration("20210318160717_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,7 +20,7 @@ namespace Server.Migrations
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("Server.Data.Speaker", b =>
+            modelBuilder.Entity("Pronto_MIA.Data.Speaker", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
