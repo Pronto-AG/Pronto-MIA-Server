@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Rebuild solution
-        run: dotnet rebuild
+      - name: Restore solution
+        run: dotnet restore
 
       - name: Build with warnings as errors
         run: |
