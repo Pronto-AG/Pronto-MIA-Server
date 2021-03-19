@@ -24,14 +24,6 @@ jobs:
         working-directory: ./Pronto-MIA
         run: dotnet restore
 
-      - name: Cache Dependencies
-        id: cache-dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.nuget            
-          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
-
       - name: Lint by treating warnings as errors
         working-directory: ./Pronto-MIA
         run: |
@@ -50,7 +42,7 @@ jobs:
         with:
           path: |
             ~/.nuget            
-          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}-1
+          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
 
       - name: Restore solution
         working-directory: ./Pronto-MIA
@@ -58,5 +50,5 @@ jobs:
 
       - name: Run Tests
         working-directory: ./Pronto-MIA
-        run: dotnet test
+        run: dotnet test --no-restore
 
