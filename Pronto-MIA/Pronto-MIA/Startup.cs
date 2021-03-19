@@ -33,17 +33,7 @@ namespace Pronto_MIA
                 .AddQueryType<Query>();
         }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to configure
-        /// the HTTP request pipeline.
-        /// </summary>
-        /// <param name="app">Builder.</param>
-        /// <param name="env">Environment.</param>
-        /// <param name="serviceProvider">Services.</param>
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IServiceProvider serviceProvider)
+        public void addSpeaker(IServiceProvider serviceProvider)
         {
             using (
                 var context = serviceProvider.GetService<InformbobDbContext>())
@@ -57,7 +47,21 @@ namespace Pronto_MIA
                 context.Add(dani);
                 context.SaveChanges();
             }
+        }
 
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure
+        /// the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">Builder.</param>
+        /// <param name="env">Environment.</param>
+        /// <param name="serviceProvider">Services.</param>
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IServiceProvider serviceProvider)
+        {
+            this.addSpeaker(serviceProvider);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

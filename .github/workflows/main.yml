@@ -1,0 +1,20 @@
+name: Server CI
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:5.0
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Rebuild solution
+        run: dotnet rebuild
+
+      - name: Build with warnings as errors
+        run: |
+             dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
+             grep '0 Error(s)' ./buildlog.txt

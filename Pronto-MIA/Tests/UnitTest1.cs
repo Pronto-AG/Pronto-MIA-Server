@@ -1,4 +1,9 @@
 using System;
+using Microsoft.Extensions.Configuration;
+using NSubstitute;
+using NSubstitute.ReceivedExtensions;
+using Pronto_MIA;
+using Pronto_MIA.Data;
 using Xunit;
 
 namespace Tests
@@ -10,6 +15,16 @@ namespace Tests
         {
             const bool result = false;
             Assert.False(result, "Result should be false.");
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            var speak = new Speaker
+            {
+                Name = "Dani"
+            };
+            Assert.Equal("Dani", speak.Name);
         }
     }
 }
