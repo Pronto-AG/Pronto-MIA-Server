@@ -11,12 +11,50 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      
+      - name: Load Cache
+        id: load-cache
+        uses: actions/cache@v2
+        with:
+          path: | 
+            ~/.nuget
+          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+
       - name: Restore solution
         working-directory: ./Pronto-MIA
         run: dotnet restore
 
-      - name: Build with warnings as errors
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget            
+          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+
+      - name: Lint by treating warnings as errors
         working-directory: ./Pronto-MIA
         run: |
-             dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
-             grep '0 Error(s)' ./buildlog.txt
+#             dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
+#             grep '0 Error(s)' ./buildlog.txt
+  test:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:5.0
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load Cache          
+        id: load-cache        
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget            
+          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+
+      - name: Restore solution
+        working-directory: ./Pronto-MIA
+        run: dotnet restore
+
+      - name: Run Tests
+        working-directory: ./Pronto-MIA
+        run dotnet test
