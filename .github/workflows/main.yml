@@ -11,13 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Change into solution
-        run: cd Pronto-MIA
-
       - name: Restore solution
+        working-directory: ./Pronto-MIA
         run: dotnet restore
 
       - name: Build with warnings as errors
+        working-directory: ./Pronto-MIA
         run: |
              dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
              grep '0 Error(s)' ./buildlog.txt
