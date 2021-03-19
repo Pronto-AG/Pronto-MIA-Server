@@ -39,6 +39,7 @@ jobs:
 #             grep '0 Error(s)' ./buildlog.txt
   test:
     runs-on: ubuntu-latest
+    needs: lint
     container: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
       - uses: actions/checkout@v2
