@@ -50,7 +50,7 @@ jobs:
         with:
           path: |
             ~/.nuget            
-          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}-1
 
       - name: Restore solution
         working-directory: ./Pronto-MIA
