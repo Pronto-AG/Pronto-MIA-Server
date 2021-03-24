@@ -91,7 +91,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: pronto-ag/informbob-server:master
+          tags: ghcr.io/pronto-ag/pronto-mia-server:master
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
