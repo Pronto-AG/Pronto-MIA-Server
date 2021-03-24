@@ -13,7 +13,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Load Nuget Packages
+      - name: Load Nuget cache
         uses: actions/cache@v2
         with:
           path: ~/.nuget/packages
@@ -39,7 +39,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Load Nuget Packages
+      - name: Load Nuget cache
         uses: actions/cache@v2
         with:
           path: ~/.nuget/packages
@@ -91,7 +91,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: pronto-ag/pronto-mia-server:master
+          tags: Pronto-AG/Informbob-Server:master
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
