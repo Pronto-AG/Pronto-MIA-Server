@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v2
 
       
       - name: Load Cache
@@ -34,7 +35,8 @@ jobs:
     needs: lint
     container: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v2
 
       - name: Load Cache          
         id: load-cache        
@@ -52,3 +54,30 @@ jobs:
         working-directory: ./Pronto-MIA
         run: dotnet test --no-restore
 
+  build-dev:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Build docker
+        run: docker build .
+
+  build-master:
+    name: Push Docker image of master to GitHub Packages
+    runs-on: ubuntu-latest
+    #if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: pronto-ag/informbob-server/pronto-mia-server
+          tag_with_ref: true
