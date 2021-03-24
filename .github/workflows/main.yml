@@ -13,14 +13,13 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      
-      - name: Load Cache
-        id: load-cache
+      - name: Load Nuget Packages
         uses: actions/cache@v2
         with:
-          path: | 
-            ~/.nuget
-          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Restore solution
         working-directory: ./Pronto-MIA
@@ -40,13 +39,13 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Load Cache          
-        id: load-cache        
+      - name: Load Nuget Packages
         uses: actions/cache@v2
         with:
-          path: |
-            ~/.nuget            
-          key: nuget-${{ hashFiles('./Pronto-MIA/Pronto-MIA/Pronto-MIA.csproj') }}-${{ hashFiles('./Pronto-MIA/Tests/Tests.csproj') }}
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Restore solution
         working-directory: ./Pronto-MIA

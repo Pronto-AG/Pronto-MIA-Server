@@ -1,8 +1,3 @@
-using System;
-using Microsoft.Extensions.Configuration;
-using NSubstitute;
-using NSubstitute.ReceivedExtensions;
-using Pronto_MIA;
 using Pronto_MIA.Data;
 using Xunit;
 
