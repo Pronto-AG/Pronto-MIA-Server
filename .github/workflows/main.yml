@@ -6,6 +6,7 @@ on:
 
 jobs:
   lint:
+    name: Run linter
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:5.0
     steps:
@@ -31,6 +32,7 @@ jobs:
 #             dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
 #             grep '0 Error(s)' ./buildlog.txt
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
     needs: lint
     container: mcr.microsoft.com/dotnet/sdk:5.0
@@ -55,6 +57,7 @@ jobs:
         run: dotnet test --no-restore
 
   build-dev:
+    name: Test build
     runs-on: ubuntu-latest
     needs: test
     if: github.ref != 'refs/heads/master'
