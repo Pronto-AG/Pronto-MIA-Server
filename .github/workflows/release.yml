@@ -77,8 +77,21 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/pronto-ag/pronto-mia-server:${{ github.ref }}
+          tags: ghcr.io/pronto-ag/pronto-mia-server:${{ github.ref:10 }}
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+   build-documentation:
+     name: Build documentation
+     runs-on: ubuntu-latest
+     needs: test
+     steps:
+       - name: Check out the repo
+         uses: actions/checkout@v2
+
+       - name: Build documentation
+         uses: mattnotmitt/doxygen-action@v1
+         with:
+           doxyfile-path: ./doxygen.conf
+           enable-latex: true
