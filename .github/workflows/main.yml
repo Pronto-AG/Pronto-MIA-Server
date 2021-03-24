@@ -65,10 +65,10 @@ jobs:
         run: docker build .
 
   build-docker-master:
-    name: Push Docker image to GitHub Container Registry
+    name: Push Docker master image to GitHub Container Registry
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/master'
+#    if: github.ref == 'refs/heads/master'
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -94,7 +94,7 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
 
   build-docker-release:
-    name: Push Docker image to GitHub Container Registry
+    name: Push Docker release image to GitHub Container Registry
     runs-on: ubuntu-latest
     needs: test
     if: startsWith(github.ref, 'refs/tags/')
