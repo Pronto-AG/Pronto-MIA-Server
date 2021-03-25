@@ -9,14 +9,25 @@ namespace Pronto_MIA
     using Pronto_MIA.Data;
     using Pronto_MIA.Services;
 
+    /// <summary>
+    /// Class for starting up the Asp.Net application.
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Startup"/> class.
+        /// Gets the correct configuration by dependency injection.
+        /// </summary>
+        /// <param name="cfg">Configuration used by the startup class.</param>
         public Startup(IConfiguration cfg)
         {
-            this.cfg = cfg;
+            this.Cfg = cfg;
         }
 
-        public IConfiguration cfg { get; }
+        /// <summary>
+        /// Gets the configuration used by the startup class.
+        /// </summary>
+        public IConfiguration Cfg { get; }
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to add
@@ -27,10 +38,41 @@ namespace Pronto_MIA
         /// <param name="services">The Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDatabaseService(this.cfg);
+            services.AddDatabaseService(this.Cfg);
             services
                 .AddGraphQLServer()
                 .AddQueryType<Query>();
+        }
+
+        /// <summary>
+        /// Creates a new speaker and inserts it into the database.
+        /// </summary>
+        /// <param name="serviceProvider">Dependency injected service provider
+        /// used for finding the database service. </param>
+        /// <exception cref="NullReferenceException">If the database service
+        /// cannot be found.</exception>
+        public void AddSpeaker(IServiceProvider serviceProvider)
+        {
+            using (
+                var context = serviceProvider.GetService<InformbobDbContext>())
+            {
+                Speaker dani = new Speaker
+                {
+                    Bio = "Hello Friends im Dani",
+                    Name = "Dani Lombarti",
+                    WebSite = "danilombarti.com.uk",
+                };
+
+                if (context != null)
+                {
+                    context.Add(dani);
+                    context.SaveChanges();
+                }
+                else
+                {
+                    throw new NullReferenceException();
+                }
+            }
         }
 
         /// <summary>
@@ -45,19 +87,7 @@ namespace Pronto_MIA
             IWebHostEnvironment env,
             IServiceProvider serviceProvider)
         {
-            using (
-                var context = serviceProvider.GetService<InformbobDbContext>())
-            {
-                Speaker dani = new Speaker
-                {
-                    Bio = "Hello Friends im Dani",
-                    Name = "Dani Lombarti",
-                    WebSite = "danilombarti.com.uk",
-                };
-                context.Add(dani);
-                context.SaveChanges();
-            }
-
+            this.AddSpeaker(serviceProvider);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

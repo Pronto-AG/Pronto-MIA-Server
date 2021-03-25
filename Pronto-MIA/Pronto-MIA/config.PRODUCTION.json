@@ -15,8 +15,8 @@
         "LIMIT_INDICATOR": "Note",
         "ERROR_INDICATOR": "Error Message"
     },
-    "DbContext": {
-        "CONNECTION_STRING": "Server=127.0.0.1;Port=5432;Database=Informbob;User=Informbob-DB-Admin;Password=Super/%Secure;"
+    "_DbContext": {
+        "_CONNECTION_STRING": "Server=127.0.0.1;Port=5432;Database=Informbob;User=Informbob-DB-Admin;Password=Super/%Secure;"
     },
     "RequestBuilder": {
         "BASE_URI": "https://www.alphavantage.co/query",

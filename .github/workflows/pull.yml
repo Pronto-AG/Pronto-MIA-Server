@@ -1,0 +1,38 @@
+name: Pull request CI
+on:
+  pull_request:
+    types: [opened]
+    branches:
+      - master
+
+jobs:
+  coverage:
+    name: Add coverage to pull request
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:5.0
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Load Nuget cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore solution
+        working-directory: ./Pronto-MIA
+        run: dotnet restore
+
+      - name: Run Tests
+        working-directory: ./Pronto-MIA
+        run: dotnet test --collect:"XPlat Code Coverage" --no-restore
+
+      - name: Show coverage
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ./Pronto-MIA/Tests/TestResults/**/*.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 80

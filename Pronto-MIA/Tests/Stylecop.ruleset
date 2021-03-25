@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Rules for Stylecop" Description="Code analysis rules for Stylecop" ToolsVersion="15">
+    <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+        <Rule Id="SA1633" Action="None" />
+        <Rule Id="SA0001" Action="None" />
+    </Rules>
+</RuleSet>
