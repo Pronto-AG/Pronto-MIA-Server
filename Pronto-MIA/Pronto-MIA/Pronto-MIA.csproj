@@ -4,6 +4,8 @@
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Pronto_MIA</RootNamespace>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <CodeAnalysisRuleSet>.\Stylecop.ruleset</CodeAnalysisRuleSet>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,6 +26,12 @@
     <ItemGroup>
       <None Remove="Menees.Analyzers.Settings.xml" />
       <AdditionalFiles Include="Menees.Analyzers.Settings.xml" />
+      <Content Remove="stylecop.json" />
+      <AdditionalFiles Include="stylecop.json">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </AdditionalFiles>
     </ItemGroup>
 
 </Project>

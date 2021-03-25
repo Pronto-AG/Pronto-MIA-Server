@@ -1,8 +1,8 @@
-using Pronto_MIA.Data;
-using Xunit;
-
 namespace Tests
 {
+    using Pronto_MIA.Data;
+    using Xunit;
+
     public class UnitTest1
     {
         [Fact]
@@ -17,7 +17,7 @@ namespace Tests
         {
             var speak = new Speaker
             {
-                Name = "Dani"
+                Name = "Dani",
             };
             Assert.Equal("Dani", speak.Name);
         }

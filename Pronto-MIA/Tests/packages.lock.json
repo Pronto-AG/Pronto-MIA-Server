@@ -8,6 +8,12 @@
         "resolved": "3.0.3",
         "contentHash": "PdyhdzG2LK7YUEtccObPql+3OuFODaFNeYayxdPoK1eHb2StZoeQf1WMb16QrKiIdi4fs5Kog8jxXtlZOgAEuA=="
       },
+      "Menees.Analyzers": {
+        "type": "Direct",
+        "requested": "[2.0.6, )",
+        "resolved": "2.0.6",
+        "contentHash": "5vvHuwLxotAj6jyeU3a926MMfQGzIGEe4m3zUGTD9g0wVp6HFAMRkhl9xJyLbfrnnU0GfDG1SsBCzWpSV7AZSw=="
+      },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
         "requested": "[16.9.1, )",
@@ -27,6 +33,12 @@
           "Castle.Core": "4.4.0",
           "System.Threading.Tasks.Extensions": "4.3.0"
         }
+      },
+      "StyleCop.Analyzers": {
+        "type": "Direct",
+        "requested": "[1.1.118, )",
+        "resolved": "1.1.118",
+        "contentHash": "Onx6ovGSqXSK07n/0eM3ZusiNdB6cIlJdabQhWGgJp3Vooy9AaLS/tigeybOJAobqbtggTamoWndz72JscZBvw=="
       },
       "xunit": {
         "type": "Direct",
