@@ -62,7 +62,7 @@ jobs:
       - name: Zip coverage
         uses: thedoctor0/zip-release@master
         with:
-          filename: 'coverage-report.zip'
+          filename: 'code-coverage.zip'
           path: ./coveragereport
 
       - name: Upload coverage report artifact
