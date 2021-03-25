@@ -50,7 +50,15 @@ jobs:
 
       - name: Run Tests
         working-directory: ./Pronto-MIA
-        run: dotnet test --no-restore
+        run: dotnet test --collect:"XPlat Code Coverage" --no-restore
+
+      - name: Show coverage
+        working-directory: ./Pronto-MIA/Tests
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: TestResults/**/*.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 80
 
   build-dev:
     name: Test build
