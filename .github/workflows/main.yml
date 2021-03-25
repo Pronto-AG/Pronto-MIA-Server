@@ -176,6 +176,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Documentation
+          path: ./doc
 
       - name: Zip documentation
         uses: thedoctor0/zip-release@master
@@ -187,6 +188,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: CoverageReport
+          path: ./coverage-report
       
       - name: Zip coverage
         uses: thedoctor0/zip-release@master
