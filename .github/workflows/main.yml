@@ -56,21 +56,15 @@ jobs:
         uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
         with:
           reports: './Pronto-MIA/Tests/TestResults/**/*.xml'
-          targetdir: 'coveragereport'
+          targetdir: 'coverage-report'
           reporttypes: 'HtmlInline;Cobertura'
-
-      - name: Zip coverage
-        uses: thedoctor0/zip-release@master
-        with:
-          filename: 'code-coverage.zip'
-          path: ./coveragereport
 
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v2
         with:
           name: CoverageReport
-          path: code-coverage.zip
-          retention-days: 1
+          path: coverage-report/
+          retention-days: 2
 
   build-dev:
     name: Test build
@@ -162,17 +156,11 @@ jobs:
           doxyfile-path: ./doxygen.conf
           enable-latex: true
 
-      - name: Zip documentation
-        uses: thedoctor0/zip-release@master
-        with:
-          filename: 'documentation.zip'
-          path: ./doc
-
       - name: Save documentation
         uses: actions/upload-artifact@v2
         with:
           name: Documentation
-          path: documentation.zip
+          path: doc/
           retention-days: 1
 
   create-release:
@@ -189,10 +177,23 @@ jobs:
         with:
           name: Documentation
 
+      - name: Zip documentation
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: 'documentation.zip'
+          path: ./doc
+
       - name: Get coverage
         uses: actions/download-artifact@v2
         with:
           name: CoverageReport
+      
+      - name: Zip coverage
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: 'code-coverage.zip'
+          path: ./coverage-report
+
   
       - name: Create Release
         uses: softprops/action-gh-release@v1
