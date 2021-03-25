@@ -27,6 +27,7 @@ jobs:
         run: |
              dotnet build -c release -o ./app --no-restore -warnAsError | tee ./buildlog.txt
              grep '0 Error(s)' ./buildlog.txt
+
   test:
     name: Run Tests
     runs-on: ubuntu-latest
