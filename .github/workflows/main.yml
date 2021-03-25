@@ -59,11 +59,17 @@ jobs:
           targetdir: 'coveragereport'
           reporttypes: 'HtmlInline;Cobertura'
 
+      - name: Zip coverage
+        uses: thedoctor0/zip-release@master
+        with:
+          filename: 'coverage-report.zip'
+          path: ./coveragereport
+
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v2
         with:
           name: CoverageReport
-          path: coveragereport
+          path: code-coverage.zip
           retention-days: 1
 
   build-dev:
@@ -193,7 +199,7 @@ jobs:
         with:
           files: | 
                  documentation.zip
-                 coveragereport
+                 code-coverage.zip
           body_path: ./CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
