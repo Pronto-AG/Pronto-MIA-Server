@@ -1,4 +1,4 @@
-namespace Pronto_MIA.Data
+namespace Pronto_MIA.Domain.Entities
 {
     using System.ComponentModel.DataAnnotations;
 

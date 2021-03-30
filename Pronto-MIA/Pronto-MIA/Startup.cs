@@ -3,10 +3,13 @@ namespace Pronto_MIA
     using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Pronto_MIA.Data;
+    using Pronto_MIA.DataAccess;
+    using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.Domain.Entities;
     using Pronto_MIA.Services;
 
     /// <summary>
@@ -18,7 +21,7 @@ namespace Pronto_MIA
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// Gets the correct configuration by dependency injection.
         /// </summary>
-        /// <param name="cfg">Configuration used by the startup class.</param>
+        /// <param name="cfg">Application configuration.</param>
         public Startup(IConfiguration cfg)
         {
             this.Cfg = cfg;
@@ -38,10 +41,11 @@ namespace Pronto_MIA
         /// <param name="services">The Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<UserManager, UserManager>();
             services.AddDatabaseService(this.Cfg);
-            services
-                .AddGraphQLServer()
-                .AddQueryType<Query>();
+            services.AddAuthorization();
+            services.AddAuthenticationService(this.Cfg);
+            services.AddGraphQLService();
         }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace Pronto_MIA
         public void AddSpeaker(IServiceProvider serviceProvider)
         {
             using (
-                var context = serviceProvider.GetService<InformbobDbContext>())
+                var context = serviceProvider.GetService<ProntoMIADbContext>())
             {
                 Speaker dani = new Speaker
                 {
@@ -88,17 +92,54 @@ namespace Pronto_MIA
             IServiceProvider serviceProvider)
         {
             this.AddSpeaker(serviceProvider);
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            this.ConfigureAppExceptions(app, env);
+
+            app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGraphQL("/");
             });
+        }
+
+        /// <summary>
+        /// Method to set the exception policy of ASP.NET depending on the
+        /// running environment.
+        /// </summary>
+        /// <param name="app">The application builder which will create the
+        /// application.</param>
+        /// <param name="env">The host environment.</param>
+        private void ConfigureAppExceptions(
+            IApplicationBuilder app,
+            IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = 200;
+                        context.Response.ContentType = "application/json";
+                        const string msg = "{ \"errors\": " +
+                                           "[ { \"message\": " +
+                                           "\"Invalid Request\", " +
+                                           "\"extensions\":"
+                                           + " { \"code\": " +
+                                           "\"INVALID_REQUEST\" } } ] }";
+                        await context.Response.WriteAsync(msg);
+                    });
+                });
+                app.UseHsts();
+            }
         }
     }
 }

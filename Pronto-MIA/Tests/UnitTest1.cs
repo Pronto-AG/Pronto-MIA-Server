@@ -1,6 +1,6 @@
 namespace Tests
 {
-    using Pronto_MIA.Data;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class UnitTest1
