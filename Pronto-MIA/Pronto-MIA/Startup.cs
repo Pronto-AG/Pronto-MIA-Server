@@ -7,6 +7,7 @@ namespace Pronto_MIA
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Net.Http.Headers;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
@@ -49,7 +50,9 @@ namespace Pronto_MIA
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("*");
+                        builder.WithOrigins("*")
+                            .WithHeaders(
+                                HeaderNames.ContentType, "application/json");
                     });
             });
             services.AddAuthenticationService(this.Cfg);
