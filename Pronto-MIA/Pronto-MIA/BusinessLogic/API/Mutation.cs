@@ -19,24 +19,15 @@ namespace Pronto_MIA.BusinessLogic.API
         {
             // you can now work with standard stream functionality of .NET to
             // handle the file.
-            try
+            await using Stream stream = upload.OpenReadStream();
+            await using (FileStream fs = File.Create("upload.pdf"))
             {
-                Console.WriteLine("Hello?");
-                await using Stream stream = upload.OpenReadStream();
-                await using (FileStream fs = File.Create("upload.pdf"))
-                {
-                    await stream.CopyToAsync(fs);
-                    stream.Close();
-                    fs.Close();
-                }
+                await stream.CopyToAsync(fs);
+                stream.Close();
+                fs.Close();
+            }
 
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return true;
         }
     }
 }

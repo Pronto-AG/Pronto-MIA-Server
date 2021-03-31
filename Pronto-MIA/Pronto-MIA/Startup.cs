@@ -44,6 +44,14 @@ namespace Pronto_MIA
             services.AddScoped<UserManager, UserManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "_myAllowSpecificOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyHeader();
+                    });
+            });
             services.AddAuthenticationService(this.Cfg);
             services.AddGraphQLService();
         }
@@ -99,6 +107,7 @@ namespace Pronto_MIA
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseCors("_myAllowSpecificOrigins");
 
             app.UseEndpoints(endpoints =>
             {
