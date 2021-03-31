@@ -51,8 +51,7 @@ namespace Pronto_MIA
                     builder =>
                     {
                         builder.WithOrigins("*")
-                            .WithHeaders(
-                                HeaderNames.ContentType, "application/json");
+                            .AllowAnyHeader();
                     });
             });
             services.AddAuthenticationService(this.Cfg);
