@@ -1,3 +1,5 @@
+using HotChocolate.Types;
+
 namespace Pronto_MIA.Services
 {
     using System;
@@ -25,7 +27,9 @@ namespace Pronto_MIA.Services
         {
             services.AddGraphQLServer()
                 .AddAuthorization()
-                .AddQueryType<Query>();
+                .AddType<UploadType>()
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>();
             AddErrorHandling(services);
         }
 

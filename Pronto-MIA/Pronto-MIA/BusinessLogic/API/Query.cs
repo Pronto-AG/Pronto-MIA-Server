@@ -1,10 +1,15 @@
+using System;
+
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
+    using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Execution;
+    using HotChocolate.Types;
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess;
@@ -64,6 +69,16 @@ namespace Pronto_MIA.BusinessLogic.API
             }
 
             return checkUser.Item2;
+        }
+
+        /// <summary>
+        /// Method to get a pdf from the server.
+        /// </summary>
+        /// <returns>Link to the pdf.</returns>
+        [Authorize]
+        public string GetPdf()
+        {
+            return "HelloWorld";
         }
     }
 }
