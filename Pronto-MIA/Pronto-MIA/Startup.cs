@@ -46,10 +46,10 @@ namespace Pronto_MIA
             services.AddAuthorization();
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "_myAllowSpecificOrigins",
+                options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.AllowAnyHeader();
+                        builder.WithOrigins("*");
                     });
             });
             services.AddAuthenticationService(this.Cfg);
@@ -107,7 +107,7 @@ namespace Pronto_MIA
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors("_myAllowSpecificOrigins");
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
