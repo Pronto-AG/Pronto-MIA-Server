@@ -1,5 +1,3 @@
-using System;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -76,9 +74,13 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </summary>
         /// <returns>Link to the pdf.</returns>
         [Authorize]
-        public string GetPdf()
+        public DeploymentPlan GetPdf()
         {
-            return "HelloWorld";
+            return new DeploymentPlan
+            {
+                Link = "https://localhost:5001/StaticFiles/upload.pdf",
+            };
         }
     }
 }
+

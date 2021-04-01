@@ -1,5 +1,3 @@
-using System;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -20,7 +18,8 @@ namespace Pronto_MIA.BusinessLogic.API
             // you can now work with standard stream functionality of .NET to
             // handle the file.
             await using Stream stream = upload.OpenReadStream();
-            await using (FileStream fs = File.Create("upload.pdf"))
+            await using (FileStream fs =
+                File.Create("../../files/upload.pdf"))
             {
                 await stream.CopyToAsync(fs);
                 stream.Close();

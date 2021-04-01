@@ -1,3 +1,7 @@
+using System.IO;
+using HotChocolate.AspNetCore;
+using Microsoft.Extensions.FileProviders;
+
 namespace Pronto_MIA
 {
     using System;
@@ -111,9 +115,21 @@ namespace Pronto_MIA
             app.UseAuthorization();
             app.UseCors();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(),
+                        "../../files")),
+                RequestPath = "/StaticFiles",
+            });
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGraphQL("/");
+                endpoints.MapGraphQL().WithOptions(
+                    new GraphQLServerOptions
+                    {
+                        Tool = { Enable = env.IsDevelopment() },
+                    });
             });
         }
 
