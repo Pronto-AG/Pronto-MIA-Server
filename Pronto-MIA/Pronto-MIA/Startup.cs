@@ -1,5 +1,7 @@
 using System.IO;
+using System.Net;
 using HotChocolate.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.FileProviders;
 
 namespace Pronto_MIA
@@ -48,7 +50,12 @@ namespace Pronto_MIA
         {
             services.AddScoped<UserManager, UserManager>();
             services.AddDatabaseService(this.Cfg);
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(

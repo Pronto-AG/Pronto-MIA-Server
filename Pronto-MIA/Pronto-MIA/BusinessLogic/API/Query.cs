@@ -1,3 +1,5 @@
+using System;
+
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -76,10 +78,11 @@ namespace Pronto_MIA.BusinessLogic.API
         [Authorize]
         public DeploymentPlan GetPdf()
         {
-            return new DeploymentPlan
+            var dpl = new DeploymentPlan
             {
-                Link = "https://localhost:5001/StaticFiles/upload.pdf",
+                Link = new Uri("https://localhost:5001/StaticFiles/upload.pdf"),
             };
+            return dpl;
         }
     }
 }

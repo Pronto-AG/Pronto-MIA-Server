@@ -1,7 +1,8 @@
 namespace Pronto_MIA.Domain.Entities
 {
+    using System;
     public class DeploymentPlan
     {
-        public string Link { get; set; }
+        public Uri Link { get; set; }
     }
 }
