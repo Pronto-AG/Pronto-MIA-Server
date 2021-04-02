@@ -75,8 +75,15 @@ _[Ss]cripts
 *.dot[Cc]over
 
 # Specific
+## Docker-Compose dev files
 dev/
+## Dev Environment upload files
+files/
+## Intellij files
 **/.idea/
+## Documentation files
 doc/
+## Production build files
 **/app/
+## Environment variables
 .env

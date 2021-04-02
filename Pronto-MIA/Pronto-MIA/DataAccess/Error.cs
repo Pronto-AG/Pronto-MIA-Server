@@ -22,6 +22,12 @@ namespace Pronto_MIA.DataAccess
         /// found.
         /// </summary>
         UserNotFound,
+        
+        /// <summary>
+        /// Error code representing that the deployment plan searched for could
+        /// not be found.
+        /// </summary>
+        DeploymentPlanNotFound,
 
         /// <summary>
         /// Error code representing that the password provided did not match
@@ -36,10 +42,15 @@ namespace Pronto_MIA.DataAccess
         IllegalUserOperation,
 
         /// <summary>
-        /// Error code respresenting that the connection to the database could
+        /// Error code representing that the connection to the database could
         /// not be established.
         /// </summary>
         DatabaseUnavailable,
+
+        /// <summary>
+        /// Error code representing that a file operation could not be done.
+        /// </summary>
+        FileOperationError,
 
         /// <summary>
         /// Error code representing that the error which occured could not be

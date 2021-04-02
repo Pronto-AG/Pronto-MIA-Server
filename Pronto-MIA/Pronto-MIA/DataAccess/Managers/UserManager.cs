@@ -5,6 +5,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Linq;
     using System.Security.Claims;
     using System.Text;
+    using LanguageExt;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.IdentityModel.Tokens;
@@ -60,7 +61,7 @@ namespace Pronto_MIA.DataAccess.Managers
         /// error will be null and the string will contain a JWT-Bearer-Token.
         /// If an error occured the string will be null and the error will
         /// contain the corresponding error object.</returns>
-        public Tuple<DataAccess.Error?, string> Authenticate(
+        public Either<DataAccess.Error, string> Authenticate(
             string userName, string password)
         {
             var user = this.dbContext.Users.SingleOrDefault(
@@ -70,8 +71,7 @@ namespace Pronto_MIA.DataAccess.Managers
             {
                 this.logger.LogWarning(
                     "Invalid userName {UserName}", userName);
-                return new Tuple<DataAccess.Error?, string>(
-                    DataAccess.Error.UserNotFound, null);
+                return DataAccess.Error.UserNotFound;
             }
 
             var hashGenerator = HashGeneratorFactory.GetGeneratorForUser(user);
@@ -81,12 +81,10 @@ namespace Pronto_MIA.DataAccess.Managers
             {
                 this.logger.LogWarning(
                     "Invalid password for user {UserName}", userName);
-                return new Tuple<DataAccess.Error?, string>(
-                    DataAccess.Error.WrongPassword, null);
+                return DataAccess.Error.WrongPassword;
             }
 
-            return new Tuple<DataAccess.Error?, string>(
-                null, this.GenerateToken(user));
+            return this.GenerateToken(user);
         }
 
         private string GenerateToken(User user)

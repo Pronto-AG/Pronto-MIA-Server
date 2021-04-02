@@ -22,22 +22,20 @@ namespace Pronto_MIA.DataAccess
         {
         }
 
-       /*protected override void OnConfiguring(
-           DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql("Host=127.0.0.1;" +
-                                        "Database=informbob;" +
-                                        "Username=informbob-db-admin;" +
-                                        "Password=super-secure-babula");*/
-
-       /// <summary>
-       /// Gets or sets the contents of a DBSet containing speakers.
-       /// </summary>
+        /// <summary>
+        /// Gets or sets the DBSet containing speakers.
+        /// </summary>
         public DbSet<Speaker> Speakers { get; set; }
 
-       /// <summary>
-       /// Gets or sets the contents of a DBSet containing users.
-       /// </summary>
+        /// <summary>
+        /// Gets or sets the DBSet containing users.
+        /// </summary>
         public DbSet<User> Users { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DBSet containing deployment plans.
+        /// </summary>
+        public DbSet<DeploymentPlan> DeploymentPlans { get; set; }
 
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,6 +43,8 @@ namespace Pronto_MIA.DataAccess
            base.OnModelCreating(modelBuilder);
 
            modelBuilder.ApplyConfiguration(new UserTypeConfig());
+           modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
+
            var generatorOptions = new Pbkdf2GeneratorOptions(
                1500);
            var generator = new Pbkdf2Generator(generatorOptions);

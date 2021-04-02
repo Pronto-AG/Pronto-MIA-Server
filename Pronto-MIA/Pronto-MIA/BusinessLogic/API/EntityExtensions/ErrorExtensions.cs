@@ -48,12 +48,16 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Username already taken";
                 case DataAccess.Error.UserNotFound:
                     return "Could not find given user";
+                case DataAccess.Error.DeploymentPlanNotFound:
+                    return "Could not find given deployment plan";
                 case DataAccess.Error.WrongPassword:
                     return "Wrong password for given user";
                 case DataAccess.Error.IllegalUserOperation:
                     return "Given user not allowed to perform this action";
                 case DataAccess.Error.DatabaseUnavailable:
                     return "Connection to database failed";
+                case DataAccess.Error.FileOperationError:
+                    return "A file operation error occured";
                 case DataAccess.Error.UnknownError:
                     return "An unknown internal error occured";
                 default: throw new ArgumentException(

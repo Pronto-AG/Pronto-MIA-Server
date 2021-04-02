@@ -3,6 +3,7 @@ using HotChocolate.Types;
 namespace Pronto_MIA.Services
 {
     using System;
+    using Domain.Entities;
     using Microsoft.Extensions.DependencyInjection;
     using Npgsql;
     using Pronto_MIA.BusinessLogic.API;
@@ -27,7 +28,11 @@ namespace Pronto_MIA.Services
         {
             services.AddGraphQLServer()
                 .AddAuthorization()
+                .AddSorting()
+                .AddFiltering()
+                .AddProjections()
                 .AddType<UploadType>()
+                .AddType<DeploymentPlanResolvers>()
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>();
             AddErrorHandling(services);
@@ -56,10 +61,7 @@ namespace Pronto_MIA.Services
                             .WithMessage(
                                 Error.DatabaseUnavailable.Message());
                     default:
-                        return error
-                            .WithCode(Error.UnknownError.ToString())
-                            .WithMessage(
-                                Error.UnknownError.Message());
+                        return error;
                 }
             });
         }

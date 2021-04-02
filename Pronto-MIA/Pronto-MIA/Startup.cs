@@ -1,19 +1,16 @@
-using System.IO;
-using System.Net;
-using HotChocolate.AspNetCore;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.FileProviders;
-
 namespace Pronto_MIA
 {
     using System;
+    using System.IO;
+    using HotChocolate.AspNetCore;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Net.Http.Headers;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
@@ -48,13 +45,16 @@ namespace Pronto_MIA
         /// <param name="services">The Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
             services.AddScoped<UserManager, UserManager>();
+            services.AddScoped<FileManager, FileManager>();
+            services.AddScoped<DeploymentPlanManager, DeploymentPlanManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization(options =>
             {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                /*options.FallbackPolicy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
-                    .Build();
+                    .Build();*/
             });
             services.AddCors(options =>
             {
@@ -125,9 +125,11 @@ namespace Pronto_MIA
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(),
+                    Path.Combine(
+                        Directory.GetCurrentDirectory(),
                         "../../files")),
-                RequestPath = "/StaticFiles",
+                RequestPath = "/" +
+                    this.Cfg.GetValue<string>("API:STATIC_FILE_ENDPOINT"),
             });
 
             app.UseEndpoints(endpoints =>

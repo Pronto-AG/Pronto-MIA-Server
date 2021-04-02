@@ -3,13 +3,13 @@ using System;
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
-    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
+    using HotChocolate.Data;
     using HotChocolate.Execution;
-    using HotChocolate.Types;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess;
@@ -62,28 +62,19 @@ namespace Pronto_MIA.BusinessLogic.API
             string userName,
             string password)
         {
-            var checkUser = userManager.Authenticate(userName, password);
-            if (checkUser.Item1 != null)
-            {
-                throw ((DataAccess.Error)checkUser.Item1).AsQueryException();
-            }
-
-            return checkUser.Item2;
+            return userManager.Authenticate(userName, password).Match(
+                token => token,
+                error => throw error.AsQueryException());
         }
 
-        /// <summary>
-        /// Method to get a pdf from the server.
-        /// </summary>
-        /// <returns>Link to the pdf.</returns>
+        // [UseProjection]
+        [UseFiltering]
+        [UseSorting]
         [Authorize]
-        public DeploymentPlan GetPdf()
+        public async Task<IQueryable<DeploymentPlan?>> DeploymentPlans(
+            [Service] DeploymentPlanManager deploymentPlanManager)
         {
-            var dpl = new DeploymentPlan
-            {
-                Link = new Uri("https://localhost:5001/StaticFiles/upload.pdf"),
-            };
-            return dpl;
+            return deploymentPlanManager.GetAll();
         }
     }
 }
-
