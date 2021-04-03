@@ -23,11 +23,6 @@ namespace Pronto_MIA.DataAccess
         }
 
         /// <summary>
-        /// Gets or sets the DBSet containing speakers.
-        /// </summary>
-        public DbSet<Speaker> Speakers { get; set; }
-
-        /// <summary>
         /// Gets or sets the DBSet containing users.
         /// </summary>
         public DbSet<User> Users { get; set; }

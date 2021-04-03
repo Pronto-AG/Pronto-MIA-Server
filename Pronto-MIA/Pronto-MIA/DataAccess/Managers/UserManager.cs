@@ -84,6 +84,8 @@ namespace Pronto_MIA.DataAccess.Managers
                 return DataAccess.Error.WrongPassword;
             }
 
+            this.logger.LogDebug(
+                "User {UserName} has been authenticated", userName);
             return this.GenerateToken(user);
         }
 
@@ -109,6 +111,9 @@ namespace Pronto_MIA.DataAccess.Managers
                 signingCredentials: credentials);
 
             var tokenString = tokenHandler.WriteToken(token);
+            this.logger.LogDebug(
+                "Token for user {UserName} has been created",
+                user.UserName);
             return tokenString;
         }
     }

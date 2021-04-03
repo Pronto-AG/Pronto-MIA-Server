@@ -1,9 +1,8 @@
-using HotChocolate.Types;
-
 namespace Pronto_MIA.Services
 {
     using System;
-    using Domain.Entities;
+    using System.Runtime.CompilerServices;
+    using HotChocolate.Types;
     using Microsoft.Extensions.DependencyInjection;
     using Npgsql;
     using Pronto_MIA.BusinessLogic.API;
@@ -61,7 +60,11 @@ namespace Pronto_MIA.Services
                             .WithMessage(
                                 Error.DatabaseUnavailable.Message());
                     default:
-                        return error;
+                        return error
+                            .WithCode(Error.UnknownError
+                                .ToString())
+                            .WithMessage(
+                                Error.UnknownError.Message());
                 }
             });
         }

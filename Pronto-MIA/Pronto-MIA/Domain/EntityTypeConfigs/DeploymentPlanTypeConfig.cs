@@ -23,12 +23,13 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.Property(dP => dP.Id).ValueGeneratedOnAdd();
             builder.Property(dP => dP.AvailableFrom).IsRequired();
             builder.Property(dP => dP.AvailableUntil).IsRequired();
-            builder.Property(dP => dP.fileUUID).IsRequired();
-            builder.HasIndex(dP => dP.fileUUID).IsUnique();
-            builder.Property(dP => dP.fileUUID)
+            builder.Property(dP => dP.FileUUID).IsRequired();
+            builder.HasIndex(dP => dP.FileUUID).IsUnique();
+            builder.Property(dP => dP.FileUUID)
                 .HasConversion(
                     uuid => uuid.ToString(),
                     uuid => Guid.Parse(uuid));
+            builder.Property(dP => dP.FileExtension).IsRequired();
         }
     }
 }

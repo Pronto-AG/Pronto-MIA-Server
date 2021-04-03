@@ -22,7 +22,7 @@ namespace Pronto_MIA.DataAccess
         /// found.
         /// </summary>
         UserNotFound,
-        
+
         /// <summary>
         /// Error code representing that the deployment plan searched for could
         /// not be found.

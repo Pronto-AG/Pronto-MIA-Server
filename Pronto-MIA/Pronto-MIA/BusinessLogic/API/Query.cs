@@ -1,5 +1,3 @@
-using System;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -35,16 +33,6 @@ namespace Pronto_MIA.BusinessLogic.API
         private IConfiguration Cfg { get; }
 
         /// <summary>
-        /// Method to get speakers from the database.
-        /// </summary>
-        /// <param name="context">The database context to get the speakers from.
-        /// </param>
-        /// <returns>An IQueryable containing the speakers.</returns>
-        [Authorize]
-        public IQueryable<Speaker> GetSpeakers(
-            [Service] ProntoMIADbContext context) => context.Speakers;
-
-        /// <summary>
         /// Method which allows the user to retrieve a token which may then be
         /// used for authentication in further requests.
         /// </summary>
@@ -67,11 +55,17 @@ namespace Pronto_MIA.BusinessLogic.API
                 error => throw error.AsQueryException());
         }
 
+        /// <summary>
+        /// Method which retrieves the available deployment plans.
+        /// </summary>
+        /// <param name="deploymentPlanManager">The deployment plan manager
+        /// responsible for managing deployment plans.</param>
+        /// <returns>Queryable of all available deployment plans.</returns>
         // [UseProjection]
         [UseFiltering]
         [UseSorting]
         [Authorize]
-        public async Task<IQueryable<DeploymentPlan?>> DeploymentPlans(
+        public IQueryable<DeploymentPlan?> DeploymentPlans(
             [Service] DeploymentPlanManager deploymentPlanManager)
         {
             return deploymentPlanManager.GetAll();

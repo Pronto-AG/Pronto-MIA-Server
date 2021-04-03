@@ -2,8 +2,8 @@ namespace Pronto_MIA
 {
     using System;
     using System.IO;
+    using System.Net;
     using HotChocolate.AspNetCore;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -49,13 +49,9 @@ namespace Pronto_MIA
             services.AddScoped<UserManager, UserManager>();
             services.AddScoped<FileManager, FileManager>();
             services.AddScoped<DeploymentPlanManager, DeploymentPlanManager>();
+            services.AddSingleton<FirebaseManager, FirebaseManager>();
             services.AddDatabaseService(this.Cfg);
-            services.AddAuthorization(options =>
-            {
-                /*options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();*/
-            });
+            services.AddAuthorization();
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -70,37 +66,6 @@ namespace Pronto_MIA
         }
 
         /// <summary>
-        /// Creates a new speaker and inserts it into the database.
-        /// </summary>
-        /// <param name="serviceProvider">Dependency injected service provider
-        /// used for finding the database service. </param>
-        /// <exception cref="NullReferenceException">If the database service
-        /// cannot be found.</exception>
-        public void AddSpeaker(IServiceProvider serviceProvider)
-        {
-            using (
-                var context = serviceProvider.GetService<ProntoMIADbContext>())
-            {
-                Speaker dani = new Speaker
-                {
-                    Bio = "Hello Friends im Dani",
-                    Name = "Dani Lombarti",
-                    WebSite = "danilombarti.com.uk",
-                };
-
-                if (context != null)
-                {
-                    context.Add(dani);
-                    context.SaveChanges();
-                }
-                else
-                {
-                    throw new NullReferenceException();
-                }
-            }
-        }
-
-        /// <summary>
         /// This method gets called by the runtime. Use this method to configure
         /// the HTTP request pipeline.
         /// </summary>
@@ -112,33 +77,22 @@ namespace Pronto_MIA
             IWebHostEnvironment env,
             IServiceProvider serviceProvider)
         {
-            this.AddSpeaker(serviceProvider);
             this.ConfigureAppExceptions(app, env);
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors();
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "../../files")),
-                RequestPath = "/" +
-                    this.Cfg.GetValue<string>("API:STATIC_FILE_ENDPOINT"),
-            });
-
+            this.ConfigureStaticFiles(app);
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGraphQL().WithOptions(
-                    new GraphQLServerOptions
-                    {
-                        Tool = { Enable = env.IsDevelopment() },
-                    });
+                endpoints.MapGraphQL("/" +
+                    this.Cfg.GetValue<string>("API:GRAPHQL_ENDPOINT"))
+                    .WithOptions(
+                        new GraphQLServerOptions
+                        {
+                            Tool = { Enable = env.IsDevelopment() },
+                        });
             });
         }
 
@@ -176,6 +130,38 @@ namespace Pronto_MIA
                 });
                 app.UseHsts();
             }
+        }
+
+        /// <summary>
+        /// Method to configure the static file endpoint. This endpoint is used
+        /// in order to serve files connected to deployment plans or other
+        /// application object.
+        /// </summary>
+        /// <param name="app">The application builder which will be extended
+        /// with the endpoint.</param>
+        private void ConfigureStaticFiles(IApplicationBuilder app)
+        {
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    if (ctx.Context.User.Identity == null ||
+                        ctx.Context.User.Identity.IsAuthenticated)
+                    {
+                        return;
+                    }
+
+                    ctx.Context.Response.StatusCode =
+                        (int)HttpStatusCode.Unauthorized;
+                    ctx.Context.Response.ContentLength = 0;
+                    ctx.Context.Response.Body = Stream.Null;
+                },
+                FileProvider = new PhysicalFileProvider(
+                    this.Cfg.GetValue<string>("StaticFiles:ROOT_DIRECTORY")),
+                RequestPath = "/" +
+                              this.Cfg.GetValue<string>(
+                                  "API:STATIC_FILE_ENDPOINT"),
+            });
         }
     }
 }
