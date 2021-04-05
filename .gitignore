@@ -73,8 +73,19 @@ _[Ss]cripts
 *.nupkg
 *.ncrunchsolution
 *.dot[Cc]over
-# Dev directory for docker
+
+# Specific
+## Docker-Compose dev files
 dev/
+## Dev Environment upload files
+files/
+## Intellij files
 **/.idea/
+## Documentation files
 doc/
+## Production build files
 **/app/
+## Environment variables
+.env
+## Production buildlog
+Pronto-MIA/buildlog.txt 

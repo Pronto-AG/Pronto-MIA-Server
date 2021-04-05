@@ -1,12 +1,17 @@
 namespace Pronto_MIA
 {
     using System;
+    using System.IO;
+    using System.Net;
+    using HotChocolate.AspNetCore;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
-    using Pronto_MIA.Data;
+    using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Services;
 
     /// <summary>
@@ -18,7 +23,7 @@ namespace Pronto_MIA
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// Gets the correct configuration by dependency injection.
         /// </summary>
-        /// <param name="cfg">Configuration used by the startup class.</param>
+        /// <param name="cfg">Application configuration.</param>
         public Startup(IConfiguration cfg)
         {
             this.Cfg = cfg;
@@ -38,41 +43,24 @@ namespace Pronto_MIA
         /// <param name="services">The Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+            services.AddScoped<UserManager, UserManager>();
+            services.AddScoped<FileManager, FileManager>();
+            services.AddScoped<DeploymentPlanManager, DeploymentPlanManager>();
+            services.AddSingleton<FirebaseManager, FirebaseManager>();
             services.AddDatabaseService(this.Cfg);
-            services
-                .AddGraphQLServer()
-                .AddQueryType<Query>();
-        }
-
-        /// <summary>
-        /// Creates a new speaker and inserts it into the database.
-        /// </summary>
-        /// <param name="serviceProvider">Dependency injected service provider
-        /// used for finding the database service. </param>
-        /// <exception cref="NullReferenceException">If the database service
-        /// cannot be found.</exception>
-        public void AddSpeaker(IServiceProvider serviceProvider)
-        {
-            using (
-                var context = serviceProvider.GetService<InformbobDbContext>())
+            services.AddAuthorization();
+            services.AddCors(options =>
             {
-                Speaker dani = new Speaker
-                {
-                    Bio = "Hello Friends im Dani",
-                    Name = "Dani Lombarti",
-                    WebSite = "danilombarti.com.uk",
-                };
-
-                if (context != null)
-                {
-                    context.Add(dani);
-                    context.SaveChanges();
-                }
-                else
-                {
-                    throw new NullReferenceException();
-                }
-            }
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("*")
+                            .AllowAnyHeader();
+                    });
+            });
+            services.AddAuthenticationService(this.Cfg);
+            services.AddGraphQLService();
         }
 
         /// <summary>
@@ -87,17 +75,90 @@ namespace Pronto_MIA
             IWebHostEnvironment env,
             IServiceProvider serviceProvider)
         {
-            this.AddSpeaker(serviceProvider);
+            this.ConfigureAppExceptions(app, env);
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseCors();
+            this.ConfigureStaticFiles(app);
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGraphQL("/" +
+                    this.Cfg.GetValue<string>("API:GRAPHQL_ENDPOINT"))
+                    .WithOptions(
+                        new GraphQLServerOptions
+                        {
+                            Tool = { Enable = env.IsDevelopment() },
+                        });
+            });
+        }
+
+        /// <summary>
+        /// Method to set the exception policy of ASP.NET depending on the
+        /// running environment.
+        /// </summary>
+        /// <param name="app">The application builder which will create the
+        /// application.</param>
+        /// <param name="env">The host environment.</param>
+        private void ConfigureAppExceptions(
+            IApplicationBuilder app,
+            IWebHostEnvironment env)
+        {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            else
             {
-                endpoints.MapGraphQL("/");
+                app.UseExceptionHandler(errorApp =>
+                {
+                    errorApp.Run(async context =>
+                    {
+                        context.Response.StatusCode = 200;
+                        context.Response.ContentType = "application/json";
+                        const string msg = "{ \"errors\": " +
+                                           "[ { \"message\": " +
+                                           "\"Invalid Request\", " +
+                                           "\"extensions\":"
+                                           + " { \"code\": " +
+                                           "\"INVALID_REQUEST\" } } ] }";
+                        await context.Response.WriteAsync(msg);
+                    });
+                });
+                app.UseHsts();
+            }
+        }
+
+        /// <summary>
+        /// Method to configure the static file endpoint. This endpoint is used
+        /// in order to serve files connected to deployment plans or other
+        /// application object.
+        /// </summary>
+        /// <param name="app">The application builder which will be extended
+        /// with the endpoint.</param>
+        private void ConfigureStaticFiles(IApplicationBuilder app)
+        {
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    if (ctx.Context.User.Identity == null ||
+                        ctx.Context.User.Identity.IsAuthenticated)
+                    {
+                        return;
+                    }
+
+                    ctx.Context.Response.StatusCode =
+                        (int)HttpStatusCode.Unauthorized;
+                    ctx.Context.Response.ContentLength = 0;
+                    ctx.Context.Response.Body = Stream.Null;
+                },
+                FileProvider = new PhysicalFileProvider(
+                    this.Cfg.GetValue<string>("StaticFiles:ROOT_DIRECTORY")),
+                RequestPath = "/" +
+                              this.Cfg.GetValue<string>(
+                                  "API:STATIC_FILE_ENDPOINT"),
             });
         }
     }

@@ -1,6 +1,7 @@
 namespace Tests
 {
-    using Pronto_MIA.Data;
+    using System;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class UnitTest1
@@ -15,11 +16,9 @@ namespace Tests
         [Fact]
         public void Test2()
         {
-            var speak = new Speaker
-            {
-                Name = "Dani",
-            };
-            Assert.Equal("Dani", speak.Name);
+            var deploymentPlan = new DeploymentPlan(
+                DateTime.UtcNow.Date, DateTime.UtcNow);
+            Assert.Equal(string.Empty, deploymentPlan.FileExtension);
         }
     }
 }

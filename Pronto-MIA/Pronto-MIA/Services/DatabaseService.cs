@@ -3,7 +3,7 @@ namespace Pronto_MIA.Services
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Pronto_MIA.Data;
+    using Pronto_MIA.DataAccess;
 
     /// <summary>
     /// Class containing all logic regarding the database service.
@@ -21,9 +21,9 @@ namespace Pronto_MIA.Services
             this IServiceCollection services,
             IConfiguration cfg)
         {
-            services.AddDbContext<InformbobDbContext>(options =>
+            services.AddDbContext<ProntoMIADbContext>(options =>
                 options.UseNpgsql(
-                    cfg.GetConnectionString("InformbobDBContext")));
+                    cfg.GetConnectionString("ProntoMIADbContext")));
         }
     }
 }
