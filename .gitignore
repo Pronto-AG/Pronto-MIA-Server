@@ -87,3 +87,5 @@ doc/
 **/app/
 ## Environment variables
 .env
+## Production buildlog
+Pronto-MIA/buildlog.txt 

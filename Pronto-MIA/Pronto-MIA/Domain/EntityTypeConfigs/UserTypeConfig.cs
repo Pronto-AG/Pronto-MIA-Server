@@ -22,8 +22,8 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.HasIndex(u => u.UserName).IsUnique();
             builder.Property(u => u.UserName).IsRequired();
             builder.Property(u => u.PasswordHash).IsRequired();
-            builder.Property(u => u.HashGeneratorOptions).IsRequired();
             builder.Property(u => u.HashGeneratorOptions)
+                .IsRequired()
                 .HasColumnType("jsonb");
         }
     }
