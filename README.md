@@ -13,7 +13,35 @@ All available settings for the application can be defined within three json file
     - Contains the settings required for the application to run in production mode. Those settings will not be loaded if the application is run in development mode.
 
 ### Available options
+The following options are available and have to be set in order for the application to function.
 
+#### Logging
+- `Logging:LogLevel:Default` -> The log level which is taken by the log provider in order to filter log events.
+- `Logging:LogLevel:Microsoft` -> The log level which is taken by the log provider in order to filter log events regarding the `Microsoft` namespace.
+- `Logging:LogLevel:Microsoft.Hosting.Lifetime` -> The log level which is taken by the log provider in order to filter log events regarding the `Microsoft.Hosting.Lifetime` namespace.
+
+#### ASP.NET
+- `AllowedHosts`-> The hostsnames which the application may bind to.
+
+#### API
+- `API:GRAPHQL_ENDPOINT` -> The endpoint which will server the GraphQL-API. This option contains relative url from the hosts root.
+
+#### ConnectionStrings
+- `ConnectionStrings:ProntoMIADbContext` -> Option containing the postgres connection string used by the application to connect to the database.
+
+#### StaticFiles
+- `StaticFiles:ENDPOINT` -> The endpoint over which static files delivered by the application will be served. This option contains relative url from the hosts root.
+- `StaticFiles:ROOT_DIRECTORY` -> The directory where static files served by the application will be stored. This option contains an absolute path to the target directory.
+
+#### JWT
+- `JWT:ISSUER` -> The issuer used to sign authentication tokens created by this application.
+- `JWT:AUDIENCE` -> Audience specified within the authentication tokens created by this application.
+- `JWT:SIGNING_KEY` -> Key used to sign the authentication tokens of this application. This information is highly confidential and should be kept secret.
+- `JWT:VALID_FOR_DAYS` -> Integer telling the application how long a token should remain valid.
+- `JWT:REQUIRE_HTTPS` -> Defines if the authentication requires https.
+
+#### Firebase
+- `Firebase:CREDENTIAL_FILE` -> Path to the file where the credentials needed by firebase are stored. This option contains an absolute path to the file on the file system.
 
 ## Development setup
 In order to be able to adjust the application server you will first need to setup the development environment correctly. In order to do this the following prerequisites need to be installed:
