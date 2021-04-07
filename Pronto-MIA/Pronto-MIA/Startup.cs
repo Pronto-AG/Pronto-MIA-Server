@@ -11,6 +11,7 @@ namespace Pronto_MIA
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
+    using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Services;
 
@@ -24,7 +25,8 @@ namespace Pronto_MIA
         /// Gets the correct configuration by dependency injection.
         /// </summary>
         /// <param name="cfg">Application configuration.</param>
-        public Startup(IConfiguration cfg)
+        public Startup(
+            IConfiguration cfg)
         {
             this.Cfg = cfg;
         }
@@ -32,7 +34,7 @@ namespace Pronto_MIA
         /// <summary>
         /// Gets the configuration used by the startup class.
         /// </summary>
-        public IConfiguration Cfg { get; }
+        private IConfiguration Cfg { get; }
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to add
@@ -75,6 +77,8 @@ namespace Pronto_MIA
             IWebHostEnvironment env,
             IServiceProvider serviceProvider)
         {
+            DbMigrationHelper.Migrate(app);
+
             this.ConfigureAppExceptions(app, env);
             app.UseHttpsRedirection();
             app.UseRouting();
