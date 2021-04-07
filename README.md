@@ -21,16 +21,16 @@ The following options are available and have to be set in order for the applicat
 - `Logging:LogLevel:Microsoft.Hosting.Lifetime` -> The log level which is taken by the log provider in order to filter log events regarding the `Microsoft.Hosting.Lifetime` namespace.
 
 #### ASP.NET
-- `AllowedHosts`-> The hostsnames which the application may bind to.
+- `AllowedHosts`-> The hostnames which the application may bind to.
 
 #### API
-- `API:GRAPHQL_ENDPOINT` -> The endpoint which will server the GraphQL-API. This option contains relative url from the hosts root.
+- `API:GRAPHQL_ENDPOINT` -> The endpoint which will serve the GraphQL-API. This option contains a relative url from the host's root.
 
 #### ConnectionStrings
 - `ConnectionStrings:ProntoMIADbContext` -> Option containing the postgres connection string used by the application to connect to the database.
 
 #### StaticFiles
-- `StaticFiles:ENDPOINT` -> The endpoint over which static files delivered by the application will be served. This option contains relative url from the hosts root.
+- `StaticFiles:ENDPOINT` -> The endpoint over which static files delivered by the application will be served. This option contains a relative url from the host's root.
 - `StaticFiles:ROOT_DIRECTORY` -> The directory where static files served by the application will be stored. This option contains an absolute path to the target directory.
 
 #### JWT
@@ -55,12 +55,12 @@ After the prerequisites are installed on your system you might initalize the dev
 2. Change your working directory into the repository
 3. Run `docker-compose -f docker-compose.dev.yml up`
     - This command will create and start a postgres database configured to work with the connection string within the `appsettings.Development.json` configuration file.
-4. After the database is running it needs to be seeded in order to be usable by the application. To do this run `dotnet ef database update`. This command will create all tables and contents required by the application within the database.
+4. As soon as the database is running, it needs to be seeded in order to be usable by the application. To do this run `dotnet ef database update`. This command will create all tables and contents required by the application within the database.
 5. Adjust the configuration within `appsettings.Development.json` to fit your needs. The settings `StaticFiles:ROOT_DIRECTORY` and `Firebase:CREDENTIAL_FILE` need static paths to where you want those places to be on your system. Therefore those settings need to be adjusted.
 6. Now you may open the application folder `Pronto-MIA` with the .Net IDE of your choice and adjust/run the application.
 
 ## Production Setup
-The easiest way to run the application in production mode is to download the prebuild docker container and map the needed configuration and authentication files into it. Three assets need to be mapped into the container as is demostrated in the `docker-compose.yml` file contained within the repository. Those assets are:
+The easiest way to run the application in production mode is to download the prebuilt docker container and map the needed configuration and authentication files into it. Three assets need to be mapped into the container as demostrated in the `docker-compose.yml` file contained within the repository. Those assets are:
 1. The configuration files `appsettings.json` and `appsettings.Production.json` needed by the application.
 2. The `firebase-authentication.json` containing the authentication details needed by firebase to send messages. This file has to be mapped to the file specified in the setting `Firebase:CREDENTIAL_FILE`.
 3. A directory where the application can persist files. This directory has to be mapped to the directory specified in the setting `StaticFiles:ROOT_DIRECTORY`.
