@@ -2,7 +2,6 @@ version: "3.8"
 services:
   db:
     image: "postgres:13.0-alpine"
-    container_name: "db"
     restart: unless-stopped
     environment:
       - POSTGRES_DB=informbob
@@ -11,7 +10,7 @@ services:
     expose:
        - "5432"
     volumes:
-      - ./dev/db/data:/var/lib/postgresql/data
+      - ./prod/db/data:/var/lib/postgresql/data
     networks:
       - db
     deploy:
@@ -20,11 +19,13 @@ services:
           cpus: '0.40'
           memory: 200M
   app:
-    image: 6f9c244d2ea8
-    container_name: "Pronto-MIA"
+    image: ghcr.io/pronto-ag/pronto-mia-server:v0.1.0
     restart: unless-stopped
-    environment:
-      - pronto-mia_JWT__SIGNING_KEY=Thorsten-Doernbach
+    volumes:
+      - ./prod/app/config/appsettings.json:/app/appsettings.json
+      - ./prod/app/config/appsettings.Production.json:/app/appsettings.Production.json
+      - ./prod/app/config/firebase-credentials.json:/app/firebase-credentials.json
+      - ./prod/app/files:/files
     ports:
       - "5000:80"
     depends_on:
