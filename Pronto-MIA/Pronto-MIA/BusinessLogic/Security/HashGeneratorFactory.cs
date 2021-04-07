@@ -23,7 +23,7 @@ namespace Pronto_MIA.BusinessLogic.Security
         {
             switch (user.HashGenerator)
             {
-                case "Pbkdf2Generator":
+                case Pbkdf2Generator.Identifier:
                     var options = Pbkdf2GeneratorOptions.FromJson(
                         user.HashGeneratorOptions);
                     return new Pbkdf2Generator(

@@ -3,6 +3,7 @@ namespace Pronto_MIA
     using System;
     using System.IO;
     using System.Net;
+    using System.Security.Cryptography;
     using HotChocolate.AspNetCore;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -78,6 +79,12 @@ namespace Pronto_MIA
             IServiceProvider serviceProvider)
         {
             DbMigrationHelper.Migrate(app);
+            
+            var salt = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(salt);
+            Console.WriteLine(Convert.ToHexString(salt));
+            Console.WriteLine(Convert.ToBase64String(salt));
 
             this.ConfigureAppExceptions(app, env);
             app.UseHttpsRedirection();

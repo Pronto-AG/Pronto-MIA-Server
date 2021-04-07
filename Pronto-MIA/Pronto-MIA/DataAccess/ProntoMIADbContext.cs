@@ -47,7 +47,7 @@ namespace Pronto_MIA.DataAccess
            var franz = new User(
                "Franz",
                hash,
-               generator.GetType().Name,
+               Pbkdf2Generator.Identifier,
                generator.GetOptions().ToJson())
            {
                Id = -1,

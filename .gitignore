@@ -77,6 +77,8 @@ _[Ss]cripts
 # Specific
 ## Docker-Compose dev files
 dev/
+## Docker-Compose prod files
+prod/
 ## Dev Environment upload files
 files/
 ## Intellij files
