@@ -158,7 +158,7 @@ namespace Pronto_MIA
                     this.Cfg.GetValue<string>("StaticFiles:ROOT_DIRECTORY")),
                 RequestPath = "/" +
                               this.Cfg.GetValue<string>(
-                                  "API:STATIC_FILE_ENDPOINT"),
+                                  "StaticFiles:ENDPOINT"),
             });
         }
     }

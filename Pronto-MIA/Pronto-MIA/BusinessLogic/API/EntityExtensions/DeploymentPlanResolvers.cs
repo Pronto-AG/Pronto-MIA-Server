@@ -34,7 +34,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                           $"{request.Host.Value}" +
                           $"{request.PathBase.Value}";
             var staticFileRoot =
-                cfg.GetValue<string>("API:STATIC_FILE_ENDPOINT");
+                cfg.GetValue<string>("StaticFiles:ENDPOINT");
             var fileUrl = baseUrl + "/" + staticFileRoot + "/" +
                           DeploymentPlanManager.FileDirectory + "/" +
                           deploymentPlan.FileUUID +

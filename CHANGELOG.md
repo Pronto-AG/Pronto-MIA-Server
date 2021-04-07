@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2021-04-06
+### Added
+- Query endpoint "Authenticate" which allows a user to get an authentication token.
+- Query endpoint "DeploymentPlans" to view and filter available deployment plans.
+- Mutation endpoint "AddDeploymentPlan" to add a deployment plan.
+- Mutation endpoint "SendPushTo" to send a push notification to a device.
+- Authentication with username and password.
+
 ## [0.0.1] - 2021-03-24
 ### Changed
 - Created CI
