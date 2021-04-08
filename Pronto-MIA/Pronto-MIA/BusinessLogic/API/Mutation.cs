@@ -97,7 +97,7 @@ namespace Pronto_MIA.BusinessLogic.API
             var result = await
                 userManager.RegisterFcmToken(userState.UserName, token);
             return result.Match(
-                deploymentPlan => deploymentPlan,
+                returnValue => returnValue,
                 error => throw error.AsQueryException());
         }
 
