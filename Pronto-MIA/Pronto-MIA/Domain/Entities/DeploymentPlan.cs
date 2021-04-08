@@ -14,19 +14,12 @@ namespace Pronto_MIA.Domain.Entities
         /// graphql is able to generate a deployment plan object. This
         /// constructor should not be manually called.
         /// </summary>
-        /// <param name="availableFrom">The
-        /// <see cref="AvailableFrom"/> property.</param>
-        /// <param name="availableUntil">The
-        /// <see cref="AvailableUntil"/> property.</param>
-        public DeploymentPlan(
-            DateTime availableFrom,
-            DateTime availableUntil)
-            : this(
-                availableFrom,
-                availableUntil,
-                Guid.Empty,
-                string.Empty)
+        public DeploymentPlan()
         {
+            this.AvailableFrom = default;
+            this.AvailableUntil = default;
+            this.FileUUID = Guid.Empty;
+            this.FileExtension = string.Empty;
         }
 
         /// <summary>

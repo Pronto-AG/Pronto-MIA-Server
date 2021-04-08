@@ -68,8 +68,8 @@
       },
       "Castle.Core": {
         "type": "Transitive",
-        "resolved": "4.4.0",
-        "contentHash": "b5rRL5zeaau1y/5hIbI+6mGw3cwun16YjkHZnV9RRT5UyUIFsgLmNXJ0YnIN9p8Hw7K7AbG1q1UclQVU3DinAQ==",
+        "resolved": "4.4.1",
+        "contentHash": "zanbjWC0Y05gbx4eGXkzVycOQqVOFVeCjVsDSyuao9P4mtN1w3WxxTo193NGC7j3o2u3AJRswaoC6hEbnGACnQ==",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Collections.Specialized": "4.3.0",
@@ -424,6 +424,15 @@
         "type": "Transitive",
         "resolved": "5.0.5",
         "contentHash": "czVyD5h0etXlrFHln0GPwlhmNm4yFe8vA/xfW/oN26OT8AAWkA6YPjr+z68/kmPqMWFo8UHxvDBZ9g2TiJY9qQ=="
+      },
+      "Microsoft.EntityFrameworkCore.Proxies": {
+        "type": "Transitive",
+        "resolved": "5.0.5",
+        "contentHash": "kLPZnY7opUH2wlZ8csVFcoQ9qJR0WpYTfcd0WTbeAJkoozMwrjAi99zp5dOZW58QF5VJt1o76osEWSBB+++pPQ==",
+        "dependencies": {
+          "Castle.Core": "4.4.1",
+          "Microsoft.EntityFrameworkCore": "5.0.5"
+        }
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Transitive",
@@ -1747,7 +1756,8 @@
           "HotChocolate.Data": "11.1.0",
           "LanguageExt.Core": "3.4.15",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "5.0.4",
-          "Microsoft.EntityFrameworkCore": "5.0.4",
+          "Microsoft.EntityFrameworkCore": "5.0.5",
+          "Microsoft.EntityFrameworkCore.Proxies": "5.0.5",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "5.0.2"
         }
       }

@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Domain.Entities
 {
+    using System.Collections.Generic;
     using HotChocolate;
 
     /// <summary>
@@ -59,5 +60,11 @@ namespace Pronto_MIA.Domain.Entities
         /// </summary>
         [GraphQLIgnore]
         public string HashGeneratorOptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets list of <see cref="FcmToken"/> belonging to this user.
+        /// </summary>
+        [GraphQLIgnore]
+        public virtual ICollection<FcmToken> FCMTokens { get; set; }
     }
 }

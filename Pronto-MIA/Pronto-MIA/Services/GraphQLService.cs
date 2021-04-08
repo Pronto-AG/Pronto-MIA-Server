@@ -1,12 +1,17 @@
 namespace Pronto_MIA.Services
 {
     using System;
-    using System.Runtime.CompilerServices;
+    using System.Security.Claims;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using HotChocolate.Execution;
     using HotChocolate.Types;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Npgsql;
     using Pronto_MIA.BusinessLogic.API;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.DataAccess;
 
     /// <summary>
@@ -27,13 +32,14 @@ namespace Pronto_MIA.Services
         {
             services.AddGraphQLServer()
                 .AddAuthorization()
-                .AddSorting()
-                .AddFiltering()
-                .AddProjections()
+                .AddHttpRequestInterceptor(AddUserState)
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
                 .AddQueryType<Query>()
-                .AddMutationType<Mutation>();
+                .AddMutationType<Mutation>()
+                .AddProjections()
+                .AddFiltering()
+                .AddSorting();
             AddErrorHandling(services);
         }
 
@@ -55,11 +61,12 @@ namespace Pronto_MIA.Services
                         when error.Exception.InnerException is NpgsqlException:
                     case NpgsqlException:
                         return error
-                            .WithCode(Error.DatabaseUnavailable
+                            .WithCode(Error.DatabaseOperationError
                                 .ToString())
                             .WithMessage(
-                                Error.DatabaseUnavailable.Message());
+                                Error.DatabaseOperationError.Message());
                     default:
+                        Console.WriteLine(error.Exception.Message);
                         return error
                             .WithCode(Error.UnknownError
                                 .ToString())
@@ -67,6 +74,34 @@ namespace Pronto_MIA.Services
                                 Error.UnknownError.Message());
                 }
             });
+        }
+
+        /// <summary>
+        /// Adds user information to the global state cache so that it may be
+        /// accessed in a query.
+        /// </summary>
+        private static ValueTask AddUserState(
+            HttpContext context,
+            IRequestExecutor executor,
+            IQueryRequestBuilder builder,
+            CancellationToken token)
+        {
+            ApiUserState apiUserState = default;
+            var identity = context.User.Identity;
+            if (identity != null && identity.IsAuthenticated)
+            {
+                var userId = context
+                    .User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userName = context
+                    .User.FindFirstValue(ClaimTypes.Name);
+                apiUserState = new ApiUserState(userId, userName);
+            }
+
+            builder.SetProperty(
+                ApiUserGlobalState.ApiUserStateName,
+                apiUserState);
+
+            return ValueTask.CompletedTask;
         }
     }
 }

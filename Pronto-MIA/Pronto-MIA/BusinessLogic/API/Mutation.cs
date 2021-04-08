@@ -11,6 +11,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using HotChocolate.Data;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
 
@@ -31,8 +32,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
         /// <returns>The newly generated deployment plan.</returns>
-        [UseFirstOrDefault]
         [Authorize]
+        [UseFirstOrDefault]
         public async Task<IQueryable<DeploymentPlan?>> AddDeploymentPlan(
             [Service] DeploymentPlanManager deploymentPlanManager,
             IFile file,
@@ -75,6 +76,44 @@ namespace Pronto_MIA.BusinessLogic.API
                 Token = deviceToken,
             };
             return await firebaseManager.SendAsync(message);
+        }
+
+        /// <summary>
+        /// Registers a fcm token for the authenticated user. If the token
+        /// already exists it will be overwritten with the currently
+        /// authenticated user.
+        /// </summary>
+        /// <param name="userManager">The manager managing the users lifecycle.
+        /// </param>
+        /// <param name="userState">Information about the current user.</param>
+        /// <param name="token">The token to be registered.</param>
+        /// <returns>True if the token was saved successfully.</returns>
+        [Authorize]
+        public async Task<bool> RegisterFcmToken(
+            [Service] UserManager userManager,
+            [ApiUserGlobalState] ApiUserState userState,
+            string token)
+        {
+            var result = await
+                userManager.RegisterFcmToken(userState.UserName, token);
+            return result.Match(
+                deploymentPlan => deploymentPlan,
+                error => throw error.AsQueryException());
+        }
+
+        /// <summary>
+        /// Unregisters a given fcm token from the user it was assigned to.
+        /// If the token cannot be found nothing will be done.
+        /// </summary>
+        /// <param name="userManager">The manager managing the users lifecycle.
+        /// </param>
+        /// <param name="token">The fcm token to be removed.</param>
+        /// <returns>True if the token could be removed.</returns>
+        public async Task<bool> UnregisterFcmToken(
+            [Service] UserManager userManager,
+            string token)
+        {
+            return await userManager.UnregisterFcmToken(token);
         }
     }
 }

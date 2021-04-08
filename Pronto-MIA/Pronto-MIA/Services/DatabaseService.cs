@@ -21,9 +21,12 @@ namespace Pronto_MIA.Services
             this IServiceCollection services,
             IConfiguration cfg)
         {
-            services.AddDbContext<ProntoMIADbContext>(options =>
-                options.UseNpgsql(
-                    cfg.GetConnectionString("ProntoMIADbContext")));
+            services.AddDbContext<ProntoMiaDbContext>(options =>
+                {
+                    options.UseNpgsql(
+                        cfg.GetConnectionString("ProntoMIADbContext"));
+                    options.UseLazyLoadingProxies();
+                });
         }
     }
 }

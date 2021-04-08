@@ -4,7 +4,7 @@ namespace Tests.TestBusinessLogic.TestAPI
 
     public class TestMutation
     {
-        private ProntoMIADbContext dbContext;
+        private ProntoMiaDbContext dbContext;
 
         public TestMutation()
         {

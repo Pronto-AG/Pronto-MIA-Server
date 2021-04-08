@@ -42,10 +42,9 @@ namespace Pronto_MIA.DataAccess
         IllegalUserOperation,
 
         /// <summary>
-        /// Error code representing that the connection to the database could
-        /// not be established.
+        /// Error code representing that a database operation has failed.
         /// </summary>
-        DatabaseUnavailable,
+        DatabaseOperationError,
 
         /// <summary>
         /// Error code representing that a file operation could not be done.

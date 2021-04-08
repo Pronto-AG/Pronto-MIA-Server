@@ -54,8 +54,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Wrong password for given user";
                 case DataAccess.Error.IllegalUserOperation:
                     return "Given user not allowed to perform this action";
-                case DataAccess.Error.DatabaseUnavailable:
-                    return "Connection to database failed";
+                case DataAccess.Error.DatabaseOperationError:
+                    return "Database operation failed";
                 case DataAccess.Error.FileOperationError:
                     return "A file operation error occured";
                 case DataAccess.Error.UnknownError:

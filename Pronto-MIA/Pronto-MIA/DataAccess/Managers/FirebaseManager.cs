@@ -16,6 +16,7 @@ namespace Pronto_MIA.DataAccess.Managers
     {
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
+        private FirebaseMessaging instance;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -28,9 +29,10 @@ namespace Pronto_MIA.DataAccess.Managers
             ILogger<FirebaseManager> logger,
             IConfiguration cfg)
         {
-            this.logger = logger;
             this.cfg = cfg;
+            this.logger = logger;
             this.Create();
+            this.instance = FirebaseMessaging.DefaultInstance;
         }
 
         /// <summary>
@@ -44,8 +46,7 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             try
             {
-                string response = await
-                    FirebaseMessaging.DefaultInstance.SendAsync(message);
+                string response = await this.instance.SendAsync(message);
                 this.logger.LogTrace(
                     "Successfully sent message {Message}", response);
             }

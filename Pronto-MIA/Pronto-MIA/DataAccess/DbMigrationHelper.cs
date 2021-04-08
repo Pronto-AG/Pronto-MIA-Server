@@ -22,7 +22,7 @@ namespace Pronto_MIA.DataAccess
                 .CreateScope();
             using var ctx = scope
                 .ServiceProvider
-                .GetRequiredService<ProntoMIADbContext>();
+                .GetRequiredService<ProntoMiaDbContext>();
 
             ctx.Database.Migrate();
         }

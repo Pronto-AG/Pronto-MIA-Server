@@ -16,7 +16,7 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class DeploymentPlanManager
     {
-        private readonly ProntoMIADbContext dbContext;
+        private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
         private readonly FileManager fileManager;
@@ -35,7 +35,7 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="cfg">The configuration of this application.</param>
         public DeploymentPlanManager(
             ILogger<DeploymentPlanManager> logger,
-            ProntoMIADbContext dbContext,
+            ProntoMiaDbContext dbContext,
             FileManager fileManager,
             IConfiguration cfg)
         {

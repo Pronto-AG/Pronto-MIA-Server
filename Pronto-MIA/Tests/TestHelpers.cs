@@ -6,15 +6,15 @@ namespace Tests
 
     public class TestHelpers
     {
-        public static ProntoMIADbContext InMemoryDbContext
+        public static ProntoMiaDbContext InMemoryDbContext
         {
             get
             {
-                var options = new DbContextOptionsBuilder<ProntoMIADbContext>()
+                var options = new DbContextOptionsBuilder<ProntoMiaDbContext>()
                     .UseInMemoryDatabase(Guid.NewGuid().ToString())
                     .Options;
                 options.Freeze();
-                return new ProntoMIADbContext(options);
+                return new ProntoMiaDbContext(options);
             }
         }
     }
