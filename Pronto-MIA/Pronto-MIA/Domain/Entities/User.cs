@@ -30,6 +30,20 @@ namespace Pronto_MIA.Domain.Entities
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="User"/>
+        /// class. This constructor is only used for HotChocolate so that
+        /// graphql is able to generate an object. This
+        /// constructor should not be manually called.
+        /// </summary>
+        protected User()
+        {
+            this.UserName = default;
+            this.PasswordHash = default;
+            this.HashGenerator = default;
+            this.HashGeneratorOptions = default;
+        }
+
+        /// <summary>
         /// Gets or sets the id used as primary key by the database.
         /// </summary>
         public int Id { get; set; }

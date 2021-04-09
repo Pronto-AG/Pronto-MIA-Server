@@ -49,7 +49,8 @@ namespace Pronto_MIA
             services.AddScoped<UserManager, UserManager>();
             services.AddScoped<FileManager, FileManager>();
             services.AddScoped<DeploymentPlanManager, DeploymentPlanManager>();
-            services.AddSingleton<FirebaseManager, FirebaseManager>();
+            services.AddScoped<FirebaseMessagingManager,
+                FirebaseMessagingManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization();
             services.AddCors(options =>
@@ -57,7 +58,8 @@ namespace Pronto_MIA
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("*")
+                        builder
+                            .SetIsOriginAllowed(origin => origin != "null")
                             .AllowAnyHeader();
                     });
             });

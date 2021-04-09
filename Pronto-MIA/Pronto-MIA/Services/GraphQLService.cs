@@ -66,7 +66,6 @@ namespace Pronto_MIA.Services
                             .WithMessage(
                                 Error.DatabaseOperationError.Message());
                     default:
-                        Console.WriteLine(error.Exception.Message);
                         return error
                             .WithCode(Error.UnknownError
                                 .ToString())

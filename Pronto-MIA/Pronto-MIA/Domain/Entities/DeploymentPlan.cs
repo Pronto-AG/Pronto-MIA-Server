@@ -10,20 +10,6 @@ namespace Pronto_MIA.Domain.Entities
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeploymentPlan"/>
-        /// class. This constructor is only used for HotChocolate so that
-        /// graphql is able to generate a deployment plan object. This
-        /// constructor should not be manually called.
-        /// </summary>
-        public DeploymentPlan()
-        {
-            this.AvailableFrom = default;
-            this.AvailableUntil = default;
-            this.FileUUID = Guid.Empty;
-            this.FileExtension = string.Empty;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeploymentPlan"/>
         /// class.
         /// </summary>
         /// <param name="availableFrom">The
@@ -44,6 +30,20 @@ namespace Pronto_MIA.Domain.Entities
             this.AvailableUntil = availableUntil;
             this.FileUUID = fileUUID;
             this.FileExtension = fileExtension;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeploymentPlan"/>
+        /// class. This constructor is only used for HotChocolate so that
+        /// graphql is able to generate an object. This
+        /// constructor should not be manually called.
+        /// </summary>
+        protected DeploymentPlan()
+        {
+            this.AvailableFrom = default;
+            this.AvailableUntil = default;
+            this.FileUUID = Guid.Empty;
+            this.FileExtension = string.Empty;
         }
 
         /// <summary>

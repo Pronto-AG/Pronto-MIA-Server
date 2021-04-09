@@ -26,10 +26,10 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <summary>
         /// Initializes a new instance of the <see cref="UserManager"/> class.
         /// </summary>
-        /// <param name="logger">The logger to be used in order to document
-        /// events regarding this user manager.</param>
         /// <param name="dbContext">The database context where users are
         /// persisted.</param>
+        /// <param name="logger">The logger to be used in order to document
+        /// events regarding this user manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
         public UserManager(
             ProntoMiaDbContext dbContext,
@@ -88,56 +88,22 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <summary>
-        /// Method to register a new fcm token for a user. If the token is
-        /// already registered it will be overwritten.
+        /// Method that returns a User object for the given username.
         /// </summary>
-        /// <param name="userName">Username of the user to whom the the token
-        /// should get added.
-        /// </param>
-        /// <param name="fcmToken">The token to be added.</param>
-        /// <returns>A tuple of an error and a boolean. If no error occured the
-        /// error will be null and the boolean will contain true.
-        /// If an error occured the boolean will be null and the error will
-        /// contain the corresponding error object.</returns>
-        public async Task<Either<Error, bool>>
-            RegisterFcmToken(string userName, string fcmToken)
+        /// <param name="userName">The name of the user to be found.</param>
+        /// <returns>User or default if user could not be found.</returns>
+        public async Task<User?>
+            GetByUserName(string userName)
         {
-            var user = await this.GetByUserName(userName);
+            var user = await this.dbContext.Users.SingleOrDefaultAsync(
+                u => u.UserName == userName);
             if (user == default)
             {
-                return DataAccess.Error.UserNotFound;
+                this.logger.LogWarning(
+                    "Invalid username {UserName}", userName);
             }
 
-            await this.MoveOrCreateFcmToken(fcmToken, user);
-            return true;
-        }
-
-        /// <summary>
-        /// Method to remove a fcm token from the database.
-        /// </summary>
-        /// <param name="fcmToken">The token to be removed.</param>
-        /// <returns>True if the token could be removed false if the token did
-        /// not exist.</returns>
-        public async Task<bool> UnregisterFcmToken(string fcmToken)
-        {
-            var tokenObject = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == fcmToken);
-            if (tokenObject != default)
-            {
-                this.logger.LogDebug(
-                    "FCMToken {FcmToken} was removed from User {UserName}",
-                    fcmToken,
-                    tokenObject.Owner.UserName);
-                this.dbContext.Remove(tokenObject);
-                await this.dbContext.SaveChangesAsync();
-
-                return true;
-            }
-
-            this.logger.LogDebug(
-                "FCMToken {FcmToken} did not exist. Nothing to remove",
-                fcmToken);
-            return false;
+            return user;
         }
 
         private string GenerateToken(User user)
@@ -166,54 +132,6 @@ namespace Pronto_MIA.DataAccess.Managers
                 "Token for user {UserName} has been created",
                 user.UserName);
             return tokenString;
-        }
-
-        private async Task<User?>
-            GetByUserName(string userName)
-        {
-            var user = await this.dbContext.Users.SingleOrDefaultAsync(
-                u => u.UserName == userName);
-            if (user == default)
-            {
-                this.logger.LogWarning(
-                    "Invalid username {UserName}", userName);
-            }
-
-            return user;
-        }
-
-        /// <summary>
-        /// If a fcm token already exists it will be moved else a new token will
-        /// be created.
-        /// </summary>
-        private async Task MoveOrCreateFcmToken(string fcmToken, User user)
-        {
-            var tokenObject = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == fcmToken);
-
-            if (tokenObject == default)
-            {
-                tokenObject = new FcmToken(fcmToken, user);
-                await this.dbContext.FcmTokens.AddAsync(tokenObject);
-                await this.dbContext.SaveChangesAsync();
-
-                this.logger.LogDebug(
-                    "FCMToken {FcmToken} was created for user {UserName}",
-                    fcmToken,
-                    user.UserName);
-            }
-            else if (tokenObject.Owner != user)
-            {
-                var oldUsername = tokenObject.Owner.UserName;
-                tokenObject.Owner = user;
-                await this.dbContext.SaveChangesAsync();
-
-                this.logger.LogDebug(
-                    "FCMToken {Token} was moved from user {Old} to user {New}",
-                    fcmToken,
-                    oldUsername,
-                    user.UserName);
-            }
         }
     }
 }
