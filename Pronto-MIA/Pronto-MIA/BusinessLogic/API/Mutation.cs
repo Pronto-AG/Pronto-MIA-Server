@@ -91,8 +91,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="fcmToken">The token to be registered.</param>
         /// <returns>True if the token was saved successfully.</returns>
         [Authorize]
-        [UseSingleOrDefault]
-        //[UseProjection]
+        [UseSingleOrDefault] // [UseProjection]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             [Service] FirebaseMessagingManager firebaseMessagingManager,
             [Service] UserManager userManager,
