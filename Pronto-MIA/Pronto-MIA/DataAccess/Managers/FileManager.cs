@@ -60,7 +60,7 @@ namespace Pronto_MIA.DataAccess.Managers
         /// should be placed.</param>
         /// <param name="fileName">The name the file should be saved as.</param>
         /// <param name="file">The file that will be saved.</param>
-        /// <returns>Task that can be awaited.</returns>
+        /// <returns>Empty task.</returns>
         public async Task
             Create(string subDirectory, string fileName, IFile file)
         {
@@ -86,7 +86,9 @@ namespace Pronto_MIA.DataAccess.Managers
         /// be found.</param>
         /// <param name="fileName">The name of the file.</param>
         /// <param name="fileExtension">The file extension of the file.</param>
-        public void Remove(
+        /// <returns>Error if something went wrong or null if successful.
+        /// </returns>
+        public DataAccess.Error? Remove(
             string subDirectory,
             string fileName,
             string fileExtension)
@@ -95,6 +97,7 @@ namespace Pronto_MIA.DataAccess.Managers
                 this.GetFilePath(subDirectory, fileName, fileExtension));
             this.logger.LogDebug(
                 "File {File} has been removed", fileName);
+            return null;
         }
 
         /// <summary>

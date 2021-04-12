@@ -6,6 +6,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Threading.Tasks;
     using HotChocolate.Types;
     using LanguageExt;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.Domain.Entities;
@@ -60,8 +61,9 @@ namespace Pronto_MIA.DataAccess.Managers
         /// should be treated as active.</param>
         /// <param name="availableUntil">Moment until which the deployment plan
         /// is treated as active.</param>
-        /// <returns>Either object which contains either an error if one occured
-        /// or a queryable object of the newly generated deployment plan.
+        /// <returns>`Either` object which contains either an error
+        /// if one occured or a queryable object of the newly generated
+        /// deployment plan.
         /// </returns>
         public async Task<Either<DataAccess.Error, IQueryable<DeploymentPlan>>>
             Create(
@@ -69,22 +71,11 @@ namespace Pronto_MIA.DataAccess.Managers
                 DateTime availableFrom,
                 DateTime availableUntil)
         {
+            var uuid = Guid.NewGuid();
             try
             {
-                var uuid = Guid.NewGuid();
                 await this.fileManager.Create(
                     FileDirectory, uuid.ToString(), file);
-                var deploymentPlan = new DeploymentPlan(
-                    availableFrom,
-                    availableUntil,
-                    uuid,
-                    FileManager.GetFileExtension(file));
-                await this.dbContext.DeploymentPlans.AddAsync(deploymentPlan);
-                await this.dbContext.SaveChangesAsync();
-                this.logger.LogInformation(
-                    "Deployment plan with id {Id} has been created",
-                    deploymentPlan.Id);
-                return Prelude.Right(this.GetById(deploymentPlan.Id));
             }
             catch (Exception error)
             {
@@ -92,6 +83,118 @@ namespace Pronto_MIA.DataAccess.Managers
                     "DeploymentPlan could no be saved: {Error}", error);
                 return Prelude.Left(DataAccess.Error.FileOperationError);
             }
+
+            var deploymentPlan = new DeploymentPlan(
+                availableFrom,
+                availableUntil,
+                uuid,
+                FileManager.GetFileExtension(file));
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            this.logger.LogInformation(
+                "Deployment plan with id {Id} has been created",
+                deploymentPlan.Id);
+            return Prelude.Right(this.GetQueryableById(deploymentPlan.Id));
+        }
+
+        /// <summary>
+        /// Updates the deployment plan with the given id.
+        /// </summary>
+        /// <param name="id">The id of the deployment plan to be updated.
+        /// </param>
+        /// <param name="file">The new file associated with the deployment plan.
+        /// </param>
+        /// <param name="availableFrom">New moment from which the deployment
+        /// plan should be treated as active.</param>
+        /// <param name="availableUntil">New moment until which the deployment
+        /// plan is treated as active.</param>
+        /// <returns>`Either` object which contains either an error
+        /// if one occured or a queryable object of the updated deployment plan.
+        /// </returns>
+        public async Task<Either<DataAccess.Error, IQueryable<DeploymentPlan>>>
+            Update(
+                int id,
+                IFile? file,
+                DateTime? availableFrom,
+                DateTime? availableUntil)
+        {
+            var deploymentPlan = await this.GetById(id);
+            if (deploymentPlan == default)
+            {
+                return Prelude.Left(DataAccess.Error.DeploymentPlanNotFound);
+            }
+
+            if (file != null)
+            {
+                var uuid = Guid.NewGuid();
+                try
+                {
+                    await this.fileManager.Create(
+                        FileDirectory, uuid.ToString(), file);
+                    this.fileManager.Remove(
+                        FileDirectory,
+                        deploymentPlan.FileUuid.ToString(),
+                        deploymentPlan.FileExtension);
+
+                    deploymentPlan.FileUuid = uuid;
+                    deploymentPlan.FileExtension =
+                        FileManager.GetFileExtension(file);
+                }
+                catch (Exception error)
+                {
+                    this.logger.LogWarning(
+                        "DeploymentPlan could no be updated: {Error}", error);
+                    return Prelude.Left(DataAccess.Error.FileOperationError);
+                }
+            }
+
+            if (availableFrom.HasValue)
+            {
+                deploymentPlan.AvailableFrom = (DateTime)availableFrom;
+            }
+
+            if (availableUntil.HasValue)
+            {
+                deploymentPlan.AvailableUntil = (DateTime)availableUntil;
+            }
+
+            await this.dbContext.SaveChangesAsync();
+
+            return Prelude.Right(this.GetQueryableById(id));
+        }
+
+        /// <summary>
+        /// Removes the deployment plan with the given id.
+        /// </summary>
+        /// <param name="id">Id of the deployment plan to be removed.</param>
+        /// <returns>The id of the deployment plan that was removed.</returns>
+        public async Task<Either<DataAccess.Error, int>>
+            Remove(int id)
+        {
+            var deploymentPlan = await this.GetById(id);
+            if (deploymentPlan == default)
+            {
+                return Prelude.Left(DataAccess.Error.DeploymentPlanNotFound);
+            }
+
+            try
+            {
+                this.fileManager.Remove(
+                    FileDirectory,
+                    deploymentPlan.FileUuid.ToString(),
+                    deploymentPlan.FileExtension);
+            }
+            catch (Exception error)
+            {
+                this.logger.LogWarning(
+                    "DeploymentPlan could no be Removed: {Error}", error);
+                return Prelude.Left(DataAccess.Error.FileOperationError);
+            }
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            return Prelude.Right(id);
         }
 
         /// <summary>
@@ -104,14 +207,27 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <summary>
+        /// Method to get a deployment plan queryable with the help of the
+        /// deployment plan id.
+        /// </summary>
+        /// <param name="id">The id of the deployment plan.</param>
+        /// <returns>IQueryable witch might contain the Deployment plan
+        /// with said id.</returns>
+        private IQueryable<DeploymentPlan> GetQueryableById(int id)
+        {
+            return this.dbContext.DeploymentPlans
+                .Where(dP => dP.Id == id);
+        }
+
+        /// <summary>
         /// Method to get a deployment plan with the help of its id.
         /// </summary>
         /// <param name="id">The id of the deployment plan.</param>
         /// <returns>The deployment plan with the given id.</returns>
-        private IQueryable<DeploymentPlan> GetById(int id)
+        private async Task<DeploymentPlan?> GetById(int id)
         {
-            return this.dbContext.DeploymentPlans
-                .Where(dP => dP.Id == id);
+            return await this.dbContext.DeploymentPlans
+                .SingleOrDefaultAsync(dP => dP.Id == id);
         }
     }
 }

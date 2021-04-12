@@ -129,7 +129,7 @@ namespace Pronto_MIA.DataAccess.Managers
             if (fcmTokenObject == default)
             {
                 fcmTokenObject = new FcmToken(fcmToken, user);
-                await this.dbContext.FcmTokens.AddAsync(fcmTokenObject);
+                this.dbContext.FcmTokens.Add(fcmTokenObject);
                 await this.dbContext.SaveChangesAsync();
 
                 this.logger.LogDebug(

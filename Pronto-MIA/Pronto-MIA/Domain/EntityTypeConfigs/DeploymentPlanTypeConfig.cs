@@ -23,9 +23,9 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.Property(dP => dP.Id).ValueGeneratedOnAdd();
             builder.Property(dP => dP.AvailableFrom).IsRequired();
             builder.Property(dP => dP.AvailableUntil).IsRequired();
-            builder.Property(dP => dP.FileUUID).IsRequired();
-            builder.HasIndex(dP => dP.FileUUID).IsUnique();
-            builder.Property(dP => dP.FileUUID)
+            builder.Property(dP => dP.FileUuid).IsRequired();
+            builder.HasIndex(dP => dP.FileUuid).IsUnique();
+            builder.Property(dP => dP.FileUuid)
                 .HasConversion(
                     uuid => uuid.ToString(),
                     uuid => Guid.Parse(uuid));
