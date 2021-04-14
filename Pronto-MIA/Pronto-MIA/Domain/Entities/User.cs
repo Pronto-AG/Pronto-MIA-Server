@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Domain.Entities
 {
+    using System.Collections.Generic;
     using HotChocolate;
 
     /// <summary>
@@ -26,6 +27,20 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = passwordHash;
             this.HashGenerator = hashGenerator;
             this.HashGeneratorOptions = hashGeneratorOptions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/>
+        /// class. This constructor is only used for HotChocolate so that
+        /// graphql is able to generate an object. This
+        /// constructor should not be manually called.
+        /// </summary>
+        protected User()
+        {
+            this.UserName = default;
+            this.PasswordHash = default;
+            this.HashGenerator = default;
+            this.HashGeneratorOptions = default;
         }
 
         /// <summary>
@@ -59,5 +74,11 @@ namespace Pronto_MIA.Domain.Entities
         /// </summary>
         [GraphQLIgnore]
         public string HashGeneratorOptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets list of <see cref="FcmToken"/> belonging to this user.
+        /// </summary>
+        [GraphQLIgnore]
+        public virtual ICollection<FcmToken> FCMTokens { get; set; }
     }
 }

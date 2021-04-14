@@ -8,16 +8,15 @@ namespace Pronto_MIA.DataAccess
     /// <summary>
     /// Class representing the database context of the application.
     /// </summary>
-    // ReSharper disable once InconsistentNaming
-    public class ProntoMIADbContext : DbContext
+    public class ProntoMiaDbContext : DbContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProntoMIADbContext"/>
+        /// Initializes a new instance of the <see cref="ProntoMiaDbContext"/>
         /// class. Which can then be used to access the database.
         /// </summary>
         /// <param name="options">Options used to initialize the context.
         /// </param>
-        public ProntoMIADbContext(DbContextOptions<ProntoMIADbContext> options)
+        public ProntoMiaDbContext(DbContextOptions<ProntoMiaDbContext> options)
             : base(options)
         {
         }
@@ -32,6 +31,11 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<DeploymentPlan> DeploymentPlans { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing fcm tokens.
+        /// </summary>
+        public DbSet<FcmToken> FcmTokens { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
@@ -39,6 +43,7 @@ namespace Pronto_MIA.DataAccess
 
            modelBuilder.ApplyConfiguration(new UserTypeConfig());
            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
+           modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
 
            var generatorOptions = new Pbkdf2GeneratorOptions(
                1500);
@@ -47,7 +52,7 @@ namespace Pronto_MIA.DataAccess
            var franz = new User(
                "Franz",
                hash,
-               generator.GetType().Name,
+               Pbkdf2Generator.Identifier,
                generator.GetOptions().ToJson())
            {
                Id = -1,

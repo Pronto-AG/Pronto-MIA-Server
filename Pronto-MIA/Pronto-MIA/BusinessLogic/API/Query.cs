@@ -1,6 +1,7 @@
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate;
@@ -45,12 +46,13 @@ namespace Pronto_MIA.BusinessLogic.API
         /// authentication header in order to authenticate the user.</returns>
         /// <exception cref="QueryException">If a problem occured during
         /// authentication.</exception>
-        public string? Authenticate(
+        public async Task<string?> Authenticate(
             [Service] UserManager userManager,
             string userName,
             string password)
         {
-            return userManager.Authenticate(userName, password).Match(
+            var result = await userManager.Authenticate(userName, password);
+            return result.Match(
                 token => token,
                 error => throw error.AsQueryException());
         }
@@ -61,10 +63,10 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="deploymentPlanManager">The deployment plan manager
         /// responsible for managing deployment plans.</param>
         /// <returns>Queryable of all available deployment plans.</returns>
-        // [UseProjection]
+        [Authorize]
+        [UseProjection]
         [UseFiltering]
         [UseSorting]
-        [Authorize]
         public IQueryable<DeploymentPlan?> DeploymentPlans(
             [Service] DeploymentPlanManager deploymentPlanManager)
         {

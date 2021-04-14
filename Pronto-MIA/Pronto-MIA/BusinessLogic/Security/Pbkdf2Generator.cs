@@ -14,6 +14,12 @@ namespace Pronto_MIA.BusinessLogic.Security
     /// </summary>
     public class Pbkdf2Generator : HashGenerator
     {
+        /// <summary>
+        /// Identifier of this generator. Used to differenciate between
+        /// implementations of the HashGenerator.
+        /// </summary>
+        public const string Identifier = "Pbkdf2Generator";
+
         private Pbkdf2GeneratorOptions options;
 
         /// <summary>
@@ -26,18 +32,7 @@ namespace Pronto_MIA.BusinessLogic.Security
             : base(options)
         {
             this.options = options;
-        }
 
-        /// <summary>
-        /// Hashes a password with Pbkdf2 with given salt and round count as
-        /// well as HMACSHA512.
-        /// </summary>
-        /// <param name="password">Password to be hashed with given options.
-        /// </param>
-        /// <returns>Hash encoded in base64.</returns>
-        public override byte[] HashPassword(
-            string password)
-        {
             if (this.options.Salt == null)
             {
                 var salt = new byte[this.options.SaltSize];
@@ -56,7 +51,18 @@ namespace Pronto_MIA.BusinessLogic.Security
                     throw new ArgumentException("Invalid salt");
                 }
             }
+        }
 
+        /// <summary>
+        /// Hashes a password with Pbkdf2 with given salt and round count as
+        /// well as HMACSHA512.
+        /// </summary>
+        /// <param name="password">Password to be hashed with given options.
+        /// </param>
+        /// <returns>Hash encoded in base64.</returns>
+        public override byte[] HashPassword(
+            string password)
+        {
             var hash = KeyDerivation.Pbkdf2(
                 password,
                 this.options.Salt!,
@@ -90,6 +96,12 @@ namespace Pronto_MIA.BusinessLogic.Security
         public override IHashGeneratorOptions GetOptions()
         {
             return this.options;
+        }
+
+        /// <inheritdoc/>
+        public override string GetIdentifier()
+        {
+            return Identifier;
         }
     }
 }

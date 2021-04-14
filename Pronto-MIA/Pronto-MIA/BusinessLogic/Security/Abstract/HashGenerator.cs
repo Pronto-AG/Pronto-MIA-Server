@@ -47,5 +47,13 @@ namespace Pronto_MIA.BusinessLogic.Security.Abstract
         /// for this instance.
         /// </returns>
         public abstract IHashGeneratorOptions GetOptions();
+
+        /// <summary>
+        /// Method which returns the identifier of the concrete implementation
+        /// of this abstract class.
+        /// </summary>
+        /// <returns>The identifier of the abstract class implementation.
+        /// </returns>
+        public abstract string GetIdentifier();
     }
 }

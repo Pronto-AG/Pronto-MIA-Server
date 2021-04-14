@@ -1,11 +1,13 @@
+#nullable enable
 namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
     using System.IdentityModel.Tokens.Jwt;
-    using System.Linq;
     using System.Security.Claims;
     using System.Text;
+    using System.Threading.Tasks;
     using LanguageExt;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.IdentityModel.Tokens;
@@ -17,26 +19,26 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class UserManager
     {
-        private readonly ProntoMIADbContext dbContext;
+        private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserManager"/> class.
         /// </summary>
-        /// <param name="logger">The logger to be used in order to document
-        /// events regarding this user manager.</param>
         /// <param name="dbContext">The database context where users are
         /// persisted.</param>
+        /// <param name="logger">The logger to be used in order to document
+        /// events regarding this user manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
         public UserManager(
-            ILogger<UserManager> logger,
-            ProntoMIADbContext dbContext,
-            IConfiguration cfg)
+            ProntoMiaDbContext dbContext,
+            IConfiguration cfg,
+            ILogger<UserManager> logger)
         {
-            this.logger = logger;
             this.dbContext = dbContext;
             this.cfg = cfg;
+            this.logger = logger;
         }
 
         private string SigningKey =>
@@ -61,16 +63,12 @@ namespace Pronto_MIA.DataAccess.Managers
         /// error will be null and the string will contain a JWT-Bearer-Token.
         /// If an error occured the string will be null and the error will
         /// contain the corresponding error object.</returns>
-        public Either<DataAccess.Error, string> Authenticate(
+        public async Task<Either<DataAccess.Error, string>> Authenticate(
             string userName, string password)
         {
-            var user = this.dbContext.Users.SingleOrDefault(
-                u => u.UserName == userName);
-
-            if (user == null)
+            var user = await this.GetByUserName(userName);
+            if (user == default)
             {
-                this.logger.LogWarning(
-                    "Invalid userName {UserName}", userName);
                 return DataAccess.Error.UserNotFound;
             }
 
@@ -87,6 +85,25 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogDebug(
                 "User {UserName} has been authenticated", userName);
             return this.GenerateToken(user);
+        }
+
+        /// <summary>
+        /// Method that returns a User object for the given username.
+        /// </summary>
+        /// <param name="userName">The name of the user to be found.</param>
+        /// <returns>User or default if user could not be found.</returns>
+        public async Task<User?>
+            GetByUserName(string userName)
+        {
+            var user = await this.dbContext.Users.SingleOrDefaultAsync(
+                u => u.UserName == userName);
+            if (user == default)
+            {
+                this.logger.LogWarning(
+                    "Invalid username {UserName}", userName);
+            }
+
+            return user;
         }
 
         private string GenerateToken(User user)
