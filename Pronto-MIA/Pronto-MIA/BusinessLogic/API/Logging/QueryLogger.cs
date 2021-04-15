@@ -62,8 +62,7 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
         }
 
         // Regex is:
-        // {parameter}\s*:\s*(?<!\\)(?:\\{{2}})*"(?<content>(?:(?<!\\)(?:\\{{2}}
-        //      )*\\"|[^"])*(?<!\\)(?:\\{{2}})*)"
+        // {parameter}\s*:\s*(?=")(?:"(?<content>[^"\\]*(?:\\[\s\S][^"\\]*)*)")
         private static string ReplaceSensitiveInfo(string content)
         {
             string result = content;
@@ -72,9 +71,8 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                 result = Regex.Replace(
                     result,
                     new StringBuilder(parameter)
-                        .Append("\\s*:\\s*(?<!\\\\)(?:\\\\{{2}})*\"")
-                        .Append("(?<content>(?:(?<!\\\\)(?:\\\\{{2}})*\\\\\"|")
-                        .Append("[^\"])*(?<!\\\\)(?:\\\\{{2}})*)\"")
+                        .Append("\\s*:\\s*(?=\")(?:\"(?<content>[^\"\\\\]*")
+                        .Append("(?:\\\\[\\s\\S][^\"\\\\]*)*)\")")
                         .ToString(),
                     $"{parameter}:\"***\"");
             }
@@ -115,22 +113,23 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
 
                 if (this.context.Document is not null)
                 {
-                    stringBuilder.Append("###");
+                    stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
                     stringBuilder.Append(Environment.NewLine);
                     stringBuilder.Append(this.FormatQuery());
 
                     if (this.context.Variables != null)
                     {
+                        stringBuilder.Append(Environment.NewLine);
+                        stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
                         stringBuilder.Append(this.FormatVariables());
                     }
                 }
 
+                stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
                 stringBuilder.Append(Environment.NewLine);
                 var timeNeeded = queryTimer.Elapsed.TotalMilliseconds;
                 stringBuilder.AppendFormat(
                     $"Time needed: {timeNeeded:0.#} milliseconds.");
-                stringBuilder.Append(Environment.NewLine);
-                stringBuilder.Append("###");
                 this.logger.LogInformation(stringBuilder.ToString());
             }
 
