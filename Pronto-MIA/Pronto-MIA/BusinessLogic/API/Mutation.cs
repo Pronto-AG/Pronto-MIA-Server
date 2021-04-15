@@ -12,6 +12,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
@@ -41,13 +42,10 @@ namespace Pronto_MIA.BusinessLogic.API
             DateTime availableFrom,
             DateTime availableUntil)
         {
-            var result = await deploymentPlanManager.Create(
+            return await deploymentPlanManager.Create(
                 file,
                 availableFrom,
                 availableUntil);
-            return result.Match(
-                deploymentPlan => deploymentPlan,
-                error => throw error.AsQueryException());
         }
 
         /// <summary>
@@ -77,11 +75,8 @@ namespace Pronto_MIA.BusinessLogic.API
             DateTime? availableFrom,
             DateTime? availableUntil)
         {
-            var result = await deploymentPlanManager.Update(
+            return await deploymentPlanManager.Update(
                 id, file, availableFrom, availableUntil);
-            return result.Match(
-                deploymentPlan => deploymentPlan,
-                error => throw error.AsQueryException());
         }
 
         /// <summary>
@@ -99,10 +94,7 @@ namespace Pronto_MIA.BusinessLogic.API
             [Service] DeploymentPlanManager deploymentPlanManager,
             int id)
         {
-            var result = await deploymentPlanManager.Remove(id);
-            return result.Match(
-                removedId => removedId,
-                error => throw error.AsQueryException());
+            return await deploymentPlanManager.Remove(id);
         }
 
         /// <summary>
@@ -147,7 +139,9 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="fcmToken">The token to be registered.</param>
         /// <returns>True if the token was saved successfully.</returns>
         [Authorize]
-        [UseSingleOrDefault] // [UseProjection]
+        [UseSingleOrDefault]
+        [UseProjection]
+        [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             [Service] FirebaseMessagingManager firebaseMessagingManager,
             [Service] UserManager userManager,

@@ -7,8 +7,6 @@ namespace Pronto_MIA.DataAccess.Managers
     using FirebaseAdmin;
     using FirebaseAdmin.Messaging;
     using Google.Apis.Auth.OAuth2;
-    using HotChocolate;
-    using LanguageExt;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
@@ -23,7 +21,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
-        private FirebaseMessaging instance;
+        private readonly FirebaseMessaging instance;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -84,7 +82,7 @@ namespace Pronto_MIA.DataAccess.Managers
 
             var result = this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
-            Console.WriteLine(result.First().Id);
+
             return this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
         }
@@ -139,16 +137,36 @@ namespace Pronto_MIA.DataAccess.Managers
             }
             else if (fcmTokenObject.Owner != user)
             {
-                var oldUsername = fcmTokenObject.Owner.UserName;
-                fcmTokenObject.Owner = user;
-                await this.dbContext.SaveChangesAsync();
-
+                await this.MoveFcmToken(fcmTokenObject, user);
+            }
+            else
+            {
                 this.logger.LogDebug(
-                    "FCMToken {Token} was moved from user {Old} to user {New}",
+                    "FCMToken {FcmToken} already registered for " +
+                        "user {UserName}",
                     fcmToken,
-                    oldUsername,
                     user.UserName);
             }
+        }
+
+        /// <summary>
+        /// Method to move the given token to a new owner.
+        /// </summary>
+        /// <param name="fcmTokenObject">The token to be moved.</param>
+        /// <param name="newOwner">The new owner which will be set.</param>
+        private async Task MoveFcmToken(
+            FcmToken fcmTokenObject,
+            User newOwner)
+        {
+            var oldOwner = fcmTokenObject.Owner;
+            fcmTokenObject.Owner = newOwner;
+            await this.dbContext.SaveChangesAsync();
+
+            this.logger.LogDebug(
+                "FCMToken {Token} was moved from user {Old} to user {New}",
+                fcmTokenObject.Id,
+                oldOwner.UserName,
+                newOwner.UserName);
         }
 
         /// <summary>

@@ -19,6 +19,11 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
         private static Stopwatch queryTimer;
         private readonly ILogger<QueryLogger> logger;
 
+        /// <summary>
+        /// Initializes static members of the <see cref="QueryLogger"/> class.
+        /// This includes getting all attributes marked as sensitive in order
+        /// to exclude them from logging.
+        /// </summary>
         static QueryLogger()
         {
             var assemblyTypes = Assembly.GetExecutingAssembly().GetTypes();
@@ -29,11 +34,9 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                 .Distinct().ToList();
 
             SensitiveParameters = new string[parameters.Count];
-            int index = 0;
-            foreach (var parameter in parameters)
+            for (int i = 0; i < parameters.Count; i++)
             {
-                SensitiveParameters[index] = parameter;
-                ++index;
+                SensitiveParameters[i] = parameters[i];
             }
         }
 
@@ -42,16 +45,25 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
         /// class.
         /// </summary>
         /// <param name="logger">The logger to be used.</param>
-        public QueryLogger(ILogger<QueryLogger> logger)
+        public QueryLogger(
+            ILogger<QueryLogger> logger)
         {
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Gets called as soon as a request comes in.
+        /// </summary>
+        /// <param name="context">The Context of the request.</param>
+        /// <returns>An object that will live as long as the request.</returns>
         public override IActivityScope ExecuteRequest(IRequestContext context)
         {
             return new RequestScope(this.logger, context);
         }
 
+        // Regex is:
+        // {parameter}\s*:\s*(?<!\\)(?:\\{{2}})*"(?<content>(?:(?<!\\)(?:\\{{2}}
+        //      )*\\"|[^"])*(?<!\\)(?:\\{{2}})*)"
         private static string ReplaceSensitiveInfo(string content)
         {
             string result = content;
@@ -59,7 +71,11 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             {
                 result = Regex.Replace(
                     result,
-                    $"{parameter}\\s*:\\s*(?<!\\\\)(?:\\\\{{2}})*\"(?<content>(?:(?<!\\\\)(?:\\\\{{2}})*\\\\\"|[^\"])*(?<!\\\\)(?:\\\\{{2}})*)\"",
+                    new StringBuilder(parameter)
+                        .Append("\\s*:\\s*(?<!\\\\)(?:\\\\{{2}})*\"")
+                        .Append("(?<content>(?:(?<!\\\\)(?:\\\\{{2}})*\\\\\"|")
+                        .Append("[^\"])*(?<!\\\\)(?:\\\\{{2}})*)\"")
+                        .ToString(),
                     $"{parameter}:\"***\"");
             }
 
@@ -70,21 +86,37 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
         {
             private readonly IRequestContext context;
             private readonly ILogger<QueryLogger> logger;
-            private readonly Guid uuid;
 
-            public RequestScope
-                (ILogger<QueryLogger> logger,
-                     IRequestContext context)
+            public RequestScope(
+                ILogger<QueryLogger> logger,
+                IRequestContext context)
             {
                 this.logger = logger;
                 this.context = context;
-                this.uuid = Guid.NewGuid();
+                /*this.uuid = Guid.Parse(
+                    context.Services
+                        .GetApplicationServices()
+                        .GetService<ISessionIdAccessor>()
+                        ?.GetSessionId() ?? string.Empty)*/
+
+                this.logger.LogInformation(
+                    "Request started");
+
+                queryTimer = new Stopwatch();
+                queryTimer.Start();
+            }
+
+            public void Dispose()
+            {
                 StringBuilder stringBuilder = new StringBuilder(
-                        "Query " + this.uuid.ToString() + " started")
-                    .Append(Environment.NewLine);
+                    "Request ended. Content was:");
+                stringBuilder.Append(Environment.NewLine);
+                queryTimer.Stop();
 
                 if (this.context.Document is not null)
                 {
+                    stringBuilder.Append("###");
+                    stringBuilder.Append(Environment.NewLine);
                     stringBuilder.Append(this.FormatQuery());
 
                     if (this.context.Variables != null)
@@ -93,40 +125,31 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                     }
                 }
 
+                stringBuilder.Append(Environment.NewLine);
+                var timeNeeded = queryTimer.Elapsed.TotalMilliseconds;
+                stringBuilder.AppendFormat(
+                    $"Time needed: {timeNeeded:0.#} milliseconds.");
+                stringBuilder.Append(Environment.NewLine);
+                stringBuilder.Append("###");
                 this.logger.LogInformation(stringBuilder.ToString());
-
-                queryTimer = new Stopwatch();
-                queryTimer.Start();
             }
 
-            public void Dispose()
+            private static string PaddingHelper(
+                string existingString,
+                int lengthToPadTo)
             {
-                this.logger.LogInformation(
-                    "Query " + this.uuid.ToString() + " started");
-                if (this.context.Document is not null)
+                if (string.IsNullOrEmpty(existingString))
                 {
-                    StringBuilder stringBuilder =
-                        new (this.context.Document.ToString(true));
-
-                    stringBuilder.AppendLine();
-                    if (this.context.Variables != null)
-                    {
-                        
-                    }
-                    queryTimer.Stop();
-                    stringBuilder.AppendFormat(
-                        $"Ellapsed time for query is {queryTimer.Elapsed.TotalMilliseconds:0.#} milliseconds.");
-
-                    var timer = new Stopwatch();
-                    timer.Start();
-                    this.logger.LogInformation(
-                        ReplaceSensitiveInfo(
-                            stringBuilder.ToString()));
-                    timer.Stop();
-                    this.logger.LogInformation("Regex took: " +
-                                               timer.ElapsedMilliseconds
-                                               + "ms");
+                    return string.Empty.PadRight(lengthToPadTo);
                 }
+
+                if (existingString.Length > lengthToPadTo)
+                {
+                    return existingString.Substring(0, lengthToPadTo);
+                }
+
+                return existingString + " "
+                    .PadRight(lengthToPadTo - existingString.Length);
             }
 
             private StringBuilder FormatQuery()
@@ -134,7 +157,7 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                 StringBuilder stringBuilder =
                     new (
                         ReplaceSensitiveInfo(
-                            this.context.Document.ToString(true)));
+                            this.context.Document!.ToString(true)));
                 return stringBuilder;
             }
 
@@ -148,33 +171,41 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                 if (variablesConcrete.Count > 0)
                 {
                     stringBuilder.
-                        AppendFormat($"Variables {Environment.NewLine}");
+                        AppendFormat($"Variables: {Environment.NewLine}");
                     try
                     {
-                        foreach (var variableValue in context.Variables!)
+                        foreach (var variable in this.context.Variables!)
                         {
-                            string PadRightHelper
-                                (string existingString, int lengthToPadTo)
-                            {
-                                if (string.IsNullOrEmpty(existingString))
-                                    return "".PadRight(lengthToPadTo);
-                                if (existingString.Length > lengthToPadTo)
-                                    return existingString.Substring(0, lengthToPadTo);
-                                return existingString + " ".PadRight(lengthToPadTo - existingString.Length);
-                            }
-                            stringBuilder.AppendFormat(
-                                $"  {PadRightHelper(variableValue.Name, 20)} :  {PadRightHelper(variableValue.Value.ToString(), 20)}: {variableValue.Type}");
-                            stringBuilder.AppendFormat($"{Environment.NewLine}");
+                            stringBuilder =
+                                this.FormatVariable(stringBuilder, variable);
                         }
                     }
                     catch
                     {
                         // all input type records will land here.
-                        stringBuilder.Append("  Formatting Variables Error. Continuing...");
+                        stringBuilder.Append(
+                            "  Formatting Variables Error. Continuing...");
                         stringBuilder.AppendFormat($"{Environment.NewLine}");
                     }
                 }
 
+                return stringBuilder;
+            }
+
+            private StringBuilder FormatVariable(
+                StringBuilder stringBuilder, VariableValue variable)
+            {
+                var variableName = variable.Name.ToString();
+                var variableValue = "***";
+
+                var padName = PaddingHelper(variableName, 20);
+                var padValue =
+                    PaddingHelper(variableValue, 20);
+                var type = variable.Type;
+                stringBuilder.AppendFormat(
+                    $"  {padName} : {padValue} : {type}");
+                stringBuilder
+                    .AppendFormat($"{Environment.NewLine}");
                 return stringBuilder;
             }
         }

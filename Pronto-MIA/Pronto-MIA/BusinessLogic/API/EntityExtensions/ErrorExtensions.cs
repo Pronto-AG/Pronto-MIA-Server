@@ -1,8 +1,10 @@
 namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
 {
     using System;
+    using System.Text;
     using HotChocolate;
     using HotChocolate.Execution;
+    using Pronto_MIA.BusinessLogic.API.Types;
 
     /// <summary>
     /// Class defining the extension methods regarding the
@@ -23,6 +25,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             return new QueryException(
                 ErrorBuilder
                     .New()
+                    .SetExtension("traceId", string.Empty)
                     .SetMessage(error.Message())
                     .SetCode(error.ToString())
                     .Build());

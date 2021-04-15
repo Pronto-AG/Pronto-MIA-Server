@@ -1,53 +1,32 @@
 namespace Pronto_MIA.Services
 {
-    using System.Text;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.IdentityModel.Tokens;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
-    /// Class representing an authentication service which can be used to
-    /// authenticate incoming users with the api.
+    /// Class representing the logging service.
     /// </summary>
-    public static class AuthenticationService
+    public static class LoggingService
     {
         /// <summary>
-        /// Method to add the authentication service to the service collection.
-        /// In this method a JWTBearer authentication scheme is configured and
-        /// added to the service collection.
+        /// Method to configure logging within the applications service
+        /// collection.
         /// </summary>
-        /// <param name="services">Service collection.</param>
-        /// <param name="cfg">Application configuration.</param>
-        public static void AddAuthenticationService(
-            this IServiceCollection services, IConfiguration cfg)
+        /// <param name="services">Service collection to be adjusted.</param>
+        /// <returns>The adjusted service collection.</returns>
+        public static IServiceCollection ConfigureLogging(
+            this IServiceCollection services)
         {
-            var signingKey = cfg.GetValue<string>("JWT:SIGNING_KEY");
-            var issuer = cfg.GetValue<string>("JWT:ISSUER");
-            var audience = cfg.GetValue<string>("JWT:AUDIENCE");
-            var requiresHttps = cfg.GetValue<bool>("JWT:REQUIRE_HTTPS");
-
-            var key = Encoding.ASCII.GetBytes(signingKey);
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.AddLogging(opt =>
+            {
+                opt.AddSimpleConsole(options =>
                 {
-                    options.TokenValidationParameters =
-                        new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = issuer,
-
-                        ValidateAudience = true,
-                        ValidAudience = audience,
-
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-
-                        ValidateLifetime = true,
-                    };
-                    options.RequireHttpsMetadata = requiresHttps;
-                    options.SaveToken = true;
+                    options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+                    options.IncludeScopes = true;
                 });
+            });
+
+            return services;
         }
     }
 }

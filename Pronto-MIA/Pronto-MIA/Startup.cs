@@ -11,6 +11,7 @@ namespace Pronto_MIA
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Services;
@@ -45,6 +46,7 @@ namespace Pronto_MIA
         /// <param name="services">The Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.ConfigureLogging();
             services.AddHttpContextAccessor();
             services.AddScoped<UserManager, UserManager>();
             services.AddScoped<FileManager, FileManager>();
