@@ -1,6 +1,5 @@
 namespace Pronto_MIA.BusinessLogic.API.Logging
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -82,10 +81,9 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
 
             public void Dispose()
             {
-                StringBuilder stringBuilder = new StringBuilder(
-                    "Request ended. Content was:");
-                stringBuilder.Append(Environment.NewLine);
                 queryTimer.Stop();
+                var query = string.Empty;
+                var variables = new List<QueryVariable>();
                 if (this.context.Document is not null)
                 {
                     var stringDocument = this.context.Document.ToString(true);
@@ -93,41 +91,18 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                         GetSensitiveParameters(stringDocument);
                     var sensitiveVariables = GetSensitiveVariables(
                         stringDocument, sensitiveParameters);
-                    stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                    stringBuilder.Append(Environment.NewLine);
-                    stringBuilder.Append(this.FormatQuery(
-                        stringDocument, sensitiveParameters));
+                    query = CleanQuery(stringDocument, sensitiveParameters);
                     if (this.context.Variables != null)
                     {
-                        stringBuilder.Append(
-                            this.FormatVariables(sensitiveVariables));
+                        variables = CleanVariables(
+                                this.context.Variables!.ToList(),
+                                sensitiveVariables);
                     }
                 }
 
-                stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                stringBuilder.Append(Environment.NewLine);
-                var timeNeeded = queryTimer.Elapsed.TotalMilliseconds;
-                stringBuilder.AppendFormat(
-                    $"Time needed: {timeNeeded:0.#} milliseconds.");
-                this.logger.LogInformation(stringBuilder.ToString());
-            }
-
-            private static string PaddingHelper(
-                string existingString,
-                int lengthToPadTo)
-            {
-                if (string.IsNullOrEmpty(existingString))
-                {
-                    return string.Empty.PadRight(lengthToPadTo);
-                }
-
-                if (existingString.Length > lengthToPadTo)
-                {
-                    return existingString.Substring(0, lengthToPadTo);
-                }
-
-                return existingString + " "
-                    .PadRight(lengthToPadTo - existingString.Length);
+                this.logger.LogInformation(
+                    QueryLoggerFormatter.FormatQuery(
+                        query, variables, queryTimer.Elapsed.Milliseconds));
             }
 
             private static List<string> GetSensitiveParameters(string document)
@@ -138,10 +113,10 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                     .ToList();
             }
 
-            //Regex is:
+            // Regex is:
             // {parameter}fcmToken}\s*:\s*\$(?<variableName>[^\s,\)]*)
             private static List<string> GetSensitiveVariables(
-                string document, List<string> sensitiveParameters)
+                string document, IEnumerable<string> sensitiveParameters)
             {
                 var sensitiveVariables = new List<string>();
                 foreach (var parameter in sensitiveParameters)
@@ -172,9 +147,9 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             // {parameter}\s*:\s*(?=")(?:"(?<content>[^"\\]*(?:\\[\s\S]
             //      [^"\\]*)*)")
             private static string ReplaceSensitiveParameters(
-                string content, List<string> parameters)
+                string content, IEnumerable<string> parameters)
             {
-                string result = content;
+                var result = content;
                 foreach (var parameter in parameters)
                 {
                     result = Regex.Replace(
@@ -189,70 +164,39 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
                 return result;
             }
 
-            private static StringBuilder FormatVariable(
-                StringBuilder stringBuilder,
-                VariableValue variable,
-                List<string> sensitiveVariables)
-            {
-                var variableName = variable.Name.ToString();
-                var variableValue = variable.Value.ToString();
-                if (sensitiveVariables.Contains(variableName))
-                {
-                    variableValue = "***";
-                }
-
-                var padName = PaddingHelper(variableName, 20);
-                var padValue =
-                    PaddingHelper(variableValue, 20);
-                var type = variable.Type;
-                stringBuilder.AppendFormat(
-                    $"  {padName} : {padValue} : {type}");
-                stringBuilder
-                    .AppendFormat($"{Environment.NewLine}");
-                return stringBuilder;
-            }
-
-            private StringBuilder FormatQuery(
+            private static string CleanQuery(
                 string document, List<string> sensitiveParameters)
             {
-                StringBuilder stringBuilder =
-                    new (
-                        ReplaceSensitiveParameters(
-                            this.context.Document!.ToString(true),
-                            sensitiveParameters));
-                return stringBuilder;
+                return ReplaceSensitiveParameters(
+                    document,
+                    sensitiveParameters);
             }
 
-            private StringBuilder FormatVariables(
-                List<string> sensitiveVariables)
+            private static List<QueryVariable> CleanVariables(
+                IReadOnlyCollection<VariableValue> variables,
+                ICollection<string> sensitiveVariables)
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine();
-                var variablesConcrete = this.context.Variables!.ToList();
-                if (variablesConcrete.Count > 0)
+                var cleanVariables = new List<QueryVariable>();
+                if (variables.Count <= 0)
                 {
-                    stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                    stringBuilder.Append(Environment.NewLine);
-                    stringBuilder.
-                        AppendFormat($"Variables: {Environment.NewLine}");
-                    try
-                    {
-                        foreach (var variable in variablesConcrete)
-                        {
-                            stringBuilder = FormatVariable(
-                                stringBuilder, variable, sensitiveVariables);
-                        }
-                    }
-                    catch
-                    {
-                        // all input type records will land here.
-                        stringBuilder.Append(
-                            "  Formatting Variables Error. Continuing...");
-                        stringBuilder.AppendFormat($"{Environment.NewLine}");
-                    }
+                    return cleanVariables;
                 }
 
-                return stringBuilder;
+                foreach (var variable in variables)
+                {
+                    QueryVariable newVariable = default(QueryVariable);
+                    newVariable.Name = variable.Name.ToString();
+                    newVariable.Type = variable.Type.ToString();
+                    newVariable.Value = variable.Value.ToString();
+                    if (sensitiveVariables.Contains(newVariable.Name))
+                    {
+                        newVariable.Value = "***";
+                    }
+
+                    cleanVariables.Add(newVariable);
+                }
+
+                return cleanVariables;
             }
         }
     }
