@@ -3,13 +3,11 @@ namespace Pronto_MIA
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Console;
 
     /// <summary>
     /// Class for starting the application.
     /// </summary>
-    public class Program
+    public static class Program
     {
         /// <summary>
         /// Method to create and configure a builder object which may then be
