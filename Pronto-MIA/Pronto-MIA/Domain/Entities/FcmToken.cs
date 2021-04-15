@@ -1,5 +1,7 @@
 namespace Pronto_MIA.Domain.Entities
 {
+    using Pronto_MIA.BusinessLogic.API.Logging;
+
     /// <summary>
     /// Token representing a device registered with firebase cloud messaging.
     /// </summary>
@@ -28,9 +30,9 @@ namespace Pronto_MIA.Domain.Entities
         }
 
         /// <summary>
-        /// Gets the token identifier.
+        /// Gets or sets the token identifier.
         /// </summary>
-        public string Id { get; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets or sets the user associated with this token.

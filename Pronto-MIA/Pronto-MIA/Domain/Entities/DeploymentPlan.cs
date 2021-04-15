@@ -17,7 +17,7 @@ namespace Pronto_MIA.Domain.Entities
         /// <param name="availableUntil">The
         /// <see cref="AvailableUntil"/> property.</param>
         /// <param name="fileUUID">The
-        /// <see cref="FileUUID"/> property.</param>
+        /// <see cref="FileUuid"/> property.</param>
         /// <param name="fileExtension">The
         /// <see cref="FileExtension"/> property.</param>
         public DeploymentPlan(
@@ -28,7 +28,7 @@ namespace Pronto_MIA.Domain.Entities
         {
             this.AvailableFrom = availableFrom;
             this.AvailableUntil = availableUntil;
-            this.FileUUID = fileUUID;
+            this.FileUuid = fileUUID;
             this.FileExtension = fileExtension;
         }
 
@@ -42,7 +42,7 @@ namespace Pronto_MIA.Domain.Entities
         {
             this.AvailableFrom = default;
             this.AvailableUntil = default;
-            this.FileUUID = Guid.Empty;
+            this.FileUuid = Guid.Empty;
             this.FileExtension = string.Empty;
         }
 
@@ -52,29 +52,29 @@ namespace Pronto_MIA.Domain.Entities
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets the moment from which this deployment plan should be treated as
-        /// active.
+        /// Gets or sets the moment from which this deployment plan should be
+        /// treated as active.
         /// </summary>
-        public DateTime AvailableFrom { get; }
+        public DateTime AvailableFrom { get; set; }
 
         /// <summary>
-        /// Gets the moment until which the deployment plan will be treated as
-        /// active.
+        /// Gets or sets the moment until which the deployment plan will be
+        /// treated as active.
         /// </summary>
-        public DateTime AvailableUntil { get; }
+        public DateTime AvailableUntil { get; set; }
 
         /// <summary>
-        /// Gets the uuid used as file name for the file associated with this
+        /// Gets or sets the uuid used as file name for the file associated with
+        /// this deployment plan.
+        /// </summary>
+        [GraphQLIgnore]
+        public Guid FileUuid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file extension of the file associated with this
         /// deployment plan.
         /// </summary>
         [GraphQLIgnore]
-        public Guid FileUUID { get; }
-
-        /// <summary>
-        /// Gets the file extension of the file associated with this deployment
-        /// plan.
-        /// </summary>
-        [GraphQLIgnore]
-        public string FileExtension { get; }
+        public string FileExtension { get; set; }
     }
 }

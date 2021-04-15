@@ -9,8 +9,10 @@ namespace Pronto_MIA.BusinessLogic.API
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
+    using HotChocolate.Execution;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
@@ -40,13 +42,59 @@ namespace Pronto_MIA.BusinessLogic.API
             DateTime availableFrom,
             DateTime availableUntil)
         {
-            var result = await deploymentPlanManager.Create(
+            return await deploymentPlanManager.Create(
                 file,
                 availableFrom,
                 availableUntil);
-            return result.Match(
-                deploymentPlan => deploymentPlan,
-                error => throw error.AsQueryException());
+        }
+
+        /// <summary>
+        /// Method that updates the deployment plan with the given id according
+        /// to the provided information.
+        /// </summary>
+        /// <param name="deploymentPlanManager">The manager responsible for
+        /// managing deployment plans.</param>
+        /// <param name="id">The id of the deployment plan to be adjusted.
+        /// </param>
+        /// <param name="file">The file to be associated with the new deployment
+        /// plan.</param>
+        /// <param name="availableFrom">The moment from which the deployment
+        /// plan will be treated as active.</param>
+        /// <param name="availableUntil">The moment until which the deployment
+        /// plan will be treated as active.</param>
+        /// <returns>The updated deployment plan.</returns>
+        /// <exception cref="QueryException">Returns DeploymentPlanNotFound
+        /// exception if the deployment plan with given id could not be found.
+        /// </exception>
+        [Authorize]
+        [UseSingleOrDefault]
+        public async Task<IQueryable<DeploymentPlan?>> UpdateDeploymentPlan(
+            [Service] DeploymentPlanManager deploymentPlanManager,
+            int id,
+            IFile? file,
+            DateTime? availableFrom,
+            DateTime? availableUntil)
+        {
+            return await deploymentPlanManager.Update(
+                id, file, availableFrom, availableUntil);
+        }
+
+        /// <summary>
+        /// Method that removes the deployment plan with the given id.
+        /// </summary>
+        /// <param name="deploymentPlanManager">The manager responsible for
+        /// managing deployment plans.</param>
+        /// <param name="id">Id of the plan to be removed.</param>
+        /// <returns>The id of the plan which was removed.</returns>
+        /// <exception cref="QueryException">Returns DeploymentPlanNotFound
+        /// exception if the deployment plan with given id could not be found.
+        /// </exception>
+        [Authorize]
+        public async Task<int> RemoveDeploymentPlan(
+            [Service] DeploymentPlanManager deploymentPlanManager,
+            int id)
+        {
+            return await deploymentPlanManager.Remove(id);
         }
 
         /// <summary>
@@ -91,7 +139,9 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="fcmToken">The token to be registered.</param>
         /// <returns>True if the token was saved successfully.</returns>
         [Authorize]
-        [UseSingleOrDefault] // [UseProjection]
+        [UseSingleOrDefault]
+        [UseProjection]
+        [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             [Service] FirebaseMessagingManager firebaseMessagingManager,
             [Service] UserManager userManager,

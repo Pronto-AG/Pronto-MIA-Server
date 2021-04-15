@@ -1,6 +1,5 @@
 namespace Pronto_MIA.Services
 {
-    using System;
     using System.Security.Claims;
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,11 +7,11 @@ namespace Pronto_MIA.Services
     using HotChocolate.Types;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
-    using Npgsql;
+    using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
-    using Pronto_MIA.DataAccess;
 
     /// <summary>
     /// Service which initializes and contains all information regarding the
@@ -39,40 +38,11 @@ namespace Pronto_MIA.Services
                 .AddMutationType<Mutation>()
                 .AddProjections()
                 .AddFiltering()
-                .AddSorting();
-            AddErrorHandling(services);
-        }
-
-        /// <summary>
-        /// Adds a global error handler which catches unknown errors as well
-        /// as problems with the database.
-        /// </summary>
-        /// <param name="services">The service collection of the application.
-        /// </param>
-        private static void AddErrorHandling(IServiceCollection services)
-        {
-            services.AddErrorFilter(error =>
-            {
-                switch (error.Exception)
-                {
-                    case null:
-                        return error;
-                    case InvalidOperationException _
-                        when error.Exception.InnerException is NpgsqlException:
-                    case NpgsqlException:
-                        return error
-                            .WithCode(Error.DatabaseOperationError
-                                .ToString())
-                            .WithMessage(
-                                Error.DatabaseOperationError.Message());
-                    default:
-                        return error
-                            .WithCode(Error.UnknownError
-                                .ToString())
-                            .WithMessage(
-                                Error.UnknownError.Message());
-                }
-            });
+                .AddSorting()
+                .AddErrorFilter<ErrorFilter>()
+                .AddDiagnosticEventListener(sp =>
+                    new QueryLogger(
+                        sp.GetApplicationService<ILogger<QueryLogger>>()));
         }
 
         /// <summary>

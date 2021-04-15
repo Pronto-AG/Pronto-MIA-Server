@@ -6,11 +6,12 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
-    using LanguageExt;
+    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.IdentityModel.Tokens;
+    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.Security;
     using Pronto_MIA.Domain.Entities;
 
@@ -59,17 +60,16 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="userName">The username of the user to be authenticated.
         /// </param>
         /// <param name="password">The password of the user.</param>
-        /// <returns>A tuple of an error and a string. If no error occured the
-        /// error will be null and the string will contain a JWT-Bearer-Token.
-        /// If an error occured the string will be null and the error will
-        /// contain the corresponding error object.</returns>
-        public async Task<Either<DataAccess.Error, string>> Authenticate(
+        /// <returns>The generated token.</returns>
+        /// <exception cref="QueryException">Throws if the user could not be
+        /// found or has provided an invalid password.</exception>
+        public async Task<string> Authenticate(
             string userName, string password)
         {
             var user = await this.GetByUserName(userName);
             if (user == default)
             {
-                return DataAccess.Error.UserNotFound;
+                throw DataAccess.Error.UserNotFound.AsQueryException();
             }
 
             var hashGenerator = HashGeneratorFactory.GetGeneratorForUser(user);
@@ -79,7 +79,7 @@ namespace Pronto_MIA.DataAccess.Managers
             {
                 this.logger.LogWarning(
                     "Invalid password for user {UserName}", userName);
-                return DataAccess.Error.WrongPassword;
+                throw DataAccess.Error.WrongPassword.AsQueryException();
             }
 
             this.logger.LogDebug(
@@ -131,6 +131,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogDebug(
                 "Token for user {UserName} has been created",
                 user.UserName);
+
             return tokenString;
         }
     }

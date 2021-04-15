@@ -1,17 +1,13 @@
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
-    using HotChocolate.Execution;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
-    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
-    using Pronto_MIA.DataAccess;
+    using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
 
@@ -44,17 +40,13 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="password">The password of the user.</param>
         /// <returns>A JWT-Bearer-Token which can be used within the
         /// authentication header in order to authenticate the user.</returns>
-        /// <exception cref="QueryException">If a problem occured during
-        /// authentication.</exception>
-        public async Task<string?> Authenticate(
+        [Sensitive("password")]
+        public async Task<string> Authenticate(
             [Service] UserManager userManager,
             string userName,
             string password)
         {
-            var result = await userManager.Authenticate(userName, password);
-            return result.Match(
-                token => token,
-                error => throw error.AsQueryException());
+            return await userManager.Authenticate(userName, password);
         }
 
         /// <summary>
