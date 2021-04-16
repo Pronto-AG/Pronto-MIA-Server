@@ -9,6 +9,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// authentication header in order to authenticate the user.</returns>
         [Sensitive("password")]
         public async Task<string> Authenticate(
-            [Service] UserManager userManager,
+            [Service] IUserManager userManager,
             string userName,
             string password)
         {
@@ -60,7 +61,7 @@ namespace Pronto_MIA.BusinessLogic.API
         [UseFiltering]
         [UseSorting]
         public IQueryable<DeploymentPlan?> DeploymentPlans(
-            [Service] DeploymentPlanManager deploymentPlanManager)
+            [Service] IDeploymentPlanManager deploymentPlanManager)
         {
             return deploymentPlanManager.GetAll();
         }

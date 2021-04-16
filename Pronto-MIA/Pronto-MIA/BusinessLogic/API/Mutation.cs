@@ -14,7 +14,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
-    using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -37,7 +37,7 @@ namespace Pronto_MIA.BusinessLogic.API
         [Authorize]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan?>> AddDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             IFile file,
             DateTime availableFrom,
             DateTime availableUntil)
@@ -69,7 +69,7 @@ namespace Pronto_MIA.BusinessLogic.API
         [Authorize]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan?>> UpdateDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             int id,
             IFile? file,
             DateTime? availableFrom,
@@ -91,7 +91,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </exception>
         [Authorize]
         public async Task<int> RemoveDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             int id)
         {
             return await deploymentPlanManager.Remove(id);
@@ -109,7 +109,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </returns>
         [Authorize]
         public async Task<bool> SendPushTo(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
             string deviceToken)
         {
             var message = new Message()
@@ -143,8 +143,8 @@ namespace Pronto_MIA.BusinessLogic.API
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
-            [Service] UserManager userManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
@@ -168,7 +168,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="token">The fcm token to be removed.</param>
         /// <returns>True if the token could be removed.</returns>
         public async Task<bool> UnregisterFcmToken(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
             string token)
         {
             return await firebaseMessagingManager.UnregisterFcmToken(token);

@@ -11,12 +11,13 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
     /// Class responsible for managing firebase messaging.
     /// </summary>
-    public class FirebaseMessagingManager
+    public class FirebaseMessagingManager : IFirebaseMessagingManager
     {
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
@@ -34,8 +35,8 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="cfg">The configuration of this application.</param>
         public FirebaseMessagingManager(
             ProntoMiaDbContext dbContext,
-            ILogger<FirebaseMessagingManager> logger,
-            IConfiguration cfg)
+            IConfiguration cfg,
+            ILogger<FirebaseMessagingManager> logger)
         {
             this.dbContext = dbContext;
             this.cfg = cfg;
@@ -43,13 +44,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.instance = this.GetInstance();
         }
 
-        /// <summary>
-        /// Sends the given message with firebase messaging to the devices
-        /// specified within the message.
-        /// </summary>
-        /// <param name="message">Firebase messaging message object which
-        /// contains the information required to send a message.</param>
-        /// <returns>True if sending was successful false otherwise.</returns>
+        /// <inheritdoc/>
         public async Task<bool> SendAsync(Message message)
         {
             try
@@ -67,14 +62,7 @@ namespace Pronto_MIA.DataAccess.Managers
             return true;
         }
 
-        /// <summary>
-        /// Method to register a new fcm token for a user. If the token is
-        /// already registered the owner will be adjusted.
-        /// </summary>
-        /// <param name="user"> The owner of the fcm token.
-        /// </param>
-        /// <param name="fcmToken">The token to be added.</param>
-        /// <returns>The created fcm token.</returns>
+        /// <inheritdoc/>
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             User user, string fcmToken)
         {
@@ -87,12 +75,7 @@ namespace Pronto_MIA.DataAccess.Managers
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
         }
 
-        /// <summary>
-        /// Method to remove a fcm token from the database.
-        /// </summary>
-        /// <param name="fcmToken">The token to be removed.</param>
-        /// <returns>True if the token could be removed false if the token did
-        /// not exist.</returns>
+        /// <inheritdoc/>
         public async Task<bool> UnregisterFcmToken(string fcmToken)
         {
             var tokenObject = await this.dbContext.FcmTokens

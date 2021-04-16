@@ -8,11 +8,12 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
 
     /// <summary>
     /// Class responsible for the lifecycle of a user within the application.
     /// </summary>
-    public class FileManager
+    public class FileManager : IFileManager
     {
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
@@ -34,41 +35,11 @@ namespace Pronto_MIA.DataAccess.Managers
         private string RootDirectory => this.cfg.GetValue<string>(
             "StaticFiles:ROOT_DIRECTORY");
 
-        /// <summary>
-        /// Method to extract the file extension from a <see cref="IFile"/>
-        /// object.
-        /// </summary>
-        /// <param name="file">The file from which the extension should be
-        /// extracted.</param>
-        /// <returns>The file extension.</returns>
-        /// <exception cref="QueryException">Throws if the file that was
-        /// uploaded has no file extension.</exception>
-        public static string GetFileExtension(IFile file)
-        {
-            var ext = Path.GetExtension(file.Name);
-            if (string.IsNullOrEmpty(ext))
-            {
-                throw DataAccess.Error.FileOperationError.AsQueryException();
-            }
-
-            return ext!;
-        }
-
-        /// <summary>
-        /// Method that creates a file inside the directory where files are
-        /// statically served by ASP.NET.
-        /// </summary>
-        /// <param name="subDirectory">The subdirectory in which the new file
-        /// should be placed.</param>
-        /// <param name="fileName">The name the file should be saved as.</param>
-        /// <param name="file">The file that will be saved.</param>
-        /// <returns>Empty task.</returns>
-        /// <exception cref="QueryException">Throws if an error occured during
-        /// file creation.</exception>
+        /// <inheritdoc/>
         public async Task
             Create(string subDirectory, string fileName, IFile file)
         {
-            var ext = FileManager.GetFileExtension(file);
+            var ext = IFileManager.GetFileExtension(file);
 
             try
             {
@@ -94,16 +65,7 @@ namespace Pronto_MIA.DataAccess.Managers
             }
         }
 
-        /// <summary>
-        /// Method that removes a file from the directory statically served by
-        /// ASP.NET.
-        /// </summary>
-        /// <param name="subDirectory">The subdirectory in which the file can
-        /// be found.</param>
-        /// <param name="fileName">The name of the file.</param>
-        /// <param name="fileExtension">The file extension of the file.</param>
-        /// <exception cref="QueryException">Throws if the given file could not
-        /// be removed.</exception>
+        /// <inheritdoc/>
         public void Remove(
             string subDirectory,
             string fileName,

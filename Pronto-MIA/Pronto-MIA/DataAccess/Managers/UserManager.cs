@@ -6,19 +6,19 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
-    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.IdentityModel.Tokens;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.Security;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
     /// Class responsible for the lifecycle of a user within the application.
     /// </summary>
-    public class UserManager
+    public class UserManager : IUserManager
     {
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
@@ -54,15 +54,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private int ValidForDays =>
             this.cfg.GetValue<int>("JWT:VALID_FOR_DAYS");
 
-        /// <summary>
-        /// Method to authenticate a user.
-        /// </summary>
-        /// <param name="userName">The username of the user to be authenticated.
-        /// </param>
-        /// <param name="password">The password of the user.</param>
-        /// <returns>The generated token.</returns>
-        /// <exception cref="QueryException">Throws if the user could not be
-        /// found or has provided an invalid password.</exception>
+        /// <inheritdoc/>
         public async Task<string> Authenticate(
             string userName, string password)
         {
@@ -87,11 +79,7 @@ namespace Pronto_MIA.DataAccess.Managers
             return this.GenerateToken(user);
         }
 
-        /// <summary>
-        /// Method that returns a User object for the given username.
-        /// </summary>
-        /// <param name="userName">The name of the user to be found.</param>
-        /// <returns>User or default if user could not be found.</returns>
+        /// <inheritdoc/>
         public async Task<User?>
             GetByUserName(string userName)
         {
