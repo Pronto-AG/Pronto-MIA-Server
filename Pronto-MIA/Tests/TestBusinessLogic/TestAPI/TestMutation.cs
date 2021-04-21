@@ -92,12 +92,11 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
-            User user = await this.dbContext.Users
+            var userTask = this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
             var userManager =
                 Substitute.For<IUserManager>();
-            userManager.GetByUserName("Bob").Returns(
-                Task.FromResult(user));
+            userManager.GetByUserName("Bob").Returns(userTask);
 
             await this.mutation.RegisterFcmToken(
                 firebaseMessagingManager,
@@ -107,7 +106,7 @@ namespace Tests.TestBusinessLogic.TestAPI
 
             await userManager.Received().GetByUserName("Bob");
             await firebaseMessagingManager.Received()
-                .RegisterFcmToken(user, "Hello World");
+                .RegisterFcmToken(await userTask, "Hello World");
         }
 
         [Fact]
