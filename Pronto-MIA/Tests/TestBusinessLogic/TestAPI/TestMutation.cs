@@ -92,7 +92,7 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
-            var user = await this.dbContext.Users
+            User user = await this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
             var userManager =
                 Substitute.For<IUserManager>();
