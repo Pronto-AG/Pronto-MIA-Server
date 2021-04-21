@@ -27,6 +27,7 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
             stringBuilder.AppendLine();
             stringBuilder.Append(query);
+            stringBuilder.AppendLine();
             FormatVariables(stringBuilder, variables);
             stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
             stringBuilder.AppendLine();

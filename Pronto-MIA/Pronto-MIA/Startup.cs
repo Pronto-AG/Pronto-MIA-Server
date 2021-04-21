@@ -1,7 +1,9 @@
 namespace Pronto_MIA
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Net;
     using HotChocolate.AspNetCore;
     using Microsoft.AspNetCore.Builder;
@@ -11,7 +13,6 @@ namespace Pronto_MIA
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
@@ -20,6 +21,7 @@ namespace Pronto_MIA
     /// <summary>
     /// Class for starting up the Asp.Net application.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         /// <summary>
@@ -49,6 +51,7 @@ namespace Pronto_MIA
         {
             services.ConfigureLogging();
             services.AddHttpContextAccessor();
+            services.AddScoped<IFileSystem, FileSystem>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IFileManager, FileManager>();
             services.AddScoped<IDeploymentPlanManager, DeploymentPlanManager>();

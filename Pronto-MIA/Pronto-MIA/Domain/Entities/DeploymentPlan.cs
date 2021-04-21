@@ -16,19 +16,19 @@ namespace Pronto_MIA.Domain.Entities
         /// <see cref="AvailableFrom"/> property.</param>
         /// <param name="availableUntil">The
         /// <see cref="AvailableUntil"/> property.</param>
-        /// <param name="fileUUID">The
+        /// <param name="fileUuid">The
         /// <see cref="FileUuid"/> property.</param>
         /// <param name="fileExtension">The
         /// <see cref="FileExtension"/> property.</param>
         public DeploymentPlan(
             DateTime availableFrom,
             DateTime availableUntil,
-            Guid fileUUID,
+            Guid fileUuid,
             string fileExtension)
         {
             this.AvailableFrom = availableFrom;
             this.AvailableUntil = availableUntil;
-            this.FileUuid = fileUUID;
+            this.FileUuid = fileUuid;
             this.FileExtension = fileExtension;
         }
 

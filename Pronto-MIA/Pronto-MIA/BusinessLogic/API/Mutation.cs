@@ -165,13 +165,13 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="firebaseMessagingManager">The manager managing
         /// operations with firebase messaging.
         /// </param>
-        /// <param name="token">The fcm token to be removed.</param>
+        /// <param name="fcmToken">The fcm token to be removed.</param>
         /// <returns>True if the token could be removed.</returns>
         public async Task<bool> UnregisterFcmToken(
             [Service] IFirebaseMessagingManager firebaseMessagingManager,
-            string token)
+            string fcmToken)
         {
-            return await firebaseMessagingManager.UnregisterFcmToken(token);
+            return await firebaseMessagingManager.UnregisterFcmToken(fcmToken);
         }
     }
 }

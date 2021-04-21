@@ -2,13 +2,14 @@ namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
-    using HotChocolate.Types;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
+    using IFile = HotChocolate.Types.IFile;
 
     /// <summary>
     /// Class responsible for the lifecycle of a user within the application.
@@ -17,6 +18,7 @@ namespace Pronto_MIA.DataAccess.Managers
     {
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
+        private readonly IFileSystem fileSystem;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileManager"/> class.
@@ -24,12 +26,16 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="logger">The logger to be used in order to document
         /// events regarding this user manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
+        /// <param name="fileSystem">The file system to be used by the manager
+        /// in order to persist files.</param>
         public FileManager(
             IConfiguration cfg,
-            ILogger<FileManager> logger)
+            ILogger<FileManager> logger,
+            IFileSystem fileSystem)
         {
             this.cfg = cfg;
             this.logger = logger;
+            this.fileSystem = fileSystem;
         }
 
         private string RootDirectory => this.cfg.GetValue<string>(
@@ -43,14 +49,14 @@ namespace Pronto_MIA.DataAccess.Managers
 
             try
             {
-                Directory.CreateDirectory(
+                this.fileSystem.Directory.CreateDirectory(
                     this.GetDirectoryPath(subDirectory));
-                await using Stream stream = file.OpenReadStream();
-                await using FileStream fs = File.Create(
+                var readStream = file.OpenReadStream();
+                var writeStream = this.fileSystem.File.Create(
                     this.GetFilePath(subDirectory, fileName, ext));
-                await stream.CopyToAsync(fs);
-                stream.Close();
-                fs.Close();
+                await readStream.CopyToAsync(writeStream);
+                readStream.Close();
+                writeStream.Close();
                 this.logger.LogDebug(
                     "File {File} has been created",
                     subDirectory + "/" + fileName + "." + ext);
@@ -73,7 +79,7 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             try
             {
-                File.Delete(
+                this.fileSystem.File.Delete(
                     this.GetFilePath(subDirectory, fileName, fileExtension));
                 this.logger.LogDebug(
                     "File {File} has been removed", fileName);
@@ -84,6 +90,7 @@ namespace Pronto_MIA.DataAccess.Managers
                     "File {File} could not be removed. Error: \n {error}",
                     subDirectory + "/" + fileName + "." + fileExtension,
                     error);
+                throw DataAccess.Error.FileOperationError.AsQueryException();
             }
         }
 

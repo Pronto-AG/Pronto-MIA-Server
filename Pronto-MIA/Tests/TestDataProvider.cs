@@ -8,11 +8,16 @@ namespace Tests
 
     public static class TestDataProvider
     {
+        public static void InsertTestData(ProntoMiaDbContext context)
+        {
+            InsertUsers(context);
+        }
+
         [SuppressMessage(
             "Menees.Analyzers",
             "MEN002",
             Justification = "Inline hashes and salts.")]
-        public static void InsertTestData(ProntoMiaDbContext context)
+        private static void InsertUsers(ProntoMiaDbContext context)
         {
             if (!context.Users.Any())
             {

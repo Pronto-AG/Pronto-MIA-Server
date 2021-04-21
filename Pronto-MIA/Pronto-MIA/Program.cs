@@ -1,5 +1,6 @@
 namespace Pronto_MIA
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
@@ -7,6 +8,7 @@ namespace Pronto_MIA
     /// <summary>
     /// Class for starting the application.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class Program
     {
         /// <summary>

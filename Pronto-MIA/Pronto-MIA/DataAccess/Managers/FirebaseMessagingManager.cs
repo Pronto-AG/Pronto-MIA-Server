@@ -11,6 +11,8 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess;
+    using Pronto_MIA.DataAccess.Adapters;
+    using Pronto_MIA.DataAccess.Adapters.Interfaces;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -22,7 +24,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
-        private readonly FirebaseMessaging instance;
+        private readonly IFirebaseMessagingAdapter instance;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -33,15 +35,18 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="logger">The logger to be used in order to document
         /// events regarding this manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
+        /// <param name="instance">The firebase messaging instance used
+        /// in order to send messages.</param>
         public FirebaseMessagingManager(
             ProntoMiaDbContext dbContext,
             IConfiguration cfg,
-            ILogger<FirebaseMessagingManager> logger)
+            ILogger<FirebaseMessagingManager> logger,
+            IFirebaseMessagingAdapter? instance = null)
         {
             this.dbContext = dbContext;
             this.cfg = cfg;
             this.logger = logger;
-            this.instance = this.GetInstance();
+            this.instance = instance ?? this.GetInstance();
         }
 
         /// <inheritdoc/>
@@ -67,9 +72,6 @@ namespace Pronto_MIA.DataAccess.Managers
             User user, string fcmToken)
         {
             await this.MoveOrCreateFcmToken(user, fcmToken);
-
-            var result = this.dbContext.FcmTokens.Where(
-                fcmTokenDb => fcmTokenDb.Id == fcmToken);
 
             return this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
@@ -155,11 +157,12 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <summary>
         /// Method to get a singleton instance of the firebase app.
         /// </summary>
-        private FirebaseMessaging GetInstance()
+        private IFirebaseMessagingAdapter GetInstance()
         {
             if (FirebaseMessaging.DefaultInstance != null)
             {
-                return FirebaseMessaging.DefaultInstance;
+                return new FirebaseMessagingAdapter(
+                    FirebaseMessaging.DefaultInstance);
             }
 
             var credentialFile =
@@ -171,7 +174,8 @@ namespace Pronto_MIA.DataAccess.Managers
             });
             this.logger.LogDebug("Created firebase app instance");
 
-            return FirebaseMessaging.DefaultInstance!;
+            return new FirebaseMessagingAdapter(
+                FirebaseMessaging.DefaultInstance);
         }
     }
 }
