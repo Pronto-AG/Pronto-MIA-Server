@@ -1,15 +1,14 @@
 namespace Pronto_MIA
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Logging.Console;
 
     /// <summary>
     /// Class for starting the application.
     /// </summary>
-    public class Program
+    public static class Program
     {
         /// <summary>
         /// Method to create and configure a builder object which may then be
@@ -19,7 +18,7 @@ namespace Pronto_MIA
         /// <returns>The created builder object.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
+                .ConfigureAppConfiguration((_, config) =>
                 {
                     config.AddEnvironmentVariables(prefix: "pronto-mia_");
                 })

@@ -1,6 +1,6 @@
 namespace Pronto_MIA.BusinessLogic.API.Logging
 {
-    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
@@ -61,25 +61,6 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             return new RequestScope(this.logger, context);
         }
 
-        // Regex is:
-        // {parameter}\s*:\s*(?=")(?:"(?<content>[^"\\]*(?:\\[\s\S][^"\\]*)*)")
-        private static string ReplaceSensitiveInfo(string content)
-        {
-            string result = content;
-            foreach (var parameter in SensitiveParameters)
-            {
-                result = Regex.Replace(
-                    result,
-                    new StringBuilder(parameter)
-                        .Append("\\s*:\\s*(?=\")(?:\"(?<content>[^\"\\\\]*")
-                        .Append("(?:\\\\[\\s\\S][^\"\\\\]*)*)\")")
-                        .ToString(),
-                    $"{parameter}:\"***\"");
-            }
-
-            return result;
-        }
-
         private class RequestScope : IActivityScope
         {
             private readonly IRequestContext context;
@@ -91,12 +72,6 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             {
                 this.logger = logger;
                 this.context = context;
-                /*this.uuid = Guid.Parse(
-                    context.Services
-                        .GetApplicationServices()
-                        .GetService<ISessionIdAccessor>()
-                        ?.GetSessionId() ?? string.Empty)*/
-
                 this.logger.LogInformation(
                     "Request started");
 
@@ -106,106 +81,122 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
 
             public void Dispose()
             {
-                StringBuilder stringBuilder = new StringBuilder(
-                    "Request ended. Content was:");
-                stringBuilder.Append(Environment.NewLine);
                 queryTimer.Stop();
-
+                var query = string.Empty;
+                var variables = new List<QueryVariable>();
                 if (this.context.Document is not null)
                 {
-                    stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                    stringBuilder.Append(Environment.NewLine);
-                    stringBuilder.Append(this.FormatQuery());
-
+                    var stringDocument = this.context.Document.ToString(true);
+                    var sensitiveParameters =
+                        GetSensitiveParameters(stringDocument);
+                    var sensitiveVariables = GetSensitiveVariables(
+                        stringDocument, sensitiveParameters);
+                    query = CleanQuery(stringDocument, sensitiveParameters);
                     if (this.context.Variables != null)
                     {
-                        stringBuilder.Append(Environment.NewLine);
-                        stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                        stringBuilder.Append(this.FormatVariables());
+                        variables = CleanVariables(
+                                this.context.Variables!.ToList(),
+                                sensitiveVariables);
                     }
                 }
 
-                stringBuilder.Append("+-+-+-+-+-+-+-+-+-+");
-                stringBuilder.Append(Environment.NewLine);
-                var timeNeeded = queryTimer.Elapsed.TotalMilliseconds;
-                stringBuilder.AppendFormat(
-                    $"Time needed: {timeNeeded:0.#} milliseconds.");
-                this.logger.LogInformation(stringBuilder.ToString());
+                this.logger.LogInformation(
+                    QueryLoggerFormatter.FormatQuery(
+                        query, variables, queryTimer.Elapsed.Milliseconds));
             }
 
-            private static string PaddingHelper(
-                string existingString,
-                int lengthToPadTo)
+            private static List<string> GetSensitiveParameters(string document)
             {
-                if (string.IsNullOrEmpty(existingString))
-                {
-                    return string.Empty.PadRight(lengthToPadTo);
-                }
-
-                if (existingString.Length > lengthToPadTo)
-                {
-                    return existingString.Substring(0, lengthToPadTo);
-                }
-
-                return existingString + " "
-                    .PadRight(lengthToPadTo - existingString.Length);
+                return SensitiveParameters
+                    .Where(parameter =>
+                        StringContains(document, parameter))
+                    .ToList();
             }
 
-            private StringBuilder FormatQuery()
+            // Regex is:
+            // {parameter}fcmToken}\s*:\s*\$(?<variableName>[^\s,\)]*)
+            private static List<string> GetSensitiveVariables(
+                string document, IEnumerable<string> sensitiveParameters)
             {
-                StringBuilder stringBuilder =
-                    new (
-                        ReplaceSensitiveInfo(
-                            this.context.Document!.ToString(true)));
-                return stringBuilder;
-            }
-
-            private StringBuilder FormatVariables()
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine();
-
-                var variablesConcrete =
-                            this.context.Variables!.ToList();
-                if (variablesConcrete.Count > 0)
+                var sensitiveVariables = new List<string>();
+                foreach (var parameter in sensitiveParameters)
                 {
-                    stringBuilder.
-                        AppendFormat($"Variables: {Environment.NewLine}");
-                    try
+                    var result = Regex.Match(
+                        document,
+                        $"{parameter}\\s*:\\s*\\$(?<variableName>[^\\s,\\)]*)");
+                    var variableName = result.Groups["variableName"].Value;
+
+                    if (variableName != string.Empty)
                     {
-                        foreach (var variable in this.context.Variables!)
-                        {
-                            stringBuilder =
-                                this.FormatVariable(stringBuilder, variable);
-                        }
-                    }
-                    catch
-                    {
-                        // all input type records will land here.
-                        stringBuilder.Append(
-                            "  Formatting Variables Error. Continuing...");
-                        stringBuilder.AppendFormat($"{Environment.NewLine}");
+                        sensitiveVariables.Add(variableName);
                     }
                 }
 
-                return stringBuilder;
+                return sensitiveVariables;
             }
 
-            private StringBuilder FormatVariable(
-                StringBuilder stringBuilder, VariableValue variable)
+            private static bool StringContains(
+                string content, string keyToLookFor)
             {
-                var variableName = variable.Name.ToString();
-                var variableValue = "***";
+                return (content.Length - content.Replace(
+                    keyToLookFor, string.Empty).Length)
+                    / keyToLookFor.Length > 0;
+            }
 
-                var padName = PaddingHelper(variableName, 20);
-                var padValue =
-                    PaddingHelper(variableValue, 20);
-                var type = variable.Type;
-                stringBuilder.AppendFormat(
-                    $"  {padName} : {padValue} : {type}");
-                stringBuilder
-                    .AppendFormat($"{Environment.NewLine}");
-                return stringBuilder;
+            // Regex is:
+            // {parameter}\s*:\s*(?=")(?:"(?<content>[^"\\]*(?:\\[\s\S]
+            //      [^"\\]*)*)")
+            private static string ReplaceSensitiveParameters(
+                string content, IEnumerable<string> parameters)
+            {
+                var result = content;
+                foreach (var parameter in parameters)
+                {
+                    result = Regex.Replace(
+                        result,
+                        new StringBuilder(parameter)
+                            .Append("\\s*:\\s*(?=\")(?:\"(?<content>[^\"\\\\]*")
+                            .Append("(?:\\\\[\\s\\S][^\"\\\\]*)*)\")")
+                            .ToString(),
+                        $"{parameter}:\"***\"");
+                }
+
+                return result;
+            }
+
+            private static string CleanQuery(
+                string document, List<string> sensitiveParameters)
+            {
+                return ReplaceSensitiveParameters(
+                    document,
+                    sensitiveParameters);
+            }
+
+            private static List<QueryVariable> CleanVariables(
+                IReadOnlyCollection<VariableValue> variables,
+                ICollection<string> sensitiveVariables)
+            {
+                var cleanVariables = new List<QueryVariable>();
+                if (variables.Count <= 0)
+                {
+                    return cleanVariables;
+                }
+
+                foreach (var variable in variables)
+                {
+                    QueryVariable newVariable = default(QueryVariable);
+                    newVariable.Name = variable.Name.ToString();
+                    newVariable.Type = variable.Type.ToString();
+                    newVariable.Value = variable.Value.ToString();
+                    if (sensitiveVariables.Contains(newVariable.Name))
+                    {
+                        newVariable.Value = "***";
+                    }
+
+                    cleanVariables.Add(newVariable);
+                }
+
+                return cleanVariables;
             }
         }
     }

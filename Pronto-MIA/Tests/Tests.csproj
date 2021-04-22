@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <IsPackable>false</IsPackable>
@@ -36,6 +35,13 @@
 
     <ItemGroup>
       <AdditionalFiles Include="Menees.Analyzers.Settings.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Files\appsettings.test.json" />
+      <Content Include="Files\appsettings.test.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

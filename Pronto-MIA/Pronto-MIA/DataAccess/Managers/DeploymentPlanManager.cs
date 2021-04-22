@@ -2,6 +2,7 @@
 namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
@@ -9,17 +10,18 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
     /// Class responsible for the lifecycle of a deployment plan within the
     /// application.
     /// </summary>
-    public class DeploymentPlanManager
+    public class DeploymentPlanManager : IDeploymentPlanManager
     {
         private readonly ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
-        private readonly FileManager fileManager;
+        private readonly IFileManager fileManager;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -33,46 +35,34 @@ namespace Pronto_MIA.DataAccess.Managers
         /// persistence of the file associated with the deployment plan object.
         /// </param>
         public DeploymentPlanManager(
-            ILogger<DeploymentPlanManager> logger,
             ProntoMiaDbContext dbContext,
-            FileManager fileManager)
+            ILogger<DeploymentPlanManager> logger,
+            IFileManager fileManager)
         {
             this.logger = logger;
             this.dbContext = dbContext;
             this.fileManager = fileManager;
         }
 
-        /// <summary>
-        /// Gets the subdirectory into which files associated with deployment
-        /// plans are persisted.
-        /// </summary>
-        public static string FileDirectory { get; } = "deployment_plans";
-
-        /// <summary>
-        /// Method which creates a new deployment plan object.
-        /// </summary>
-        /// <param name="file">The file to be associated with the new deployment
-        /// plan.</param>
-        /// <param name="availableFrom">Moment from which the deployment plan
-        /// should be treated as active.</param>
-        /// <param name="availableUntil">Moment until which the deployment plan
-        /// is treated as active.</param>
-        /// <returns>Queryable object of the deployment plan.</returns>
+        /// <inheritdoc/>
         public async Task<IQueryable<DeploymentPlan>>
             Create(
                 IFile file,
                 DateTime availableFrom,
-                DateTime availableUntil)
+                DateTime availableUntil,
+                string? description)
         {
+            CheckTimePlausibility(availableFrom, availableUntil);
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(
-                    FileDirectory, uuid.ToString(), file);
+                IDeploymentPlanManager.FileDirectory, uuid.ToString(), file);
 
             var deploymentPlan = new DeploymentPlan(
                 availableFrom,
                 availableUntil,
                 uuid,
-                FileManager.GetFileExtension(file));
+                IFileManager.GetFileExtension(file),
+                description);
             this.dbContext.DeploymentPlans.Add(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
             this.logger.LogInformation(
@@ -81,26 +71,14 @@ namespace Pronto_MIA.DataAccess.Managers
             return this.GetQueryableById(deploymentPlan.Id);
         }
 
-        /// <summary>
-        /// Updates the deployment plan with the given id.
-        /// </summary>
-        /// <param name="id">The id of the deployment plan to be updated.
-        /// </param>
-        /// <param name="file">The new file associated with the deployment plan.
-        /// </param>
-        /// <param name="availableFrom">New moment from which the deployment
-        /// plan should be treated as active.</param>
-        /// <param name="availableUntil">New moment until which the deployment
-        /// plan is treated as active.</param>
-        /// <returns>Queryable object of the deployment plan.</returns>
-        /// <exception cref="QueryException">If the deployment plan to be
-        /// updated could not be found.</exception>
+        /// <inheritdoc/>
         public async Task<IQueryable<DeploymentPlan>>
             Update(
                 int id,
                 IFile? file,
                 DateTime? availableFrom,
-                DateTime? availableUntil)
+                DateTime? availableUntil,
+                string? description)
         {
             var deploymentPlan = await this.GetById(id);
             if (deploymentPlan == default)
@@ -111,10 +89,13 @@ namespace Pronto_MIA.DataAccess.Managers
                     .AsQueryException();
             }
 
-            deploymentPlan = await this.UpdateFile(deploymentPlan, file);
+            // Must be before UpdateFile since it may throw an error if the
+            // times are not set correctly.
             deploymentPlan = this.UpdateTimes(
                 deploymentPlan, availableFrom, availableUntil);
-
+            deploymentPlan = await this.UpdateFile(deploymentPlan, file);
+            deploymentPlan = this.UpdateDescription(
+                deploymentPlan, description);
             await this.dbContext.SaveChangesAsync();
             this.logger.LogInformation(
                 "Deployment plan with id {Id} has been updated",
@@ -122,13 +103,7 @@ namespace Pronto_MIA.DataAccess.Managers
             return this.GetQueryableById(id);
         }
 
-        /// <summary>
-        /// Removes the deployment plan with the given id.
-        /// </summary>
-        /// <param name="id">Id of the deployment plan to be removed.</param>
-        /// <returns>The id of the deployment plan that was removed.</returns>
-        /// <exception cref="QueryException">If the deployment plan to remove
-        /// could not be found.</exception>
+        /// <inheritdoc/>
         public async Task<int>
             Remove(int id)
         {
@@ -142,7 +117,7 @@ namespace Pronto_MIA.DataAccess.Managers
             }
 
             this.fileManager.Remove(
-                FileDirectory,
+                IDeploymentPlanManager.FileDirectory,
                 deploymentPlan.FileUuid.ToString(),
                 deploymentPlan.FileExtension);
 
@@ -152,13 +127,32 @@ namespace Pronto_MIA.DataAccess.Managers
             return id;
         }
 
-        /// <summary>
-        /// Method to get all available deployment plans.
-        /// </summary>
-        /// <returns>All available deployment plans.</returns>
+        /// <inheritdoc/>
         public IQueryable<DeploymentPlan?> GetAll()
         {
             return this.dbContext.DeploymentPlans;
+        }
+
+        /// <summary>
+        /// Checks if the available from time is smaller that the available
+        /// until value.
+        /// </summary>
+        /// <param name="availableFrom">Moment from which the deployment plan
+        /// should be treated as active.</param>
+        /// <param name="availableUntil">Moment until which the deployment plan
+        /// is treated as active.</param>
+        /// <exception cref="QueryException">If the available from time is
+        /// after the available until time.</exception>
+        private static void CheckTimePlausibility(
+            DateTime availableFrom,
+            DateTime availableUntil)
+        {
+            if (availableFrom < availableUntil)
+            {
+                return;
+            }
+
+            throw Error.DeploymentPlanImpossibleTime.AsQueryException();
         }
 
         /// <summary>
@@ -202,14 +196,14 @@ namespace Pronto_MIA.DataAccess.Managers
 
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(
-                FileDirectory, uuid.ToString(), file);
+                IDeploymentPlanManager.FileDirectory, uuid.ToString(), file);
 
             deploymentPlan.FileUuid = uuid;
             deploymentPlan.FileExtension =
-                FileManager.GetFileExtension(file);
+                IFileManager.GetFileExtension(file);
 
             this.fileManager.Remove(
-                FileDirectory,
+                IDeploymentPlanManager.FileDirectory,
                 deploymentPlan.FileUuid.ToString(),
                 deploymentPlan.FileExtension);
 
@@ -230,14 +224,36 @@ namespace Pronto_MIA.DataAccess.Managers
             DateTime? availableFrom,
             DateTime? availableUntil)
         {
-            if (availableFrom.HasValue)
+            if (availableFrom.HasValue && availableUntil.HasValue)
             {
+                CheckTimePlausibility(
+                    availableFrom.Value, availableUntil.Value);
+                deploymentPlan.AvailableFrom = availableFrom.Value;
+                deploymentPlan.AvailableUntil = availableUntil.Value;
+            }
+            else if (availableFrom.HasValue)
+            {
+                CheckTimePlausibility(
+                    availableFrom.Value, deploymentPlan.AvailableUntil);
                 deploymentPlan.AvailableFrom = (DateTime)availableFrom;
             }
-
-            if (availableUntil.HasValue)
+            else if (availableUntil.HasValue)
             {
-                deploymentPlan.AvailableUntil = (DateTime)availableUntil;
+                CheckTimePlausibility(
+                    deploymentPlan.AvailableFrom, availableUntil.Value);
+                deploymentPlan.AvailableUntil = availableUntil.Value;
+            }
+
+            return deploymentPlan;
+        }
+
+        private DeploymentPlan UpdateDescription(
+            DeploymentPlan deploymentPlan, string? description)
+        {
+            if (description != null)
+            {
+                deploymentPlan.Description =
+                    description == string.Empty ? null : description;
             }
 
             return deploymentPlan;

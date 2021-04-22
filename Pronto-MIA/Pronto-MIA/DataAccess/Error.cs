@@ -30,6 +30,12 @@ namespace Pronto_MIA.DataAccess
         DeploymentPlanNotFound,
 
         /// <summary>
+        /// Error code representing that the times defined within the deployment
+        /// plan do not match up.
+        /// </summary>
+        DeploymentPlanImpossibleTime,
+
+        /// <summary>
         /// Error code representing that the password provided did not match
         /// with the hash stored in the system.
         /// </summary>
@@ -50,6 +56,11 @@ namespace Pronto_MIA.DataAccess
         /// Error code representing that a file operation could not be done.
         /// </summary>
         FileOperationError,
+
+        /// <summary>
+        /// Error code representing that a firebase operation could not be done.
+        /// </summary>
+        FirebaseOperationError,
 
         /// <summary>
         /// Error code representing that the error which occured could not be

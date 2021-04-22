@@ -8,7 +8,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using HotChocolate.Data;
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.BusinessLogic.API.Logging;
-    using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -16,19 +16,6 @@ namespace Pronto_MIA.BusinessLogic.API
     /// </summary>
     public class Query
     {
-        #pragma warning disable SA1642
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Query"/> class.
-        /// </summary>
-        /// <param name="cfg">The configuration used by the query class.</param>
-        #pragma warning restore SA1642
-        public Query(IConfiguration cfg)
-        {
-            this.Cfg = cfg;
-        }
-
-        private IConfiguration Cfg { get; }
-
         /// <summary>
         /// Method which allows the user to retrieve a token which may then be
         /// used for authentication in further requests.
@@ -42,7 +29,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// authentication header in order to authenticate the user.</returns>
         [Sensitive("password")]
         public async Task<string> Authenticate(
-            [Service] UserManager userManager,
+            [Service] IUserManager userManager,
             string userName,
             string password)
         {
@@ -56,11 +43,10 @@ namespace Pronto_MIA.BusinessLogic.API
         /// responsible for managing deployment plans.</param>
         /// <returns>Queryable of all available deployment plans.</returns>
         [Authorize]
-        [UseProjection]
         [UseFiltering]
         [UseSorting]
         public IQueryable<DeploymentPlan?> DeploymentPlans(
-            [Service] DeploymentPlanManager deploymentPlanManager)
+            [Service] IDeploymentPlanManager deploymentPlanManager)
         {
             return deploymentPlanManager.GetAll();
         }

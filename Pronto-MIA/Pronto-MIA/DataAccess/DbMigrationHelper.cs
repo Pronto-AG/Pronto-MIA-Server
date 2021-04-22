@@ -1,5 +1,6 @@
 namespace Pronto_MIA.DataAccess
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ namespace Pronto_MIA.DataAccess
     /// <summary>
     /// Class containing helper methods needed for db migrations.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class DbMigrationHelper
     {
         /// <summary>

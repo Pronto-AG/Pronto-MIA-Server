@@ -2,6 +2,7 @@ namespace Pronto_MIA
 {
     using System;
     using System.IO;
+    using System.IO.Abstractions;
     using System.Net;
     using HotChocolate.AspNetCore;
     using Microsoft.AspNetCore.Builder;
@@ -11,9 +12,9 @@ namespace Pronto_MIA
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Services;
 
     /// <summary>
@@ -48,10 +49,11 @@ namespace Pronto_MIA
         {
             services.ConfigureLogging();
             services.AddHttpContextAccessor();
-            services.AddScoped<UserManager, UserManager>();
-            services.AddScoped<FileManager, FileManager>();
-            services.AddScoped<DeploymentPlanManager, DeploymentPlanManager>();
-            services.AddScoped<FirebaseMessagingManager,
+            services.AddScoped<IFileSystem, FileSystem>();
+            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<IFileManager, FileManager>();
+            services.AddScoped<IDeploymentPlanManager, DeploymentPlanManager>();
+            services.AddScoped<IFirebaseMessagingManager,
                 FirebaseMessagingManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization();

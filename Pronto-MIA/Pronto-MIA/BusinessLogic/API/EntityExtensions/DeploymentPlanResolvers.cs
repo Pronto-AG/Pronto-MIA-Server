@@ -5,7 +5,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
     using HotChocolate.Types;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Configuration;
-    using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -29,6 +29,11 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             [Service]IConfiguration cfg,
             [Service]IHttpContextAccessor httpContext)
         {
+            if (httpContext.HttpContext == null)
+            {
+                return null;
+            }
+
             var request = httpContext.HttpContext.Request;
             var baseUrl = $"{request.Scheme}://" +
                           $"{request.Host.Value}" +
@@ -36,7 +41,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             var staticFileRoot =
                 cfg.GetValue<string>("StaticFiles:ENDPOINT");
             var fileUrl = baseUrl + "/" + staticFileRoot + "/" +
-                          DeploymentPlanManager.FileDirectory + "/" +
+                          IDeploymentPlanManager.FileDirectory + "/" +
                           deploymentPlan.FileUuid +
                           deploymentPlan.FileExtension;
             return new Uri(fileUrl);

@@ -14,7 +14,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
-    using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -33,19 +33,23 @@ namespace Pronto_MIA.BusinessLogic.API
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="description">Short description to identify the
+        /// deployment plan.</param>
         /// <returns>The newly generated deployment plan.</returns>
         [Authorize]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan?>> AddDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             IFile file,
             DateTime availableFrom,
-            DateTime availableUntil)
+            DateTime availableUntil,
+            string? description)
         {
             return await deploymentPlanManager.Create(
                 file,
                 availableFrom,
-                availableUntil);
+                availableUntil,
+                description);
         }
 
         /// <summary>
@@ -62,6 +66,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="description">Short description to identify the
+        /// deployment plan.</param>
         /// <returns>The updated deployment plan.</returns>
         /// <exception cref="QueryException">Returns DeploymentPlanNotFound
         /// exception if the deployment plan with given id could not be found.
@@ -69,14 +75,15 @@ namespace Pronto_MIA.BusinessLogic.API
         [Authorize]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan?>> UpdateDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             int id,
             IFile? file,
             DateTime? availableFrom,
-            DateTime? availableUntil)
+            DateTime? availableUntil,
+            string? description)
         {
             return await deploymentPlanManager.Update(
-                id, file, availableFrom, availableUntil);
+                id, file, availableFrom, availableUntil, description);
         }
 
         /// <summary>
@@ -91,7 +98,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </exception>
         [Authorize]
         public async Task<int> RemoveDeploymentPlan(
-            [Service] DeploymentPlanManager deploymentPlanManager,
+            [Service] IDeploymentPlanManager deploymentPlanManager,
             int id)
         {
             return await deploymentPlanManager.Remove(id);
@@ -109,7 +116,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </returns>
         [Authorize]
         public async Task<bool> SendPushTo(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
             string deviceToken)
         {
             var message = new Message()
@@ -143,8 +150,8 @@ namespace Pronto_MIA.BusinessLogic.API
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
-            [Service] UserManager userManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
@@ -165,13 +172,13 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="firebaseMessagingManager">The manager managing
         /// operations with firebase messaging.
         /// </param>
-        /// <param name="token">The fcm token to be removed.</param>
+        /// <param name="fcmToken">The fcm token to be removed.</param>
         /// <returns>True if the token could be removed.</returns>
         public async Task<bool> UnregisterFcmToken(
-            [Service] FirebaseMessagingManager firebaseMessagingManager,
-            string token)
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            string fcmToken)
         {
-            return await firebaseMessagingManager.UnregisterFcmToken(token);
+            return await firebaseMessagingManager.UnregisterFcmToken(fcmToken);
         }
     }
 }

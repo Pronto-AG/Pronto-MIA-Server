@@ -10,18 +10,22 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
+    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess;
+    using Pronto_MIA.DataAccess.Adapters;
+    using Pronto_MIA.DataAccess.Adapters.Interfaces;
+    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
     /// Class responsible for managing firebase messaging.
     /// </summary>
-    public class FirebaseMessagingManager
+    public class FirebaseMessagingManager : IFirebaseMessagingManager
     {
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
-        private readonly FirebaseMessaging instance;
+        private readonly IFirebaseMessagingAdapter instance;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -32,24 +36,21 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="logger">The logger to be used in order to document
         /// events regarding this manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
+        /// <param name="instance">The firebase messaging instance used
+        /// in order to send messages.</param>
         public FirebaseMessagingManager(
             ProntoMiaDbContext dbContext,
+            IConfiguration cfg,
             ILogger<FirebaseMessagingManager> logger,
-            IConfiguration cfg)
+            IFirebaseMessagingAdapter? instance = null)
         {
             this.dbContext = dbContext;
             this.cfg = cfg;
             this.logger = logger;
-            this.instance = this.GetInstance();
+            this.instance = instance ?? this.GetInstance();
         }
 
-        /// <summary>
-        /// Sends the given message with firebase messaging to the devices
-        /// specified within the message.
-        /// </summary>
-        /// <param name="message">Firebase messaging message object which
-        /// contains the information required to send a message.</param>
-        /// <returns>True if sending was successful false otherwise.</returns>
+        /// <inheritdoc/>
         public async Task<bool> SendAsync(Message message)
         {
             try
@@ -61,38 +62,23 @@ namespace Pronto_MIA.DataAccess.Managers
             catch (Exception error)
             {
                 this.logger.LogWarning("Firebase error: {Error}", error);
-                return false;
+                throw Error.FirebaseOperationError.AsQueryException();
             }
 
             return true;
         }
 
-        /// <summary>
-        /// Method to register a new fcm token for a user. If the token is
-        /// already registered the owner will be adjusted.
-        /// </summary>
-        /// <param name="user"> The owner of the fcm token.
-        /// </param>
-        /// <param name="fcmToken">The token to be added.</param>
-        /// <returns>The created fcm token.</returns>
+        /// <inheritdoc/>
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             User user, string fcmToken)
         {
             await this.MoveOrCreateFcmToken(user, fcmToken);
 
-            var result = this.dbContext.FcmTokens.Where(
-                fcmTokenDb => fcmTokenDb.Id == fcmToken);
-
             return this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
         }
 
-        /// <summary>
-        /// Method to remove a fcm token from the database.
-        /// </summary>
-        /// <param name="fcmToken">The token to be removed.</param>
-        /// <returns>True if the token could be removed false if the token did
-        /// not exist.</returns>
+        /// <inheritdoc/>
         public async Task<bool> UnregisterFcmToken(string fcmToken)
         {
             var tokenObject = await this.dbContext.FcmTokens
@@ -172,11 +158,12 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <summary>
         /// Method to get a singleton instance of the firebase app.
         /// </summary>
-        private FirebaseMessaging GetInstance()
+        private IFirebaseMessagingAdapter GetInstance()
         {
             if (FirebaseMessaging.DefaultInstance != null)
             {
-                return FirebaseMessaging.DefaultInstance;
+                return new FirebaseMessagingAdapter(
+                    FirebaseMessaging.DefaultInstance);
             }
 
             var credentialFile =
@@ -188,7 +175,8 @@ namespace Pronto_MIA.DataAccess.Managers
             });
             this.logger.LogDebug("Created firebase app instance");
 
-            return FirebaseMessaging.DefaultInstance!;
+            return new FirebaseMessagingAdapter(
+                FirebaseMessaging.DefaultInstance);
         }
     }
 }
