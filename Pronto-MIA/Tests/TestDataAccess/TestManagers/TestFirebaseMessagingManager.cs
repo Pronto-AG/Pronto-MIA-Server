@@ -167,10 +167,14 @@ namespace Tests.TestDataAccess.TestManagers
                 .ReturnsForAnyArgs(
                     Task.FromException<string>(new IOException()));
 
-            var result = await this.firebaseMessagingManager
-                .SendAsync(message);
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.firebaseMessagingManager.SendAsync(message);
+            });
 
-            Assert.False(result);
+            Assert.Equal(
+                Error.FirebaseOperationError.ToString(),
+                error.Errors[0].Code);
 
             this.firebaseMessagingAdapter.ClearSubstitute();
         }

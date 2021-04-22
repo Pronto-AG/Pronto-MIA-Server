@@ -8,7 +8,6 @@ namespace Pronto_MIA
     /// <summary>
     /// Class for starting the application.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class Program
     {
         /// <summary>
@@ -19,7 +18,7 @@ namespace Pronto_MIA
         /// <returns>The created builder object.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
+                .ConfigureAppConfiguration((_, config) =>
                 {
                     config.AddEnvironmentVariables(prefix: "pronto-mia_");
                 })

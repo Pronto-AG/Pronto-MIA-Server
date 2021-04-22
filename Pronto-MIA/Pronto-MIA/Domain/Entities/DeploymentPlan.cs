@@ -20,16 +20,20 @@ namespace Pronto_MIA.Domain.Entities
         /// <see cref="FileUuid"/> property.</param>
         /// <param name="fileExtension">The
         /// <see cref="FileExtension"/> property.</param>
+        /// <param name="description">The
+        /// <see cref="Description"/> property.</param>
         public DeploymentPlan(
             DateTime availableFrom,
             DateTime availableUntil,
             Guid fileUuid,
-            string fileExtension)
+            string fileExtension,
+            string description = null)
         {
             this.AvailableFrom = availableFrom;
             this.AvailableUntil = availableUntil;
             this.FileUuid = fileUuid;
             this.FileExtension = fileExtension;
+            this.Description = description;
         }
 
         /// <summary>
@@ -44,12 +48,19 @@ namespace Pronto_MIA.Domain.Entities
             this.AvailableUntil = default;
             this.FileUuid = Guid.Empty;
             this.FileExtension = string.Empty;
+            this.Description = null;
         }
 
         /// <summary>
         /// Gets or sets the id used as primary key by the database.
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets the description which may be used to identify the
+        /// deployment plan.
+        /// </summary>
+        public string Description { get; set; }
 
         /// <summary>
         /// Gets or sets the moment from which this deployment plan should be

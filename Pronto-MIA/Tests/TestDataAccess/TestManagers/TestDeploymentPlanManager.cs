@@ -14,6 +14,10 @@ namespace Tests.TestDataAccess.TestManagers
     using Pronto_MIA.Domain.Entities;
     using Xunit;
 
+    [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN005",
+        Justification = "Test file may be more than 300 lines.")]
     public class TestDeploymentPlanManager
     {
         private readonly DeploymentPlanManager deploymentPlanManager;
@@ -41,7 +45,8 @@ namespace Tests.TestDataAccess.TestManagers
             await this.deploymentPlanManager.Create(
                 file,
                 DateTime.MinValue,
-                DateTime.MaxValue);
+                DateTime.MaxValue,
+                "Hello World");
 
             await this.fileManager.Received().Create(
                 IDeploymentPlanManager.FileDirectory,
@@ -52,10 +57,31 @@ namespace Tests.TestDataAccess.TestManagers
                     dP => dP.AvailableUntil == DateTime.MaxValue);
             Assert.NotNull(deploymentPlan);
             Assert.Equal(DateTime.MinValue, deploymentPlan.AvailableFrom);
+            Assert.Equal("Hello World", deploymentPlan.Description);
 
             this.dbContext.DeploymentPlans.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
             this.fileManager.ClearReceivedCalls();
+        }
+
+        [Fact]
+        public async Task TestCreateTimeError()
+        {
+            var file = Substitute.For<IFile>();
+            file.Name.Returns("Important.pdf");
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.deploymentPlanManager.Create(
+                    file,
+                    DateTime.MaxValue,
+                    DateTime.MinValue,
+                    null);
+            });
+
+            Assert.Equal(
+                Error.DeploymentPlanImpossibleTime.ToString(),
+                error.Errors[0].Code);
         }
 
         [SuppressMessage(
@@ -73,7 +99,7 @@ namespace Tests.TestDataAccess.TestManagers
             var oldFileUuid = deploymentPlan.FileUuid.ToString();
 
             await this.deploymentPlanManager.Update(
-                deploymentPlan.Id, file, null, null);
+                deploymentPlan.Id, file, null, null, null);
 
             await this.fileManager.Received().Create(
                 IDeploymentPlanManager.FileDirectory, Arg.Any<string>(), file);
@@ -89,6 +115,9 @@ namespace Tests.TestDataAccess.TestManagers
             Assert.Equal(
                 this.GetSampleDeploymentPlan().AvailableUntil,
                 deploymentPlan.AvailableUntil);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().Description,
+                deploymentPlan.Description);
 
             this.dbContext.DeploymentPlans.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
@@ -104,9 +133,9 @@ namespace Tests.TestDataAccess.TestManagers
             var newAvailableFrom = DateTime.UtcNow;
 
             await this.deploymentPlanManager.Update(
-                deploymentPlan.Id, null, newAvailableFrom, null);
+                deploymentPlan.Id, null, newAvailableFrom, null, null);
 
-            await this.fileManager.DidNotReceive().Create(
+            await this.fileManager.DidNotReceiveWithAnyArgs().Create(
                 default, default, default);
             Assert.Equal(newAvailableFrom, deploymentPlan.AvailableFrom);
             Assert.Equal(
@@ -115,6 +144,9 @@ namespace Tests.TestDataAccess.TestManagers
             Assert.Equal(
                 this.GetSampleDeploymentPlan().FileUuid,
                 deploymentPlan.FileUuid);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().Description,
+                deploymentPlan.Description);
 
             this.dbContext.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
@@ -129,9 +161,9 @@ namespace Tests.TestDataAccess.TestManagers
             var newAvailableUntil = DateTime.UtcNow;
 
             await this.deploymentPlanManager.Update(
-                deploymentPlan.Id, null, null, newAvailableUntil);
+                deploymentPlan.Id, null, null, newAvailableUntil, null);
 
-            await this.fileManager.DidNotReceive().Create(
+            await this.fileManager.DidNotReceiveWithAnyArgs().Create(
                 default, default, default);
             Assert.Equal(newAvailableUntil, deploymentPlan.AvailableUntil);
             Assert.Equal(
@@ -140,6 +172,175 @@ namespace Tests.TestDataAccess.TestManagers
             Assert.Equal(
                 this.GetSampleDeploymentPlan().FileUuid,
                 deploymentPlan.FileUuid);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().Description,
+                deploymentPlan.Description);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateAvailableBoth()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newAvailableFrom = DateTime.UtcNow;
+            var newAvailableUntil = DateTime.UtcNow.AddHours(2);
+
+            await this.deploymentPlanManager.Update(
+                deploymentPlan.Id,
+                null,
+                newAvailableFrom,
+                newAvailableUntil,
+                null);
+
+            await this.fileManager.DidNotReceiveWithAnyArgs().Create(
+                default, default, default);
+            Assert.Equal(newAvailableFrom, deploymentPlan.AvailableFrom);
+            Assert.Equal(newAvailableUntil, deploymentPlan.AvailableUntil);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().FileUuid,
+                deploymentPlan.FileUuid);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().Description,
+                deploymentPlan.Description);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateDescription()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newDescription = "New";
+
+            await this.deploymentPlanManager.Update(
+                deploymentPlan.Id, null, null, null, newDescription);
+
+            await this.fileManager.DidNotReceiveWithAnyArgs().Create(
+                default, default, default);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().AvailableFrom,
+                deploymentPlan.AvailableFrom);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().AvailableUntil,
+                deploymentPlan.AvailableUntil);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().FileUuid,
+                deploymentPlan.FileUuid);
+            Assert.Equal(newDescription, deploymentPlan.Description);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateDescriptionEmptyString()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newDescription = string.Empty;
+
+            await this.deploymentPlanManager.Update(
+                deploymentPlan.Id, null, null, null, newDescription);
+
+            await this.fileManager.DidNotReceiveWithAnyArgs().Create(
+                default, default, default);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().AvailableFrom,
+                deploymentPlan.AvailableFrom);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().AvailableUntil,
+                deploymentPlan.AvailableUntil);
+            Assert.Equal(
+                this.GetSampleDeploymentPlan().FileUuid,
+                deploymentPlan.FileUuid);
+            Assert.Null(deploymentPlan.Description);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateInvalidTimeBoth()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newAvailableFrom = DateTime.MaxValue;
+            var newAvailableUntil = DateTime.MinValue;
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.deploymentPlanManager.Update(
+                    deploymentPlan.Id,
+                    null,
+                    newAvailableFrom,
+                    newAvailableUntil,
+                    null);
+            });
+
+            Assert.Equal(
+                Error.DeploymentPlanImpossibleTime.ToString(),
+                error.Errors[0].Code);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateInvalidTimeFrom()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newAvailableFrom = DateTime.MaxValue;
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.deploymentPlanManager.Update(
+                    deploymentPlan.Id,
+                    null,
+                    newAvailableFrom,
+                    null,
+                    null);
+            });
+
+            Assert.Equal(
+                Error.DeploymentPlanImpossibleTime.ToString(),
+                error.Errors[0].Code);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateInvalidTimeUntil()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            var newAvailableUntil = DateTime.MinValue;
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.deploymentPlanManager.Update(
+                    deploymentPlan.Id,
+                    null,
+                    null,
+                    newAvailableUntil,
+                    null);
+            });
+
+            Assert.Equal(
+                Error.DeploymentPlanImpossibleTime.ToString(),
+                error.Errors[0].Code);
 
             this.dbContext.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
@@ -151,7 +352,7 @@ namespace Tests.TestDataAccess.TestManagers
             var error = await Assert.ThrowsAsync<QueryException>(
                 async () =>
                     await this.deploymentPlanManager.Update(
-                        -5, null, null, DateTime.UtcNow));
+                        -5, null, null, DateTime.UtcNow, null));
             Assert.Equal(
                 Error.DeploymentPlanNotFound.ToString(),
                 error.Errors[0].Code);
@@ -231,7 +432,8 @@ namespace Tests.TestDataAccess.TestManagers
                 DateTime.MinValue,
                 DateTime.MaxValue,
                 Guid.Empty,
-                string.Empty);
+                string.Empty,
+                "Hello World");
         }
     }
 }

@@ -1,6 +1,7 @@
 namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using HotChocolate;
     using HotChocolate.Execution;
@@ -40,6 +41,10 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
         /// <returns>Human readable error message.</returns>
         /// <exception cref="ArgumentException">If no message exists for the
         /// provided error.</exception>
+        [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN003",
+        Justification = "Simple switch-case which creates many lines.")]
         public static string Message(this DataAccess.Error error)
         {
             switch (error)
@@ -53,12 +58,17 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Could not find given user";
                 case DataAccess.Error.DeploymentPlanNotFound:
                     return "Could not find given deployment plan";
+                case DataAccess.Error.DeploymentPlanImpossibleTime:
+                    return "Available from cannot be earlier than available " +
+                           "until value";
                 case DataAccess.Error.WrongPassword:
                     return "Wrong password for given user";
                 case DataAccess.Error.IllegalUserOperation:
                     return "Given user not allowed to perform this action";
                 case DataAccess.Error.DatabaseOperationError:
                     return "Database operation failed";
+                case DataAccess.Error.FirebaseOperationError:
+                    return "Firebase operation failed";
                 case DataAccess.Error.FileOperationError:
                     return "A file operation error occured";
                 case DataAccess.Error.UnknownError:

@@ -29,12 +29,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// should be treated as active.</param>
         /// <param name="availableUntil">Moment until which the deployment plan
         /// is treated as active.</param>
+        /// <param name="description">A short description to identify the
+        /// deployment plan.</param>
         /// <returns>Queryable object of the deployment plan.</returns>
         public Task<IQueryable<DeploymentPlan>>
             Create(
                 IFile file,
                 DateTime availableFrom,
-                DateTime availableUntil);
+                DateTime availableUntil,
+                string? description);
 
         /// <summary>
         /// Updates the deployment plan with the given id.
@@ -47,6 +50,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// plan should be treated as active.</param>
         /// <param name="availableUntil">New moment until which the deployment
         /// plan is treated as active.</param>
+        /// <param name="description">New description to identify the
+        /// deployment plan.</param>
         /// <returns>Queryable object of the deployment plan.</returns>
         /// <exception cref="QueryException">If the deployment plan to be
         /// updated could not be found.</exception>
@@ -55,7 +60,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
                 int id,
                 IFile? file,
                 DateTime? availableFrom,
-                DateTime? availableUntil);
+                DateTime? availableUntil,
+                string? description);
 
         /// <summary>
         /// Removes the deployment plan with the given id.

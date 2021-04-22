@@ -3,6 +3,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     using System.Linq;
     using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
+    using HotChocolate.Execution;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -17,7 +18,9 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// </summary>
         /// <param name="message">Firebase messaging message object which
         /// contains the information required to send a message.</param>
-        /// <returns>True if sending was successful false otherwise.</returns>
+        /// <returns>True if sending was successful.</returns>
+        /// <exception cref="QueryException">If an error occured with
+        /// the firebase operation.</exception>
         public Task<bool> SendAsync(Message message);
 
         /// <summary>

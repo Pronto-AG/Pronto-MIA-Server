@@ -36,10 +36,11 @@ namespace Tests.TestBusinessLogic.TestAPI
                 deploymentPlanManager,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,
-                DateTime.UtcNow);
+                DateTime.UtcNow,
+                string.Empty);
 
             await deploymentPlanManager.ReceivedWithAnyArgs()
-                .Create(default!, default, default);
+                .Create(default!, default, default, default);
         }
 
         [Fact]
@@ -53,10 +54,11 @@ namespace Tests.TestBusinessLogic.TestAPI
                 5,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,
-                DateTime.UtcNow);
+                DateTime.UtcNow,
+                string.Empty);
 
             await deploymentPlanManager.ReceivedWithAnyArgs()
-                .Update(default, default, default, default);
+                .Update(default, default, default, default, default);
         }
 
         [Fact]

@@ -10,6 +10,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
+    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Adapters;
     using Pronto_MIA.DataAccess.Adapters.Interfaces;
@@ -61,7 +62,7 @@ namespace Pronto_MIA.DataAccess.Managers
             catch (Exception error)
             {
                 this.logger.LogWarning("Firebase error: {Error}", error);
-                return false;
+                throw Error.FirebaseOperationError.AsQueryException();
             }
 
             return true;

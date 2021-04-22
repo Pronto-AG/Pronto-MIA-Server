@@ -1,7 +1,6 @@
 namespace Pronto_MIA
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.IO.Abstractions;
     using System.Net;
@@ -21,7 +20,6 @@ namespace Pronto_MIA
     /// <summary>
     /// Class for starting up the Asp.Net application.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public class Startup
     {
         /// <summary>

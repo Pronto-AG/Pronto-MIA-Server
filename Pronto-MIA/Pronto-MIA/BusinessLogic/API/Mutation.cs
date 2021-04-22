@@ -33,6 +33,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="description">Short description to identify the
+        /// deployment plan.</param>
         /// <returns>The newly generated deployment plan.</returns>
         [Authorize]
         [UseSingleOrDefault]
@@ -40,12 +42,14 @@ namespace Pronto_MIA.BusinessLogic.API
             [Service] IDeploymentPlanManager deploymentPlanManager,
             IFile file,
             DateTime availableFrom,
-            DateTime availableUntil)
+            DateTime availableUntil,
+            string? description)
         {
             return await deploymentPlanManager.Create(
                 file,
                 availableFrom,
-                availableUntil);
+                availableUntil,
+                description);
         }
 
         /// <summary>
@@ -62,6 +66,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="description">Short description to identify the
+        /// deployment plan.</param>
         /// <returns>The updated deployment plan.</returns>
         /// <exception cref="QueryException">Returns DeploymentPlanNotFound
         /// exception if the deployment plan with given id could not be found.
@@ -73,10 +79,11 @@ namespace Pronto_MIA.BusinessLogic.API
             int id,
             IFile? file,
             DateTime? availableFrom,
-            DateTime? availableUntil)
+            DateTime? availableUntil,
+            string? description)
         {
             return await deploymentPlanManager.Update(
-                id, file, availableFrom, availableUntil);
+                id, file, availableFrom, availableUntil, description);
         }
 
         /// <summary>
