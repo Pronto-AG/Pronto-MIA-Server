@@ -5,6 +5,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
+    using Castle.Core.Internal;
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,11 @@ namespace Pronto_MIA.DataAccess.Managers
                 DateTime availableUntil,
                 string? description)
         {
+            if (description == string.Empty)
+            {
+                description = null;
+            }
+
             CheckTimePlausibility(availableFrom, availableUntil);
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(

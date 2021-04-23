@@ -65,6 +65,34 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
+        public async Task TestCreateEmptyDescription()
+        {
+            var file = Substitute.For<IFile>();
+            file.Name.Returns("Important.pdf");
+
+            await this.deploymentPlanManager.Create(
+                file,
+                DateTime.MinValue,
+                DateTime.MaxValue,
+                "");
+
+            await this.fileManager.Received().Create(
+                IDeploymentPlanManager.FileDirectory,
+                Arg.Any<string>(),
+                file);
+            var deploymentPlan = await this.dbContext.DeploymentPlans
+                .FirstOrDefaultAsync(
+                    dP => dP.AvailableUntil == DateTime.MaxValue);
+            Assert.NotNull(deploymentPlan);
+            Assert.Equal(DateTime.MinValue, deploymentPlan.AvailableFrom);
+            Assert.Null(deploymentPlan.Description);
+
+            this.dbContext.DeploymentPlans.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+            this.fileManager.ClearReceivedCalls();
+        }
+
+        [Fact]
         public async Task TestCreateTimeError()
         {
             var file = Substitute.For<IFile>();
