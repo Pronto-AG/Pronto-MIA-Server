@@ -74,7 +74,7 @@ namespace Tests.TestDataAccess.TestManagers
                 file,
                 DateTime.MinValue,
                 DateTime.MaxValue,
-                "");
+                string.Empty);
 
             await this.fileManager.Received().Create(
                 IDeploymentPlanManager.FileDirectory,
