@@ -86,7 +86,8 @@ namespace Pronto_MIA
             DbMigrationHelper.Migrate(app);
 
             this.ConfigureAppExceptions(app, env);
-            //app.UseHttpsRedirection();
+            
+            // app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
