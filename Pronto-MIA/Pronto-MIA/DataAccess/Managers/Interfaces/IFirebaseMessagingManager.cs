@@ -1,3 +1,4 @@
+#nullable enable
 namespace Pronto_MIA.DataAccess.Managers.Interfaces
 {
     using System.Linq;
@@ -24,6 +25,17 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         public Task<bool> SendAsync(Message message);
 
         /// <summary>
+        /// Sends the given multicast message to all the FCM registration tokens
+        /// specified in it.
+        /// </summary>
+        /// <param name="message">The message to be sent. Must not be null.
+        /// </param>
+        /// <returns>True if sending was successful.</returns>
+        /// <exception cref="QueryException">If an error occured with
+        /// the firebase operation.</exception>
+        public Task<bool> SendMulticastAsync(MulticastMessage message);
+
+        /// <summary>
         /// Method to register a new fcm token for a user. If the token is
         /// already registered the owner will be adjusted.
         /// </summary>
@@ -41,5 +53,11 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// <returns>True if the token could be removed false if the token did
         /// not exist.</returns>
         public Task<bool> UnregisterFcmToken(string fcmToken);
+
+        /// <summary>
+        /// Method to retrieve all currently registered fcm tokens.
+        /// </summary>
+        /// <returns>The IQueryable of all available fcm tokens.</returns>
+        public IQueryable<FcmToken> GetAllFcmToken();
     }
 }

@@ -10,8 +10,8 @@ using Pronto_MIA.DataAccess;
 namespace Pronto_MIA.DataAccess.Migrations
 {
     [DbContext(typeof(ProntoMiaDbContext))]
-    [Migration("20210422092935_Deployment-plan-add-description")]
-    partial class Deploymentplanadddescription
+    [Migration("20210504085912_Deployment-plan-add-publish")]
+    partial class Deploymentplanaddpublish
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,6 +44,9 @@ namespace Pronto_MIA.DataAccess.Migrations
                     b.Property<string>("FileUuid")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("Published")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 

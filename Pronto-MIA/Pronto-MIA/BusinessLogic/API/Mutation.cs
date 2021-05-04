@@ -1,3 +1,7 @@
+using Castle.Core.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -84,6 +88,75 @@ namespace Pronto_MIA.BusinessLogic.API
         {
             return await deploymentPlanManager.Update(
                 id, file, availableFrom, availableUntil, description);
+        }
+
+        /// <summary>
+        /// Method that publishes the deployment plan with the given id.
+        /// </summary>
+        /// <param name="deploymentPlanManager">The manager responsible for
+        /// managing deployment plans.</param>
+        /// <param name="firebaseMessagingManager">The manager used to inform
+        /// affected users that a new deployment plan has been published.
+        /// </param>
+        /// <param name="id">The id of the deployment plan to be published.
+        /// </param>
+        /// <returns>The deployment plan that was published.</returns>
+        /// <exception cref="QueryException">If the deployment plan with the
+        /// given id could not be found ot the firebase manager encounters
+        /// a sending error.</exception>
+        [Authorize]
+        [UseSingleOrDefault]
+        public async Task<IQueryable<DeploymentPlan>> PublishDeploymentPlan(
+            [Service] IDeploymentPlanManager deploymentPlanManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] ILogger<Mutation> logger,
+            int id)
+        {
+            var deploymentPlan = await deploymentPlanManager.GetById(id);
+
+            // Can contain up to 500 device tokens
+            var tokens = await firebaseMessagingManager
+                .GetAllFcmToken().Select(token => token.Id).ToListAsync();
+            if (tokens.IsNullOrEmpty())
+            {
+                logger.LogInformation("No firebase tokens available.");
+                return await deploymentPlanManager.Publish(deploymentPlan.Id);
+            }
+
+            var message = new MulticastMessage()
+            {
+                Notification = new Notification
+                {
+                    Title = "Einsatzplan wurde veröffentlicht",
+                    Body = "Einsatzplan 5",
+                },
+                Data = new Dictionary<string, string>()
+                    { { "DeploymentPlanId", id.ToString() } },
+                Tokens = tokens,
+            };
+            await firebaseMessagingManager.SendMulticastAsync(message);
+
+            return await deploymentPlanManager.Publish(deploymentPlan.Id);
+        }
+
+        /// <summary>
+        /// Method that publishes the deployment plan with the given id.
+        /// </summary>
+        /// <param name="deploymentPlanManager">The manager responsible for
+        /// managing deployment plans.</param>
+        /// <param name="id">The id of the deployment plan to be published.
+        /// </param>
+        /// <returns>The deployment plan that was published.</returns>
+        /// <exception cref="QueryException">If the deployment plan with the
+        /// given id could not be found ot the firebase manager encounters
+        /// a sending error.</exception>
+        [Authorize]
+        [UseSingleOrDefault]
+        public async Task<IQueryable<DeploymentPlan>> HideDeploymentPlan(
+            [Service] IDeploymentPlanManager deploymentPlanManager,
+            int id)
+        {
+            return await deploymentPlanManager.Hide(id);
         }
 
         /// <summary>

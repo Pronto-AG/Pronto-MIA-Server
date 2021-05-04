@@ -34,6 +34,7 @@ namespace Pronto_MIA.Domain.Entities
             this.FileUuid = fileUuid;
             this.FileExtension = fileExtension;
             this.Description = description;
+            this.Published = false;
         }
 
         /// <summary>
@@ -49,6 +50,7 @@ namespace Pronto_MIA.Domain.Entities
             this.FileUuid = Guid.Empty;
             this.FileExtension = string.Empty;
             this.Description = null;
+            this.Published = false;
         }
 
         /// <summary>
@@ -73,6 +75,13 @@ namespace Pronto_MIA.Domain.Entities
         /// treated as active.
         /// </summary>
         public DateTime AvailableUntil { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the deployment plan is in
+        /// published status. Unpublished deployment plans should not be shown
+        /// to users without administrative permissions.
+        /// </summary>
+        public bool Published { get; set; }
 
         /// <summary>
         /// Gets or sets the uuid used as file name for the file associated with

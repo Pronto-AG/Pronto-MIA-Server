@@ -62,6 +62,18 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
+        public async void TestHideDeploymentPlan()
+        {
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+
+            await this.mutation
+                .HideDeploymentPlan(deploymentPlanManager, 1);
+
+            await deploymentPlanManager.Received().Hide(1);
+        }
+
+        [Fact]
         public async void TestRemoveDeploymentPlan()
         {
             var deploymentPlanManager =

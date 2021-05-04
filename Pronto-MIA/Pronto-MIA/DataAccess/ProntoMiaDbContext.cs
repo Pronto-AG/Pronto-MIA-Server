@@ -45,7 +45,7 @@ namespace Pronto_MIA.DataAccess
            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
 
-           var generatorOptions = new Pbkdf2GeneratorOptions(
+           /*var generatorOptions = new Pbkdf2GeneratorOptions(
                1500);
            var generator = new Pbkdf2Generator(generatorOptions);
            var hash = generator.HashPassword("HelloWorld");
@@ -58,7 +58,7 @@ namespace Pronto_MIA.DataAccess
                Id = -1,
            };
 
-           modelBuilder.Entity<User>().HasData(franz);
+           modelBuilder.Entity<User>().HasData(franz);*/
        }
     }
 }

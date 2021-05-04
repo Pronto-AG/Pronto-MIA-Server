@@ -64,6 +64,26 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
                 string? description);
 
         /// <summary>
+        /// Sets the status of the deployment plan with the given id to
+        /// published.
+        /// </summary>
+        /// <param name="id">Id of the deployment plan to be published.</param>
+        /// <returns>The deployment plan that was published.</returns>
+        /// <exception cref="QueryException">If the deployment plan to publish
+        /// could not be found.</exception>
+        public Task<IQueryable<DeploymentPlan>> Publish(int id);
+
+        /// <summary>
+        /// Sets the status of the deployment plan with the given id to
+        /// not published.
+        /// </summary>
+        /// <param name="id">Id of the deployment plan.</param>
+        /// <returns>The deployment plan that was adjusted..</returns>
+        /// <exception cref="QueryException">If the deployment plan to change
+        /// could not be found.</exception>
+        public Task<IQueryable<DeploymentPlan>> Hide(int id);
+
+        /// <summary>
         /// Removes the deployment plan with the given id.
         /// </summary>
         /// <param name="id">Id of the deployment plan to be removed.</param>
@@ -76,6 +96,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Method to get all available deployment plans.
         /// </summary>
         /// <returns>All available deployment plans.</returns>
-        public IQueryable<DeploymentPlan?> GetAll();
+        public IQueryable<DeploymentPlan> GetAll();
+
+        /// <summary>
+        /// Method to get a deployment plan with the help of its id.
+        /// </summary>
+        /// <param name="id">The id of the deployment plan.</param>
+        /// <returns>The deployment plan with the given id.</returns>
+        /// <exception cref="QueryException">If the deployment plan with the
+        /// given id could not be found.</exception>
+        public Task<DeploymentPlan> GetById(int id);
     }
 }

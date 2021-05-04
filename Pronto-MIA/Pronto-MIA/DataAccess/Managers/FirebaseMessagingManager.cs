@@ -1,3 +1,5 @@
+using GreenDonut;
+
 #nullable enable
 namespace Pronto_MIA.DataAccess.Managers
 {
@@ -51,6 +53,25 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
+        public async Task<bool> SendMulticastAsync(MulticastMessage message)
+        {
+            try
+            {
+                BatchResponse response = await this.instance
+                    .SendMulticastAsync(message);
+                this.logger.LogTrace(
+                    "Successfully sent message {Message}", response);
+            }
+            catch (Exception error)
+            {
+                this.logger.LogWarning("Firebase error: {Error}", error);
+                throw Error.FirebaseOperationError.AsQueryException();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
         public async Task<bool> SendAsync(Message message)
         {
             try
@@ -99,6 +120,13 @@ namespace Pronto_MIA.DataAccess.Managers
                 "FCMToken {FcmToken} did not exist. Nothing to remove",
                 fcmToken);
             return false;
+        }
+
+
+        /// <inheritdoc/>
+        public IQueryable<FcmToken> GetAllFcmToken()
+        {
+            return this.dbContext.FcmTokens;
         }
 
         /// <summary>

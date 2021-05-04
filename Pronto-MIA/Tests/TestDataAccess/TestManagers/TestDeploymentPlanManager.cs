@@ -387,6 +387,19 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
+        public async Task TestHide()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            deploymentPlan.Published = true;
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.deploymentPlanManager.Hide(deploymentPlan.Id);
+
+            Assert.False(deploymentPlan.Published);
+        }
+
+        [Fact]
         public async Task TestRemove()
         {
             var deploymentPlan = this.GetSampleDeploymentPlan();
