@@ -2,6 +2,7 @@
 namespace Tests.TestBusinessLogic.TestAPI
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using HotChocolate.Types;
@@ -59,6 +60,53 @@ namespace Tests.TestBusinessLogic.TestAPI
 
             await deploymentPlanManager.ReceivedWithAnyArgs()
                 .Update(default, default, default, default, default);
+        }
+
+        [Fact]
+        public async void TestPublishDeploymentPlan()
+        {
+            var firebaseMessagingManager =
+                Substitute.For<IFirebaseMessagingManager>();
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+
+            firebaseMessagingManager.GetAllFcmToken().Returns(
+                this.dbContext.FcmTokens);
+
+            await this.mutation.PublishDeploymentPlan(
+                deploymentPlanManager,
+                firebaseMessagingManager,
+                1,
+                "Hello World",
+                "This is the notification body.");
+
+            await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
+            await firebaseMessagingManager.ReceivedWithAnyArgs()
+                .SendMulticastAsync(default, default, default);
+        }
+
+        [Fact]
+        public async void TestPublishDeploymentPlanAlreadyPublished()
+        {
+            var firebaseMessagingManager =
+                Substitute.For<IFirebaseMessagingManager>();
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
+
+            firebaseMessagingManager.GetAllFcmToken().Returns(
+                this.dbContext.FcmTokens);
+
+            await this.mutation.PublishDeploymentPlan(
+                deploymentPlanManager,
+                firebaseMessagingManager,
+                1,
+                "Hello World",
+                "This is the notification body.");
+
+            await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
+            await firebaseMessagingManager.DidNotReceiveWithAnyArgs()
+                .SendMulticastAsync(default, default, default);
         }
 
         [Fact]

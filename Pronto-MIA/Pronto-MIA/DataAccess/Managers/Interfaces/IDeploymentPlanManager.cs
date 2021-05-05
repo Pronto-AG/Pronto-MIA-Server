@@ -68,20 +68,22 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// published.
         /// </summary>
         /// <param name="id">Id of the deployment plan to be published.</param>
-        /// <returns>The deployment plan that was published.</returns>
+        /// <returns>True if the status was changed false if the deployment plan
+        /// was already published.</returns>
         /// <exception cref="QueryException">If the deployment plan to publish
         /// could not be found.</exception>
-        public Task<IQueryable<DeploymentPlan>> Publish(int id);
+        public Task<bool> Publish(int id);
 
         /// <summary>
         /// Sets the status of the deployment plan with the given id to
         /// not published.
         /// </summary>
         /// <param name="id">Id of the deployment plan.</param>
-        /// <returns>The deployment plan that was adjusted..</returns>
+        /// <returns>True if the status was changed false if the deployment plan
+        /// was already hidden.</returns>
         /// <exception cref="QueryException">If the deployment plan to change
         /// could not be found.</exception>
-        public Task<IQueryable<DeploymentPlan>> Hide(int id);
+        public Task<bool> Hide(int id);
 
         /// <summary>
         /// Removes the deployment plan with the given id.

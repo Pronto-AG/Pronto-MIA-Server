@@ -38,6 +38,24 @@ namespace Tests
                 context.Users.AddRange(bob, alice);
                 context.SaveChanges();
             }
+
+            if (!context.DeploymentPlans.Any())
+            {
+                var deploymentPlan1 = new DeploymentPlan(
+                    DateTime.Parse("2018-08-12"),
+                    DateTime.Parse("2018-09-01"),
+                    Guid.NewGuid(),
+                    "exe");
+                var deploymentPlan2 = new DeploymentPlan(
+                    DateTime.Parse("2019-08-12"),
+                    DateTime.Parse("2019-09-01"),
+                    Guid.NewGuid(),
+                    "pdf");
+
+                context.DeploymentPlans.AddRange(
+                    deploymentPlan1, deploymentPlan2);
+                context.SaveChanges();
+            }
         }
     }
 }

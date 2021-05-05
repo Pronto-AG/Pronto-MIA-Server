@@ -1,14 +1,14 @@
-using GreenDonut;
-
 #nullable enable
 namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using FirebaseAdmin;
     using FirebaseAdmin.Messaging;
     using Google.Apis.Auth.OAuth2;
+    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
@@ -24,6 +24,11 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class FirebaseMessagingManager : IFirebaseMessagingManager
     {
+        /// <summary>
+        /// A multicast firebase message can contain up to 500 fcm tokens.
+        /// </summary>
+        private static int maxTokensPerMessage = 500;
+
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
@@ -53,19 +58,31 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<bool> SendMulticastAsync(MulticastMessage message)
+        public async Task<bool> SendMulticastAsync(
+            List<string> tokens,
+            Notification notification,
+            Dictionary<string, string> data)
         {
-            try
+            if (tokens.Count == 0)
             {
-                BatchResponse response = await this.instance
-                    .SendMulticastAsync(message);
-                this.logger.LogTrace(
-                    "Successfully sent message {Message}", response);
+                this.logger.LogInformation("No firebase tokens available.");
+                return true;
             }
-            catch (Exception error)
+
+            if (tokens.Count <= maxTokensPerMessage)
             {
-                this.logger.LogWarning("Firebase error: {Error}", error);
-                throw Error.FirebaseOperationError.AsQueryException();
+                await this.SendMulticastAsyncBatch(
+                    tokens, notification, data);
+            }
+            else
+            {
+                var tokenBatches = SplitTokensToBatches(tokens);
+
+                foreach (var batch in tokenBatches)
+                {
+                    await this.SendMulticastAsyncBatch(
+                        batch, notification, data);
+                }
             }
 
             return true;
@@ -122,11 +139,113 @@ namespace Pronto_MIA.DataAccess.Managers
             return false;
         }
 
-
         /// <inheritdoc/>
         public IQueryable<FcmToken> GetAllFcmToken()
         {
             return this.dbContext.FcmTokens;
+        }
+
+        /// <summary>
+        /// Method to split the given list of tokens into a list of lists
+        /// each containing a maximum of <see cref="maxTokensPerMessage"/>
+        /// items.
+        /// </summary>
+        /// <param name="tokens">The list of tokens to be split.</param>
+        /// <returns>A list containing multiple lists of tokens each containing
+        /// a maximum of <see cref="maxTokensPerMessage"/> items.</returns>
+        private static List<List<string>> SplitTokensToBatches(
+            List<string> tokens)
+        {
+            List<List<string>> tokenBatches = new ();
+            for (int i = 0; i < tokens.Count; i += maxTokensPerMessage)
+            {
+                tokenBatches.Add(
+                    tokens.GetRange(
+                        i,
+                        Math.Min(maxTokensPerMessage, tokens.Count - i)));
+            }
+
+            return tokenBatches;
+        }
+
+        /// <summary>
+        /// Method to check if the response of the firebase messaging api
+        /// indicates that the token used is not valid.
+        /// </summary>
+        /// <param name="response">The response that was received for the token
+        /// in question by the firebase messaging api.</param>
+        /// <returns>True if no error indicating an invalid token could be found
+        /// false otherwise.</returns>
+        private static bool FcmTokenValid(SendResponse response)
+        {
+            if (response.IsSuccess)
+            {
+                return true;
+            }
+
+            var errorCode = response.Exception.MessagingErrorCode;
+            switch (errorCode)
+            {
+                case MessagingErrorCode.Internal:
+                case MessagingErrorCode.QuotaExceeded:
+                case MessagingErrorCode.ThirdPartyAuthError:
+                    return true;
+                case MessagingErrorCode.InvalidArgument:
+                case MessagingErrorCode.SenderIdMismatch:
+                case MessagingErrorCode.Unavailable:
+                case MessagingErrorCode.Unregistered:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Method to send a message to a batch of devices. The token count has
+        /// to be below or equal to <see cref="maxTokensPerMessage"/>.
+        /// </summary>
+        /// <param name="tokens">The device tokens the message should be sent
+        /// to. No more than <see cref="maxTokensPerMessage"/> tokens are
+        /// allowed by this method.
+        /// </param>
+        /// <param name="notification">The notification to be included
+        /// in the message.</param>
+        /// <param name="data">The data to be included in the message.</param>
+        /// <returns>True if sending was successful.</returns>
+        /// <exception cref="QueryException">If a global error occured with
+        /// the firebase operation. If some devices could not be reached no
+        /// error is thrown.</exception>
+        /// <exception cref="ArgumentException">If to many tokens are passed
+        /// to this method.</exception>
+        private async Task SendMulticastAsyncBatch (
+            IReadOnlyList<string> tokens,
+            Notification notification,
+            IReadOnlyDictionary<string, string> data)
+        {
+            if (tokens.Count > maxTokensPerMessage)
+            {
+                throw new ArgumentException("To many firebase tokens.");
+            }
+
+            var message = new MulticastMessage()
+            {
+                Notification = notification, Data = data, Tokens = tokens,
+            };
+            try
+            {
+                var response = await this.instance.SendMulticastAsync(message);
+                this.logger.LogTrace(
+                    "Successfully sent message {Message}", response);
+                if (response.FailureCount > 0)
+                {
+                    await this.CleanTokenDb(message.Tokens, response.Responses);
+                }
+            }
+            catch (Exception error)
+            {
+                this.logger.LogWarning("Firebase error: {Error}", error);
+                throw Error.FirebaseOperationError.AsQueryException();
+            }
         }
 
         /// <summary>
@@ -205,6 +324,49 @@ namespace Pronto_MIA.DataAccess.Managers
 
             return new FirebaseMessagingAdapter(
                 FirebaseMessaging.DefaultInstance);
+        }
+
+        /// <summary>
+        /// Method to remove all fcmTokens which are invalid according
+        /// to the api responses from the database.
+        /// </summary>
+        /// <param name="tokens">The tokens which have been used in the api
+        /// request. It is important, that the tokens are still in the same
+        /// order as they have been sent to the api.</param>
+        /// <param name="responses">The Responses sent by the api. It is
+        /// important, that the responses are still in the same order as they
+        /// were received from the api.</param>
+        /// <returns>An empty task which does not have to be awaited since this
+        /// is only a cleanup operation.</returns>
+        private Task CleanTokenDb(
+            IReadOnlyList<string> tokens, IReadOnlyList<SendResponse> responses)
+        {
+            return Task.Run(async () =>
+            {
+                HashSet<string> toDelete = new ();
+                for (var i = 0; i < tokens.Count; i++)
+                {
+                    var response = responses[i];
+                    var token = tokens[i];
+                    if (FcmTokenValid(response))
+                    {
+                        continue;
+                    }
+
+                    var errorCode = response.Exception.MessagingErrorCode;
+                    toDelete.Add(token);
+                    this.logger.LogDebug(
+                        "Token: \"{Token}\" will be removed." +
+                        " Reason: {ErrorCode}",
+                        token,
+                        errorCode.ToString());
+                }
+
+                this.dbContext.RemoveRange(
+                    this.dbContext.FcmTokens.Where(fcmToken =>
+                        toDelete.Contains(fcmToken.Id)));
+                await this.dbContext.SaveChangesAsync();
+            });
         }
     }
 }

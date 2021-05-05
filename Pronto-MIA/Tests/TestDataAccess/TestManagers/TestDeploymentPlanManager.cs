@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Tests.TestDataAccess.TestManagers
 {
     using System;
@@ -437,7 +439,7 @@ namespace Tests.TestDataAccess.TestManagers
             await this.dbContext.SaveChangesAsync();
 
             var deploymentPlans = this.deploymentPlanManager.GetAll();
-            Assert.Equal(1, await deploymentPlans.CountAsync());
+            Assert.Equal(3, await deploymentPlans.CountAsync());
 
             this.dbContext.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
@@ -453,7 +455,7 @@ namespace Tests.TestDataAccess.TestManagers
             await this.dbContext.SaveChangesAsync();
 
             var deploymentPlans = this.deploymentPlanManager.GetAll();
-            Assert.Equal(2, await deploymentPlans.CountAsync());
+            Assert.Equal(4, await deploymentPlans.CountAsync());
 
             this.dbContext.Remove(deploymentPlan);
             this.dbContext.Remove(deploymentPlan2);
@@ -461,10 +463,16 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
-        public void TestGetAllEmpty()
+        public async Task TestGetAllEmpty()
         {
+            this.dbContext.DeploymentPlans.RemoveRange(
+                this.dbContext.DeploymentPlans);
+            await this.dbContext.SaveChangesAsync();
+
             var deploymentPlans = this.deploymentPlanManager.GetAll();
             Assert.Empty(deploymentPlans);
+
+            TestDataProvider.InsertTestData(this.dbContext);
         }
 
         private DeploymentPlan GetSampleDeploymentPlan()

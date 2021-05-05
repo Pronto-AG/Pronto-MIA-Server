@@ -1,7 +1,3 @@
-using Castle.Core.Internal;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API
 {
@@ -15,6 +11,7 @@ namespace Pronto_MIA.BusinessLogic.API
     using HotChocolate.Data;
     using HotChocolate.Execution;
     using HotChocolate.Types;
+    using Microsoft.EntityFrameworkCore;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
@@ -78,7 +75,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </exception>
         [Authorize]
         [UseSingleOrDefault]
-        public async Task<IQueryable<DeploymentPlan?>> UpdateDeploymentPlan(
+        public async Task<IQueryable<DeploymentPlan>> UpdateDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             int id,
             IFile? file,
@@ -91,7 +88,8 @@ namespace Pronto_MIA.BusinessLogic.API
         }
 
         /// <summary>
-        /// Method that publishes the deployment plan with the given id.
+        /// Method that publishes the deployment plan with the given id. If
+        /// the deployment plan is already published nothing will be done.
         /// </summary>
         /// <param name="deploymentPlanManager">The manager responsible for
         /// managing deployment plans.</param>
@@ -100,59 +98,58 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </param>
         /// <param name="id">The id of the deployment plan to be published.
         /// </param>
-        /// <returns>The deployment plan that was published.</returns>
+        /// <param name="title">The title of the info notification to be sent.
+        /// </param>
+        /// <param name="body">The body of the info notification to be sent.
+        /// </param>
+        /// <returns>True if the deployment plan status was updated false if
+        /// the deployment plan was already published.</returns>
         /// <exception cref="QueryException">If the deployment plan with the
-        /// given id could not be found ot the firebase manager encounters
+        /// given id could not be found or the firebase manager encounters
         /// a sending error.</exception>
         [Authorize]
         [UseSingleOrDefault]
-        public async Task<IQueryable<DeploymentPlan>> PublishDeploymentPlan(
+        public async Task<bool> PublishDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             [Service] IFirebaseMessagingManager firebaseMessagingManager,
-            [Service] ILogger<Mutation> logger,
-            int id)
+            int id,
+            string title,
+            string body)
         {
-            var deploymentPlan = await deploymentPlanManager.GetById(id);
-
-            // Can contain up to 500 device tokens
-            var tokens = await firebaseMessagingManager
-                .GetAllFcmToken().Select(token => token.Id).ToListAsync();
-            if (tokens.IsNullOrEmpty())
+            var wasAlreadyPublished = await deploymentPlanManager.Publish(id);
+            if (wasAlreadyPublished)
             {
-                logger.LogInformation("No firebase tokens available.");
-                return await deploymentPlanManager.Publish(deploymentPlan.Id);
+                return false;
             }
 
-            var message = new MulticastMessage()
-            {
-                Notification = new Notification
-                {
-                    Title = "Einsatzplan wurde veröffentlicht",
-                    Body = "Einsatzplan 5",
-                },
-                Data = new Dictionary<string, string>()
-                    { { "DeploymentPlanId", id.ToString() } },
-                Tokens = tokens,
-            };
-            await firebaseMessagingManager.SendMulticastAsync(message);
+            var tokens = await firebaseMessagingManager
+                .GetAllFcmToken().Select(token => token.Id).ToListAsync();
+            var notification = new Notification { Title = title, Body = body };
+            var data = new Dictionary<string, string>()
+                { { "DeploymentPlanId", id.ToString() } };
 
-            return await deploymentPlanManager.Publish(deploymentPlan.Id);
+            await firebaseMessagingManager.SendMulticastAsync(
+                tokens, notification, data);
+
+            return true;
         }
 
         /// <summary>
-        /// Method that publishes the deployment plan with the given id.
+        /// Method that hides the deployment plan with the given id. If the
+        /// deployment plan is already not in the published state nothing will
+        /// be done.
         /// </summary>
         /// <param name="deploymentPlanManager">The manager responsible for
         /// managing deployment plans.</param>
-        /// <param name="id">The id of the deployment plan to be published.
+        /// <param name="id">The id of the deployment plan to be hidden.
         /// </param>
-        /// <returns>The deployment plan that was published.</returns>
+        /// <returns>True if the deployment plan status was updated false if
+        /// the deployment plan was already hidden.</returns>
         /// <exception cref="QueryException">If the deployment plan with the
-        /// given id could not be found ot the firebase manager encounters
-        /// a sending error.</exception>
+        /// given id could not be found.</exception>
         [Authorize]
         [UseSingleOrDefault]
-        public async Task<IQueryable<DeploymentPlan>> HideDeploymentPlan(
+        public async Task<bool> HideDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             int id)
         {

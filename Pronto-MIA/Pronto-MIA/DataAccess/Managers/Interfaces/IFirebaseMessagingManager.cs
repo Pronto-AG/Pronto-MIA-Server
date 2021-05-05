@@ -1,6 +1,7 @@
 #nullable enable
 namespace Pronto_MIA.DataAccess.Managers.Interfaces
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
@@ -14,7 +15,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IFirebaseMessagingManager
     {
         /// <summary>
-        /// Sends the given message with firebase messaging to the devices
+        /// Sends the given message with firebase messaging to the device
         /// specified within the message.
         /// </summary>
         /// <param name="message">Firebase messaging message object which
@@ -26,14 +27,24 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
 
         /// <summary>
         /// Sends the given multicast message to all the FCM registration tokens
-        /// specified in it.
+        /// specified in it. It also removes all tokens that are no longer valid
+        /// from the fcmToken storage.
         /// </summary>
-        /// <param name="message">The message to be sent. Must not be null.
+        /// <param name="tokens">The device tokens the message should be sent
+        /// to. If there are more than 500 target devices the message will be
+        /// sent in batches a 500 devices.
         /// </param>
+        /// <param name="notification">The notification to be included
+        /// in the message.</param>
+        /// <param name="data">The data to be included in the message.</param>
         /// <returns>True if sending was successful.</returns>
-        /// <exception cref="QueryException">If an error occured with
-        /// the firebase operation.</exception>
-        public Task<bool> SendMulticastAsync(MulticastMessage message);
+        /// <exception cref="QueryException">If a global error occured with
+        /// the firebase operation. If some devices could not be reached no
+        /// error is thrown.</exception>
+        public Task<bool> SendMulticastAsync(
+            List<string> tokens,
+            Notification notification,
+            Dictionary<string, string> data);
 
         /// <summary>
         /// Method to register a new fcm token for a user. If the token is

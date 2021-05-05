@@ -103,25 +103,35 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>> Publish(int id)
+        public async Task<bool> Publish(int id)
         {
             var deploymentPlan = await this.GetById(id);
+
+            if (deploymentPlan.Published)
+            {
+                return false;
+            }
 
             deploymentPlan.Published = true;
             await this.dbContext.SaveChangesAsync();
 
-            return this.GetQueryableById(id);
+            return true;
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>> Hide(int id)
+        public async Task<bool> Hide(int id)
         {
             var deploymentPlan = await this.GetById(id);
+
+            if (!deploymentPlan.Published)
+            {
+                return false;
+            }
 
             deploymentPlan.Published = false;
             await this.dbContext.SaveChangesAsync();
 
-            return this.GetQueryableById(id);
+            return true;
         }
 
         /// <inheritdoc/>
