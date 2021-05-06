@@ -68,15 +68,18 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            firebaseMessagingManager.GetAllFcmToken().Returns(
+            firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
             await this.mutation.PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
+                firebaseTokenManager,
                 1,
                 "Hello World",
                 "This is the notification body.");
@@ -87,6 +90,8 @@ namespace Tests.TestBusinessLogic.TestAPI
                     Arg.Any<List<string>>(),
                     Arg.Any<Notification>(),
                     Arg.Any<Dictionary<string, string>>());
+            await firebaseTokenManager.ReceivedWithAnyArgs()
+                .UnregisterMultipleFcmToken(Arg.Any<HashSet<string>>());
         }
 
         [Fact]
@@ -94,16 +99,19 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
             deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
 
-            firebaseMessagingManager.GetAllFcmToken().Returns(
+            firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
             await this.mutation.PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
+                firebaseTokenManager,
                 1,
                 "Hello World",
                 "This is the notification body.");
@@ -159,8 +167,8 @@ namespace Tests.TestBusinessLogic.TestAPI
         [Fact]
         public async void TestRegisterFcmToken()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var userTask = this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
             var userManager =
@@ -168,21 +176,21 @@ namespace Tests.TestBusinessLogic.TestAPI
             userManager.GetByUserName("Bob").Returns(userTask);
 
             await this.mutation.RegisterFcmToken(
-                firebaseMessagingManager,
+                firebaseTokenManager,
                 userManager,
                 new ApiUserState("5", "Bob"),
                 "Hello World");
 
             await userManager.Received().GetByUserName("Bob");
-            await firebaseMessagingManager.Received()
+            await firebaseTokenManager.Received()
                 .RegisterFcmToken(await userTask, "Hello World");
         }
 
         [Fact]
         public async void TestRegisterFcmTokenError()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var userManager =
                 Substitute.For<IUserManager>();
             userManager.GetByUserName("Bob").Returns(
@@ -192,7 +200,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 async () =>
                 {
                     await this.mutation.RegisterFcmToken(
-                        firebaseMessagingManager,
+                        firebaseTokenManager,
                         userManager,
                         new ApiUserState("5", "Bob"),
                         "Hello World");
@@ -206,14 +214,14 @@ namespace Tests.TestBusinessLogic.TestAPI
         [Fact]
         public async void TestUnregisterFcmToken()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
 
             await this.mutation.UnregisterFcmToken(
-                firebaseMessagingManager,
+                firebaseTokenManager,
                 "Hello World");
 
-            await firebaseMessagingManager.Received()
+            await firebaseTokenManager.Received()
                 .UnregisterFcmToken("Hello World");
         }
     }

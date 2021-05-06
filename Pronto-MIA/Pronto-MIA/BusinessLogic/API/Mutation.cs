@@ -96,6 +96,9 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="firebaseMessagingManager">The manager used to inform
         /// affected users that a new deployment plan has been published.
         /// </param>
+        /// <param name="firebaseTokenManager">The manager responsible for the
+        /// fcm tokens used by this operation.
+        /// </param>
         /// <param name="id">The id of the deployment plan to be published.
         /// </param>
         /// <param name="title">The title of the info notification to be sent.
@@ -112,6 +115,7 @@ namespace Pronto_MIA.BusinessLogic.API
         public async Task<bool> PublishDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseTokenManager firebaseTokenManager,
             int id,
             string title,
             string body)
@@ -122,14 +126,16 @@ namespace Pronto_MIA.BusinessLogic.API
                 return false;
             }
 
-            var tokens = await firebaseMessagingManager
+            var tokens = await firebaseTokenManager
                 .GetAllFcmToken().Select(token => token.Id).ToListAsync();
             var notification = new Notification { Title = title, Body = body };
             var data = new Dictionary<string, string>()
                 { { "DeploymentPlanId", id.ToString() } };
 
-            await firebaseMessagingManager.SendMulticastAsync(
-                tokens, notification, data);
+            var invalidTokens = await firebaseMessagingManager
+                .SendMulticastAsync(tokens, notification, data);
+            await firebaseTokenManager
+                .UnregisterMultipleFcmToken(invalidTokens);
 
             return true;
         }
@@ -208,8 +214,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// already exists it will be overwritten with the currently
         /// authenticated user.
         /// </summary>
-        /// <param name="firebaseMessagingManager">The manager responsible for
-        /// firebase messaging related operations.</param>
+        /// <param name="firebaseTokenManager">The manager responsible for
+        /// firebase token operations.</param>
         /// <param name="userManager">The manager managing the users lifecycle.
         /// </param>
         /// <param name="userState">Information about the current user.</param>
@@ -220,7 +226,7 @@ namespace Pronto_MIA.BusinessLogic.API
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseTokenManager firebaseTokenManager,
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
@@ -232,23 +238,23 @@ namespace Pronto_MIA.BusinessLogic.API
             }
 
             return
-                await firebaseMessagingManager.RegisterFcmToken(user, fcmToken);
+                await firebaseTokenManager.RegisterFcmToken(user, fcmToken);
         }
 
         /// <summary>
         /// Unregisters a given fcm token from the user it was assigned to.
         /// If the token cannot be found nothing will be done.
         /// </summary>
-        /// <param name="firebaseMessagingManager">The manager managing
-        /// operations with firebase messaging.
+        /// <param name="firebaseTokenManager">The manager managing
+        /// operations with firebase tokens.
         /// </param>
         /// <param name="fcmToken">The fcm token to be removed.</param>
         /// <returns>True if the token could be removed.</returns>
         public async Task<bool> UnregisterFcmToken(
-            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseTokenManager firebaseTokenManager,
             string fcmToken)
         {
-            return await firebaseMessagingManager.UnregisterFcmToken(fcmToken);
+            return await firebaseTokenManager.UnregisterFcmToken(fcmToken);
         }
     }
 }

@@ -3,13 +3,12 @@ namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using FirebaseAdmin;
     using FirebaseAdmin.Messaging;
     using Google.Apis.Auth.OAuth2;
     using HotChocolate.Execution;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
@@ -17,7 +16,6 @@ namespace Pronto_MIA.DataAccess.Managers
     using Pronto_MIA.DataAccess.Adapters;
     using Pronto_MIA.DataAccess.Adapters.Interfaces;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
-    using Pronto_MIA.Domain.Entities;
 
     /// <summary>
     /// Class responsible for managing firebase messaging.
@@ -29,7 +27,6 @@ namespace Pronto_MIA.DataAccess.Managers
         /// </summary>
         private static int maxTokensPerMessage = 500;
 
-        private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
         private readonly IFirebaseMessagingAdapter instance;
@@ -38,27 +35,23 @@ namespace Pronto_MIA.DataAccess.Managers
         /// Initializes a new instance of the
         /// <see cref="FirebaseMessagingManager"/> class.
         /// </summary>
-        /// <param name="dbContext">The database context where users are
-        /// persisted.</param>
         /// <param name="logger">The logger to be used in order to document
         /// events regarding this manager.</param>
         /// <param name="cfg">The configuration of this application.</param>
         /// <param name="instance">The firebase messaging instance used
         /// in order to send messages.</param>
         public FirebaseMessagingManager(
-            ProntoMiaDbContext dbContext,
             IConfiguration cfg,
             ILogger<FirebaseMessagingManager> logger,
             IFirebaseMessagingAdapter? instance = null)
         {
-            this.dbContext = dbContext;
             this.cfg = cfg;
             this.logger = logger;
             this.instance = instance ?? this.GetInstance();
         }
 
         /// <inheritdoc/>
-        public async Task<bool> SendMulticastAsync(
+        public async Task<HashSet<string>> SendMulticastAsync(
             List<string> tokens,
             Notification notification,
             Dictionary<string, string> data)
@@ -66,26 +59,26 @@ namespace Pronto_MIA.DataAccess.Managers
             if (tokens.Count == 0)
             {
                 this.logger.LogInformation("No firebase tokens available.");
-                return true;
+                return new HashSet<string>();
             }
 
             if (tokens.Count <= maxTokensPerMessage)
             {
-                await this.SendMulticastAsyncBatch(
+                return await this.SendMulticastAsyncBatch(
                     tokens, notification, data);
             }
-            else
-            {
-                var tokenBatches = SplitTokensToBatches(tokens);
 
-                foreach (var batch in tokenBatches)
-                {
+            var tokenBatches = SplitTokensToBatches(tokens);
+            var invalidTokens = new HashSet<string>();
+
+            foreach (var batch in tokenBatches)
+            {
+                invalidTokens.UnionWith(
                     await this.SendMulticastAsyncBatch(
-                        batch, notification, data);
-                }
+                        batch, notification, data));
             }
 
-            return true;
+            return invalidTokens;
         }
 
         /// <inheritdoc/>
@@ -104,45 +97,6 @@ namespace Pronto_MIA.DataAccess.Managers
             }
 
             return true;
-        }
-
-        /// <inheritdoc/>
-        public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            User user, string fcmToken)
-        {
-            await this.MoveOrCreateFcmToken(user, fcmToken);
-
-            return this.dbContext.FcmTokens.Where(
-                fcmTokenDb => fcmTokenDb.Id == fcmToken);
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> UnregisterFcmToken(string fcmToken)
-        {
-            var tokenObject = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == fcmToken);
-            if (tokenObject != default)
-            {
-                this.logger.LogDebug(
-                    "FCMToken {FcmToken} was removed from User {UserName}",
-                    fcmToken,
-                    tokenObject.Owner.UserName);
-                this.dbContext.Remove(tokenObject);
-                await this.dbContext.SaveChangesAsync();
-
-                return true;
-            }
-
-            this.logger.LogDebug(
-                "FCMToken {FcmToken} did not exist. Nothing to remove",
-                fcmToken);
-            return false;
-        }
-
-        /// <inheritdoc/>
-        public IQueryable<FcmToken> GetAllFcmToken()
-        {
-            return this.dbContext.FcmTokens;
         }
 
         /// <summary>
@@ -217,7 +171,11 @@ namespace Pronto_MIA.DataAccess.Managers
         /// error is thrown.</exception>
         /// <exception cref="ArgumentException">If to many tokens are passed
         /// to this method.</exception>
-        private async Task SendMulticastAsyncBatch (
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Good cohesion within method.")]
+        private async Task<HashSet<string>> SendMulticastAsyncBatch (
             IReadOnlyList<string> tokens,
             Notification notification,
             IReadOnlyDictionary<string, string> data)
@@ -238,68 +196,17 @@ namespace Pronto_MIA.DataAccess.Managers
                     "Successfully sent message {Message}", response);
                 if (response.FailureCount > 0)
                 {
-                    await this.CleanTokenDb(message.Tokens, response.Responses);
+                    return this.
+                        GetInvalidTokens(message.Tokens, response.Responses);
                 }
+
+                return new HashSet<string>();
             }
             catch (Exception error)
             {
                 this.logger.LogWarning("Firebase error: {Error}", error);
                 throw Error.FirebaseOperationError.AsQueryException();
             }
-        }
-
-        /// <summary>
-        /// If a fcm token already exists it will be moved else a new token will
-        /// be created.
-        /// </summary>
-        private async Task MoveOrCreateFcmToken(User user, string fcmToken)
-        {
-            var fcmTokenObject = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == fcmToken);
-
-            if (fcmTokenObject == default)
-            {
-                fcmTokenObject = new FcmToken(fcmToken, user);
-                this.dbContext.FcmTokens.Add(fcmTokenObject);
-                await this.dbContext.SaveChangesAsync();
-
-                this.logger.LogDebug(
-                    "FCMToken {FcmToken} was created for user {UserName}",
-                    fcmToken,
-                    user.UserName);
-            }
-            else if (fcmTokenObject.Owner != user)
-            {
-                await this.MoveFcmToken(fcmTokenObject, user);
-            }
-            else
-            {
-                this.logger.LogDebug(
-                    "FCMToken {FcmToken} already registered for " +
-                        "user {UserName}",
-                    fcmToken,
-                    user.UserName);
-            }
-        }
-
-        /// <summary>
-        /// Method to move the given token to a new owner.
-        /// </summary>
-        /// <param name="fcmTokenObject">The token to be moved.</param>
-        /// <param name="newOwner">The new owner which will be set.</param>
-        private async Task MoveFcmToken(
-            FcmToken fcmTokenObject,
-            User newOwner)
-        {
-            var oldOwner = fcmTokenObject.Owner;
-            fcmTokenObject.Owner = newOwner;
-            await this.dbContext.SaveChangesAsync();
-
-            this.logger.LogDebug(
-                "FCMToken {Token} was moved from user {Old} to user {New}",
-                fcmTokenObject.Id,
-                oldOwner.UserName,
-                newOwner.UserName);
         }
 
         /// <summary>
@@ -338,35 +245,29 @@ namespace Pronto_MIA.DataAccess.Managers
         /// were received from the api.</param>
         /// <returns>An empty task which does not have to be awaited since this
         /// is only a cleanup operation.</returns>
-        private Task CleanTokenDb(
+        private HashSet<string> GetInvalidTokens(
             IReadOnlyList<string> tokens, IReadOnlyList<SendResponse> responses)
         {
-            return Task.Run(async () =>
+            HashSet<string> toDelete = new ();
+            for (var i = 0; i < tokens.Count; i++)
             {
-                HashSet<string> toDelete = new ();
-                for (var i = 0; i < tokens.Count; i++)
+                var response = responses[i];
+                var token = tokens[i];
+                if (FcmTokenValid(response))
                 {
-                    var response = responses[i];
-                    var token = tokens[i];
-                    if (FcmTokenValid(response))
-                    {
-                        continue;
-                    }
-
-                    var errorCode = response.Exception.MessagingErrorCode;
-                    toDelete.Add(token);
-                    this.logger.LogDebug(
-                        "Token: \"{Token}\" will be removed." +
-                        " Reason: {ErrorCode}",
-                        token,
-                        errorCode.ToString());
+                    continue;
                 }
 
-                this.dbContext.RemoveRange(
-                    this.dbContext.FcmTokens.Where(fcmToken =>
-                        toDelete.Contains(fcmToken.Id)));
-                await this.dbContext.SaveChangesAsync();
-            });
+                var errorCode = response.Exception.MessagingErrorCode;
+                toDelete.Add(token);
+                this.logger.LogDebug(
+                    "Token: \"{Token}\" is no longer valid." +
+                    " Reason: {ErrorCode}",
+                    token,
+                    errorCode.ToString());
+            }
+
+            return toDelete;
         }
     }
 }
