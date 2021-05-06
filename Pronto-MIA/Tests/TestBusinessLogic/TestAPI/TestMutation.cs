@@ -2,7 +2,9 @@
 namespace Tests.TestBusinessLogic.TestAPI
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using FirebaseAdmin.Messaging;
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
@@ -62,6 +64,79 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
+        public async void TestPublishDeploymentPlan()
+        {
+            var firebaseMessagingManager =
+                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+
+            firebaseTokenManager.GetAllFcmToken().Returns(
+                this.dbContext.FcmTokens);
+
+            await this.mutation.PublishDeploymentPlan(
+                deploymentPlanManager,
+                firebaseMessagingManager,
+                firebaseTokenManager,
+                1,
+                "Hello World",
+                "This is the notification body.");
+
+            await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
+            await firebaseMessagingManager.ReceivedWithAnyArgs()
+                .SendMulticastAsync(
+                    Arg.Any<List<string>>(),
+                    Arg.Any<Notification>(),
+                    Arg.Any<Dictionary<string, string>>());
+            await firebaseTokenManager.ReceivedWithAnyArgs()
+                .UnregisterMultipleFcmToken(Arg.Any<HashSet<string>>());
+        }
+
+        [Fact]
+        public async void TestPublishDeploymentPlanAlreadyPublished()
+        {
+            var firebaseMessagingManager =
+                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
+
+            firebaseTokenManager.GetAllFcmToken().Returns(
+                this.dbContext.FcmTokens);
+
+            await this.mutation.PublishDeploymentPlan(
+                deploymentPlanManager,
+                firebaseMessagingManager,
+                firebaseTokenManager,
+                1,
+                "Hello World",
+                "This is the notification body.");
+
+            await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
+            await firebaseMessagingManager.DidNotReceiveWithAnyArgs()
+                .SendMulticastAsync(
+                    Arg.Any<List<string>>(),
+                    Arg.Any<Notification>(),
+                    Arg.Any<Dictionary<string, string>>());
+        }
+
+        [Fact]
+        public async void TestHideDeploymentPlan()
+        {
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+
+            await this.mutation
+                .HideDeploymentPlan(deploymentPlanManager, 1);
+
+            await deploymentPlanManager.Received().Hide(1);
+        }
+
+        [Fact]
         public async void TestRemoveDeploymentPlan()
         {
             var deploymentPlanManager =
@@ -86,14 +161,14 @@ namespace Tests.TestBusinessLogic.TestAPI
                 "token123");
 
             await firebaseMessagingManager.ReceivedWithAnyArgs()
-                .SendAsync(default);
+                .SendAsync(Arg.Any<Message>());
         }
 
         [Fact]
         public async void TestRegisterFcmToken()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var userTask = this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
             var userManager =
@@ -101,21 +176,21 @@ namespace Tests.TestBusinessLogic.TestAPI
             userManager.GetByUserName("Bob").Returns(userTask);
 
             await this.mutation.RegisterFcmToken(
-                firebaseMessagingManager,
+                firebaseTokenManager,
                 userManager,
                 new ApiUserState("5", "Bob"),
                 "Hello World");
 
             await userManager.Received().GetByUserName("Bob");
-            await firebaseMessagingManager.Received()
+            await firebaseTokenManager.Received()
                 .RegisterFcmToken(await userTask, "Hello World");
         }
 
         [Fact]
         public async void TestRegisterFcmTokenError()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
             var userManager =
                 Substitute.For<IUserManager>();
             userManager.GetByUserName("Bob").Returns(
@@ -125,7 +200,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 async () =>
                 {
                     await this.mutation.RegisterFcmToken(
-                        firebaseMessagingManager,
+                        firebaseTokenManager,
                         userManager,
                         new ApiUserState("5", "Bob"),
                         "Hello World");
@@ -139,14 +214,14 @@ namespace Tests.TestBusinessLogic.TestAPI
         [Fact]
         public async void TestUnregisterFcmToken()
         {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
+            var firebaseTokenManager =
+                Substitute.For<IFirebaseTokenManager>();
 
             await this.mutation.UnregisterFcmToken(
-                firebaseMessagingManager,
+                firebaseTokenManager,
                 "Hello World");
 
-            await firebaseMessagingManager.Received()
+            await firebaseTokenManager.Received()
                 .UnregisterFcmToken("Hello World");
         }
     }

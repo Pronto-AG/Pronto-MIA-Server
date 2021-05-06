@@ -31,5 +31,11 @@ namespace Pronto_MIA.DataAccess.Adapters
         {
             return this.instance.SendAsync(message);
         }
+
+        /// <inheritdoc/>
+        public Task<BatchResponse> SendMulticastAsync(MulticastMessage message)
+        {
+            return this.instance.SendMulticastAsync(message);
+        }
     }
 }

@@ -1,18 +1,19 @@
 namespace Tests.TestDataAccess.TestManagers
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
     using HotChocolate.Execution;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using NSubstitute;
     using NSubstitute.ClearExtensions;
-    using NSubstitute.ExceptionExtensions;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Adapters.Interfaces;
     using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestFirebaseMessagingManager
@@ -29,101 +30,136 @@ namespace Tests.TestDataAccess.TestManagers
                 Substitute.For<IFirebaseMessagingAdapter>();
 
             this.firebaseMessagingManager = new FirebaseMessagingManager(
-                this.dbContext,
                 TestHelpers.TestConfiguration,
                 Substitute.For<ILogger<FirebaseMessagingManager>>(),
                 this.firebaseMessagingAdapter);
         }
 
         [Fact]
-        public async void TestFcmTokenCreateNew()
+        public async void TestSendMulticastAsyncNoTokens()
         {
-            var bob =
-                await this.dbContext.Users.SingleOrDefaultAsync(u =>
-                    u.UserName == "Bob");
+            var notification = new Notification
+            {
+                Title = "Test",
+                Body = "This is a test.",
+            };
+            var data = new Dictionary<string, string>()
+                { { "score", "850" }, { "time", "2:45" }, };
+            var tokens = new List<string>();
 
             await this.firebaseMessagingManager
-                .RegisterFcmToken(bob, "Hello World");
+                .SendMulticastAsync(tokens, notification, data);
 
-            var token = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == "Hello World");
-            Assert.Equal(token.Owner, bob);
+            await this.firebaseMessagingAdapter.DidNotReceiveWithAnyArgs()
+                .SendMulticastAsync(default);
 
-            this.dbContext.FcmTokens.Remove(token);
-            await this.dbContext.SaveChangesAsync();
+            this.firebaseMessagingAdapter.ClearReceivedCalls();
         }
 
         [Fact]
-        public async void TestFcmTokenChangeOwner()
+        public async void TestSendMulticastAsyncFewTokens()
         {
-            var bob =
-                await this.dbContext.Users.SingleOrDefaultAsync(u =>
-                    u.UserName == "Bob");
-            await this.firebaseMessagingManager
-                .RegisterFcmToken(bob, "Hello World");
-            var alice =
-                await this.dbContext.Users.SingleOrDefaultAsync(u =>
-                    u.UserName == "Alice");
+            var notification = new Notification
+            {
+                Title = "Test",
+                Body = "This is a test.",
+            };
+            var data = new Dictionary<string, string>()
+                { { "score", "850" }, { "time", "2:45" }, };
+            var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(8);
+            this.firebaseMessagingAdapter.SendMulticastAsync(default)
+                .ReturnsForAnyArgs(Task.FromResult(
+                    TestHelpersFirebaseMessagingManager
+                        .CreateBatchResponse(8)));
 
             await this.firebaseMessagingManager
-                .RegisterFcmToken(alice, "Hello World");
+                .SendMulticastAsync(tokens, notification, data);
 
-            var token = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == "Hello World");
-            Assert.Equal(token.Owner, alice);
+            var receivedMessage = (MulticastMessage)this.
+                firebaseMessagingAdapter.ReceivedCalls().First()
+                .GetArguments()[0];
 
-            this.dbContext.FcmTokens.Remove(token);
-            await this.dbContext.SaveChangesAsync();
+            Assert.Equal(tokens, receivedMessage.Tokens);
+
+            this.firebaseMessagingAdapter.ClearSubstitute();
         }
 
         [Fact]
-        public async void TestFcmTokenKeepOwner()
+        public async void TestSendMulticastAsyncManyTokens()
         {
-            var bob =
-                await this.dbContext.Users.SingleOrDefaultAsync(u =>
-                    u.UserName == "Bob");
-            await this.firebaseMessagingManager
-                .RegisterFcmToken(bob, "Hello World");
+            var notification = new Notification
+            { Title = "Test", Body = "This is a test." };
+            var data = new Dictionary<string, string>() { { "score", "850" } };
+            var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(520);
+            this.firebaseMessagingAdapter.SendMulticastAsync(default)
+                .ReturnsForAnyArgs(Task.FromResult(
+                    TestHelpersFirebaseMessagingManager
+                        .CreateBatchResponse(8)));
 
             await this.firebaseMessagingManager
-                .RegisterFcmToken(bob, "Hello World");
+                .SendMulticastAsync(tokens, notification, data);
 
-            var token = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == "Hello World");
-            Assert.Equal(token.Owner, bob);
+            await this.firebaseMessagingAdapter.ReceivedWithAnyArgs(2)
+                .SendMulticastAsync(default);
 
-            this.dbContext.FcmTokens.Remove(token);
-            await this.dbContext.SaveChangesAsync();
+            var receivedMessage1 = (MulticastMessage)this.
+                firebaseMessagingAdapter.ReceivedCalls().First()
+                .GetArguments()[0];
+            var receivedMessage2 = (MulticastMessage)this.
+                firebaseMessagingAdapter.ReceivedCalls().Skip(1).First()
+                .GetArguments()[0];
+
+            Assert.Equal(500, receivedMessage1.Tokens.Count);
+            Assert.Equal(20, receivedMessage2.Tokens.Count);
+
+            this.firebaseMessagingAdapter.ClearSubstitute();
         }
 
         [Fact]
-        public async void TestFcmTokenRemove()
+        public async void TestSendMulticastAsyncWithGlobalError()
         {
-            var bob =
-                await this.dbContext.Users.SingleOrDefaultAsync(u =>
-                    u.UserName == "Bob");
-            await this.firebaseMessagingManager
-                .RegisterFcmToken(bob, "Hello World");
+            var notification = new Notification
+                { Title = "Test", Body = "This is a test." };
+            var data = new Dictionary<string, string>() { { "score", "850" } };
+            var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(8);
 
-            var result = await this.firebaseMessagingManager.UnregisterFcmToken(
-                "Hello World");
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.firebaseMessagingManager
+                    .SendMulticastAsync(tokens, notification, data);
+            });
 
-            Assert.True(result);
-            var token = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == "Hello World");
-            Assert.Null(token);
+            Assert.Equal(
+                Error.FirebaseOperationError.ToString(),
+                error.Errors[0].Code);
+
+            this.firebaseMessagingAdapter.ClearReceivedCalls();
         }
 
         [Fact]
-        public async void TestFcmTokenRemoveNonExistent()
+        public async void TestSendMulticastAsyncWithResponseErrors()
         {
-            var result = await this.firebaseMessagingManager.UnregisterFcmToken(
-                "Hello World");
+            var testToken = new FcmToken(
+                Guid.NewGuid().ToString(), this.dbContext.Users.First());
+            var notification = new Notification
+                { Title = "Test", Body = "This is a test." };
+            var data = new Dictionary<string, string>() { { "score", "850" } };
+            var tokens = new List<string>() { testToken.Id };
+            tokens.AddRange(
+                TestHelpersFirebaseMessagingManager.CreateTokens(7));
 
-            Assert.False(result);
-            var token = await this.dbContext.FcmTokens
-                .SingleOrDefaultAsync(t => t.Id == "Hello World");
-            Assert.Null(token);
+            this.firebaseMessagingAdapter.SendMulticastAsync(default)
+                .ReturnsForAnyArgs(Task.FromResult(
+                    TestHelpersFirebaseMessagingManager
+                        .CreateBatchResponse(8, 4)));
+
+            var invalidTokens = await this.firebaseMessagingManager
+                    .SendMulticastAsync(tokens, notification, data);
+
+            Assert.Contains(testToken.Id, invalidTokens);
+            Assert.Equal(4, invalidTokens.Count);
+
+            this.firebaseMessagingAdapter.ClearSubstitute();
         }
 
         [Fact]
@@ -141,7 +177,7 @@ namespace Tests.TestDataAccess.TestManagers
                 Token = "Hello World",
             };
 
-            var result = await this.firebaseMessagingManager
+            await this.firebaseMessagingManager
                 .SendAsync(message);
 
             await this.firebaseMessagingAdapter.Received().SendAsync(message);

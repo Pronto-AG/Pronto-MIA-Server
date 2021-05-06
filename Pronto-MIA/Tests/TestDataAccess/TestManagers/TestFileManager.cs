@@ -6,8 +6,6 @@ namespace Tests.TestDataAccess.TestManagers
     using Microsoft.Extensions.Logging;
     using NSubstitute;
     using NSubstitute.ClearExtensions;
-    using NSubstitute.ExceptionExtensions;
-    using NSubstitute.ReceivedExtensions;
     using Pronto_MIA.DataAccess.Managers;
     using Xunit;
     using IFile = HotChocolate.Types.IFile;

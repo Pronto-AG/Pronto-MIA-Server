@@ -87,13 +87,6 @@ namespace Pronto_MIA.DataAccess.Managers
                 string? description)
         {
             var deploymentPlan = await this.GetById(id);
-            if (deploymentPlan == default)
-            {
-                this.logger.LogWarning(
-                    "Invalid deployment plan id {Id}", id);
-                throw DataAccess.Error.DeploymentPlanNotFound
-                    .AsQueryException();
-            }
 
             // Must be before UpdateFile since it may throw an error if the
             // times are not set correctly.
@@ -110,17 +103,42 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
+        public async Task<bool> Publish(int id)
+        {
+            var deploymentPlan = await this.GetById(id);
+
+            if (deploymentPlan.Published)
+            {
+                return false;
+            }
+
+            deploymentPlan.Published = true;
+            await this.dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> Hide(int id)
+        {
+            var deploymentPlan = await this.GetById(id);
+
+            if (!deploymentPlan.Published)
+            {
+                return false;
+            }
+
+            deploymentPlan.Published = false;
+            await this.dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        /// <inheritdoc/>
         public async Task<int>
             Remove(int id)
         {
             var deploymentPlan = await this.GetById(id);
-            if (deploymentPlan == default)
-            {
-                this.logger.LogWarning(
-                    "Invalid deployment plan id {Id}", id);
-                throw DataAccess.Error.DeploymentPlanNotFound
-                    .AsQueryException();
-            }
 
             this.fileManager.Remove(
                 IDeploymentPlanManager.FileDirectory,
@@ -134,9 +152,25 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public IQueryable<DeploymentPlan?> GetAll()
+        public IQueryable<DeploymentPlan> GetAll()
         {
             return this.dbContext.DeploymentPlans;
+        }
+
+        /// <inheritdoc/>
+        public async Task<DeploymentPlan> GetById(int id)
+        {
+            var deploymentPlan = await this.dbContext.DeploymentPlans
+                .SingleOrDefaultAsync(dP => dP.Id == id);
+            if (deploymentPlan != default)
+            {
+                return deploymentPlan;
+            }
+
+            this.logger.LogWarning(
+                "Invalid deployment plan id {Id}", id);
+            throw DataAccess.Error.DeploymentPlanNotFound
+                .AsQueryException();
         }
 
         /// <summary>
@@ -172,17 +206,6 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             return this.dbContext.DeploymentPlans
                 .Where(dP => dP.Id == id);
-        }
-
-        /// <summary>
-        /// Method to get a deployment plan with the help of its id.
-        /// </summary>
-        /// <param name="id">The id of the deployment plan.</param>
-        /// <returns>The deployment plan with the given id.</returns>
-        private async Task<DeploymentPlan?> GetById(int id)
-        {
-            return await this.dbContext.DeploymentPlans
-                .SingleOrDefaultAsync(dP => dP.Id == id);
         }
 
         /// <summary>

@@ -15,5 +15,18 @@ namespace Pronto_MIA.DataAccess.Adapters.Interfaces
         /// <returns>A task that completes with a message ID string, which
         /// represents successful handoff to FCM.</returns>
         public Task<string> SendAsync(Message message);
+
+        /// <summary>
+        /// Sends the given multicast message to all the FCM registration tokens
+        /// specified in it.
+        /// </summary>
+        /// <exception
+        /// cref="T:FirebaseAdmin.Messaging.FirebaseMessagingException">If an
+        /// error occurs while sending the messages.</exception>
+        /// <param name="message">The message to be sent. Must not be null.
+        /// </param>
+        /// <returns>A <see cref="T:FirebaseAdmin.Messaging.BatchResponse" />
+        /// containing details of the batch operation's outcome.</returns>
+        public Task<BatchResponse> SendMulticastAsync(MulticastMessage message);
     }
 }
