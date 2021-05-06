@@ -1,9 +1,8 @@
-using System.Net.Http;
-
 namespace Tests.TestDataAccess.TestManagers
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
     using System.Reflection;
     using FirebaseAdmin;
     using FirebaseAdmin.Messaging;

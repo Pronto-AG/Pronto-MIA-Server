@@ -2,8 +2,9 @@
 namespace Tests.TestBusinessLogic.TestAPI
 {
     using System;
-    using System.Linq;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
+    using FirebaseAdmin.Messaging;
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
@@ -82,7 +83,10 @@ namespace Tests.TestBusinessLogic.TestAPI
 
             await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
             await firebaseMessagingManager.ReceivedWithAnyArgs()
-                .SendMulticastAsync(default, default, default);
+                .SendMulticastAsync(
+                    Arg.Any<List<string>>(),
+                    Arg.Any<Notification>(),
+                    Arg.Any<Dictionary<string, string>>());
         }
 
         [Fact]
@@ -106,7 +110,10 @@ namespace Tests.TestBusinessLogic.TestAPI
 
             await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
             await firebaseMessagingManager.DidNotReceiveWithAnyArgs()
-                .SendMulticastAsync(default, default, default);
+                .SendMulticastAsync(
+                    Arg.Any<List<string>>(),
+                    Arg.Any<Notification>(),
+                    Arg.Any<Dictionary<string, string>>());
         }
 
         [Fact]
@@ -146,7 +153,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 "token123");
 
             await firebaseMessagingManager.ReceivedWithAnyArgs()
-                .SendAsync(default);
+                .SendAsync(Arg.Any<Message>());
         }
 
         [Fact]

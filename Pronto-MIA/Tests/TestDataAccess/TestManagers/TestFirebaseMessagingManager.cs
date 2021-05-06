@@ -1,8 +1,6 @@
-using System;
-using Pronto_MIA.Domain.Entities;
-
 namespace Tests.TestDataAccess.TestManagers
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
@@ -17,6 +15,7 @@ namespace Tests.TestDataAccess.TestManagers
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Adapters.Interfaces;
     using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     [SuppressMessage(
@@ -182,7 +181,8 @@ namespace Tests.TestDataAccess.TestManagers
             var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(8);
             this.firebaseMessagingAdapter.SendMulticastAsync(default)
                 .ReturnsForAnyArgs(Task.FromResult(
-                    TestHelpersFirebaseMessagingManager.CreateBatchResponse(8)));
+                    TestHelpersFirebaseMessagingManager
+                        .CreateBatchResponse(8)));
 
             var result = await this.firebaseMessagingManager
                 .SendMulticastAsync(tokens, notification, data);
@@ -205,7 +205,8 @@ namespace Tests.TestDataAccess.TestManagers
             var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(520);
             this.firebaseMessagingAdapter.SendMulticastAsync(default)
                 .ReturnsForAnyArgs(Task.FromResult(
-                    TestHelpersFirebaseMessagingManager.CreateBatchResponse(8)));
+                    TestHelpersFirebaseMessagingManager
+                        .CreateBatchResponse(8)));
 
             var result = await this.firebaseMessagingManager
                 .SendMulticastAsync(tokens, notification, data);

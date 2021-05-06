@@ -11,6 +11,7 @@ namespace Tests
         public static void InsertTestData(ProntoMiaDbContext context)
         {
             InsertUsers(context);
+            InsertTokens(context);
         }
 
         [SuppressMessage(
@@ -38,7 +39,10 @@ namespace Tests
                 context.Users.AddRange(bob, alice);
                 context.SaveChanges();
             }
+        }
 
+        private static void InsertTokens(ProntoMiaDbContext context)
+        {
             if (!context.DeploymentPlans.Any())
             {
                 var deploymentPlan1 = new DeploymentPlan(

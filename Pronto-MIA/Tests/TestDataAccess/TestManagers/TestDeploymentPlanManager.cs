@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Tests.TestDataAccess.TestManagers
 {
     using System;
