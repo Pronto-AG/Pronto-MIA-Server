@@ -72,11 +72,12 @@ namespace Tests.TestBusinessLogic.TestAPI
                 Substitute.For<IFirebaseTokenManager>();
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
-
+            deploymentPlanManager.Publish(default)
+                .ReturnsForAnyArgs(true);
             firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
-            await this.mutation.PublishDeploymentPlan(
+            var result = await this.mutation.PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
                 firebaseTokenManager,
@@ -84,6 +85,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 "Hello World",
                 "This is the notification body.");
 
+            Assert.True(result);
             await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
             await firebaseMessagingManager.ReceivedWithAnyArgs()
                 .SendMulticastAsync(
@@ -103,12 +105,11 @@ namespace Tests.TestBusinessLogic.TestAPI
                 Substitute.For<IFirebaseTokenManager>();
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
-            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
-
+            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(false);
             firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
-            await this.mutation.PublishDeploymentPlan(
+            var result = await this.mutation.PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
                 firebaseTokenManager,
@@ -116,6 +117,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 "Hello World",
                 "This is the notification body.");
 
+            Assert.False(result);
             await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
             await firebaseMessagingManager.DidNotReceiveWithAnyArgs()
                 .SendMulticastAsync(

@@ -387,6 +387,38 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
+        public async Task TestPublish()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            deploymentPlan.Published = false;
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.deploymentPlanManager.Publish(deploymentPlan.Id);
+
+            Assert.True(deploymentPlan.Published);
+
+            this.dbContext.DeploymentPlans.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestDoublePublish()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            deploymentPlan.Published = true;
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.deploymentPlanManager.Publish(deploymentPlan.Id);
+
+            Assert.True(deploymentPlan.Published);
+
+            this.dbContext.DeploymentPlans.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
         public async Task TestHide()
         {
             var deploymentPlan = this.GetSampleDeploymentPlan();
@@ -397,8 +429,27 @@ namespace Tests.TestDataAccess.TestManagers
             await this.deploymentPlanManager.Hide(deploymentPlan.Id);
 
             Assert.False(deploymentPlan.Published);
+
+            this.dbContext.DeploymentPlans.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
         }
 
+        [Fact]
+        public async Task TestDoubleHide()
+        {
+            var deploymentPlan = this.GetSampleDeploymentPlan();
+            deploymentPlan.Published = false;
+            this.dbContext.DeploymentPlans.Add(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.deploymentPlanManager.Hide(deploymentPlan.Id);
+
+            Assert.False(deploymentPlan.Published);
+
+            this.dbContext.DeploymentPlans.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+        
         [Fact]
         public async Task TestRemove()
         {

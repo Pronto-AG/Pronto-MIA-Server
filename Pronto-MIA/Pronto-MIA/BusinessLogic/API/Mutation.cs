@@ -120,8 +120,8 @@ namespace Pronto_MIA.BusinessLogic.API
             string title,
             string body)
         {
-            var wasAlreadyPublished = await deploymentPlanManager.Publish(id);
-            if (wasAlreadyPublished)
+            var statusChanged = await deploymentPlanManager.Publish(id);
+            if (!statusChanged)
             {
                 return false;
             }
