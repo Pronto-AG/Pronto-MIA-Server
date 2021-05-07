@@ -8,6 +8,7 @@ namespace Pronto_MIA
     /// <summary>
     /// Class for starting the application.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class Program
     {
         /// <summary>
