@@ -68,12 +68,10 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
-            var firebaseTokenManager =
-                Substitute.For<IFirebaseTokenManager>();
+            var firebaseTokenManager = Substitute.For<IFirebaseTokenManager>();
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
-            deploymentPlanManager.Publish(default)
-                .ReturnsForAnyArgs(true);
+            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
             firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 

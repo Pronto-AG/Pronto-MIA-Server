@@ -449,7 +449,7 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.DeploymentPlans.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
         }
-        
+
         [Fact]
         public async Task TestRemove()
         {
