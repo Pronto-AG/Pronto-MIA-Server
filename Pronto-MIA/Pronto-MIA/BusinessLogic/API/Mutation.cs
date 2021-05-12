@@ -130,13 +130,14 @@ namespace Pronto_MIA.BusinessLogic.API
                 .GetAllFcmToken().Select(token => token.Id).ToListAsync();
             var notification = new Notification { Title = title, Body = body };
             var data = new Dictionary<string, string>()
-                { { "DeploymentPlanId", id.ToString() } };
+            {
+                { "Action", "publish" }, { "TargetType", "deploymentPlan" },
+                { "TargetId", id.ToString() },
+            };
 
-            var invalidTokens = await firebaseMessagingManager
+            var badTokens = await firebaseMessagingManager
                 .SendMulticastAsync(tokens, notification, data);
-            await firebaseTokenManager
-                .UnregisterMultipleFcmToken(invalidTokens);
-
+            await firebaseTokenManager.UnregisterMultipleFcmToken(badTokens);
             return true;
         }
 
