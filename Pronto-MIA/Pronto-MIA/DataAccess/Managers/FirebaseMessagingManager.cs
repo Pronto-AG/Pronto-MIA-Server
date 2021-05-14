@@ -58,7 +58,7 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             if (tokens.Count == 0)
             {
-                this.logger.LogInformation("No firebase tokens available.");
+                this.logger.LogInformation("No firebase tokens available");
                 return new HashSet<string>();
             }
 
@@ -185,15 +185,24 @@ namespace Pronto_MIA.DataAccess.Managers
                 throw new ArgumentException("To many firebase tokens.");
             }
 
+            var pushConfig = new WebpushConfig()
+            {
+                Notification = new WebpushNotification()
+                {
+                    Icon = "icons/Icon-512.png", Badge = "icons/Icon-192.png",
+                },
+            };
+
             var message = new MulticastMessage()
             {
                 Notification = notification, Data = data, Tokens = tokens,
+                Webpush = pushConfig,
             };
             try
             {
                 var response = await this.instance.SendMulticastAsync(message);
                 this.logger.LogTrace(
-                    "Successfully sent message {Message}", response);
+                    "Successfully sent message {@Message}", response);
                 if (response.FailureCount > 0)
                 {
                     return this.
