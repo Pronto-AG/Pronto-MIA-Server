@@ -5,11 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+
+## [0.2.0] - 2021-05-18
 ### Added
 - Mutation endpoint "RegisterFcmToken" to register a fcm device token.
 - Mutation endpoint "UnregisterFcmToken" to remove a fcm device token.
 - Mutation endpoint "UpdateDeploymentPlan" to adjust a deployment plan.
 - Mutation endpoint "RemoveDeploymentPlan" to remove a deployment plan.
+- Mutation endpoint "PublishDeploymentPlan" to publish a deployment plan and send a push notification.
+- Mutation endpoint "HideDeploymentPlan" to remove the published status from a deplyoment plan.
+- Some unit tests
 
 ### Changed
 - Improved logging.
