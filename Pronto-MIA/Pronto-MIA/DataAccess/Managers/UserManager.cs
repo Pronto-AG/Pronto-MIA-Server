@@ -2,6 +2,7 @@
 namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
+    using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
@@ -125,7 +126,13 @@ namespace Pronto_MIA.DataAccess.Managers
                 .PasswordPolicyMet(password, this.MinPasswordLenght);
             if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
             {
-                throw DataAccess.Error.PasswordTooWeak.AsQueryException();
+                var arguments = new Dictionary<string, string>
+                {
+                    ["minLenght"] = this.MinPasswordLenght.ToString(),
+                    ["passwordPolicyViolation"] = checkPassword.ToString(),
+                };
+                throw DataAccess.Error.PasswordTooWeak
+                    .AsQueryException(arguments);
             }
 
             var user = new User(
@@ -133,10 +140,8 @@ namespace Pronto_MIA.DataAccess.Managers
                 DefaultHashGenerator.HashPassword(password),
                 DefaultHashGenerator.GetIdentifier(),
                 DefaultHashGenerator.GetOptions().ToJson());
-
             this.dbContext.Users.Add(user);
             await this.dbContext.SaveChangesAsync();
-
             return user;
         }
 

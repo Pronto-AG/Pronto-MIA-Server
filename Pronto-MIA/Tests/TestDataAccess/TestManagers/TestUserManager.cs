@@ -9,7 +9,6 @@ namespace Tests.TestDataAccess.TestManagers
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
     using Pronto_MIA.Domain.Entities;
-    using Pronto_MIA.TestBusinessLogic.TestSecurity;
     using Xunit;
 
     public class TestUserManager

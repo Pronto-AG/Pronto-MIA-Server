@@ -1,4 +1,4 @@
-namespace Pronto_MIA.TestBusinessLogic.TestSecurity
+namespace Pronto_MIA.BusinessLogic.Security
 {
     using Pronto_MIA.BusinessLogic.Security.Abstract;
     using Pronto_MIA.BusinessLogic.Security.Interfaces;
