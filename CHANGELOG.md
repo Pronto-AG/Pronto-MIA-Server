@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Mutation endpoint "CreateUser" to add a user to the application.
+- Mutation endpoint "CreateDeploymentPlan" to replace "AddDeploymentPlan"
+
+### Removed
+- Mutation endpoint "AddDeploymentPlan" for consistent naming.
 
 ## [0.2.0] - 2021-05-18
 ### Added

@@ -123,18 +123,7 @@ namespace Pronto_MIA.DataAccess.Managers
                 throw DataAccess.Error.UserAlreadyExists.AsQueryException();
             }
 
-            var checkPassword = PasswordHelper
-                .PasswordPolicyMet(password, this.MinPasswordLenght);
-            if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
-            {
-                var arguments = new Dictionary<string, string>
-                {
-                    ["minLenght"] = this.MinPasswordLenght.ToString(),
-                    ["passwordPolicyViolation"] = checkPassword.ToString(),
-                };
-                throw DataAccess.Error.PasswordTooWeak
-                    .AsQueryException(arguments);
-            }
+            this.CheckPasswordPolicy(password);
 
             var user = new User(
                 userName,
@@ -147,12 +136,37 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
+        public async Task<User> Update(
+            int id, string? userName, string? password)
+        {
+            var user = await this.GetById(id);
+            if (userName == null && password == null)
+            {
+                return user;
+            }
+
+            if (userName != null)
+            {
+                await this.UpdateUserName(userName, user);
+            }
+
+            if (password != null)
+            {
+                this.UpdatePassword(password, user);
+            }
+
+            this.dbContext.Users.Update(user);
+            await this.dbContext.SaveChangesAsync();
+            return user;
+        }
+
+        /// <inheritdoc/>
         public async Task<int>
             Remove(int id)
         {
-            var deploymentPlan = await this.GetById(id);
+            var user = await this.GetById(id);
 
-            this.dbContext.Remove(deploymentPlan);
+            this.dbContext.Remove(user);
             await this.dbContext.SaveChangesAsync();
 
             return id;
@@ -228,6 +242,48 @@ namespace Pronto_MIA.DataAccess.Managers
                 "Invalid user id {Id}", id);
             throw DataAccess.Error.UserNotFound
                 .AsQueryException();
+        }
+
+        /// <summary>
+        /// Checks the given password against the password
+        /// policy.
+        /// </summary>
+        /// <param name="password">The password to be checked.</param>
+        /// <exception cref="QueryException">Throws a PasswordTooWeak
+        /// exception if the password does not meet the policy requirements.
+        /// </exception>
+        private void CheckPasswordPolicy(string password)
+        {
+            var checkPassword = PasswordHelper
+                .PasswordPolicyMet(password, this.MinPasswordLenght);
+            if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
+            {
+                var arguments = new Dictionary<string, string>
+                {
+                    ["minLenght"] = this.MinPasswordLenght.ToString(),
+                    ["passwordPolicyViolation"] = checkPassword.ToString(),
+                };
+                throw DataAccess.Error.PasswordTooWeak
+                    .AsQueryException(arguments);
+            }
+        }
+
+        private async Task UpdateUserName(string userName, User user)
+        {
+            var userCheck = await this.GetByUserName(userName);
+            if (userCheck != default)
+            {
+                throw DataAccess.Error.UserAlreadyExists.AsQueryException();
+            }
+
+            user.UserName = userName;
+        }
+
+        private void UpdatePassword(string password, User user)
+        {
+            this.CheckPasswordPolicy(password);
+            var generator = HashGeneratorFactory.GetGeneratorForUser(user);
+            user.PasswordHash = generator.HashPassword(password);
         }
     }
 }

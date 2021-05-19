@@ -1,6 +1,7 @@
 namespace Tests.TestDataAccess.TestManagers
 {
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Microsoft.Extensions.Logging;
@@ -135,6 +136,107 @@ namespace Tests.TestDataAccess.TestManagers
                 error.Errors[0].Code);
             var user = this.dbContext.Users.Where(u => u.UserName == "Alice2");
             Assert.Empty(user);
+        }
+
+        [Fact]
+        public async Task TestUpdate()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.userManager.Update(user.Id, "Alice3", "H1-ello");
+
+            user = await this.dbContext.Users.FindAsync(user.Id);
+            Assert.Equal("Alice3", user.UserName);
+            Assert.Equal(
+                "H1-ello", Encoding.ASCII.GetString(user.PasswordHash));
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateUsernameOnly()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.userManager.Update(user.Id, "Alice3", null);
+
+            user = await this.dbContext.Users.FindAsync(user.Id);
+            Assert.Equal("Alice3", user.UserName);
+            Assert.Equal(
+                new byte[10], user.PasswordHash);
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdatePasswordOnly()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.userManager.Update(user.Id, null, "H1-ello");
+
+            user = await this.dbContext.Users.FindAsync(user.Id);
+            Assert.Equal("Alice2", user.UserName);
+            Assert.Equal(
+                "H1-ello", Encoding.ASCII.GetString(user.PasswordHash));
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateEmpty()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.userManager.Update(user.Id, null, null);
+
+            user = await this.dbContext.Users.FindAsync(user.Id);
+            Assert.Equal("Alice2", user.UserName);
+            Assert.Equal(
+                new byte[10], user.PasswordHash);
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUpdateToExistingUsername()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.userManager.Update(user.Id, "Alice", null);
+            });
+
+            Assert.Equal(
+                Error.UserAlreadyExists.ToString(),
+                error.Errors[0].Code);
+            user = await this.dbContext.Users.FindAsync(user.Id);
+            Assert.Equal("Alice2", user.UserName);
+            Assert.Equal(
+                new byte[10], user.PasswordHash);
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
         }
 
         [Fact]

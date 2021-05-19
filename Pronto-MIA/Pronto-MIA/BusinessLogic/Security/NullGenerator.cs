@@ -1,5 +1,6 @@
 namespace Pronto_MIA.BusinessLogic.Security
 {
+    using System.Text;
     using Pronto_MIA.BusinessLogic.Security.Abstract;
     using Pronto_MIA.BusinessLogic.Security.Interfaces;
 
@@ -34,7 +35,7 @@ namespace Pronto_MIA.BusinessLogic.Security
         /// <returns>Empty byte array of size 10.</returns>
         public override byte[] HashPassword(string password)
         {
-            return new byte[10];
+            return Encoding.ASCII.GetBytes(password);
         }
 
         /// <summary>

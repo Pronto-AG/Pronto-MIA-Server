@@ -70,6 +70,31 @@ namespace Pronto_MIA.BusinessLogic.API
         }
 
         /// <summary>
+        /// Method that updates the user with the given id according
+        /// to the provided information.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="id">Id of the user to be updated.</param>
+        /// <param name="userName">The new username of the user.</param>
+        /// <param name="password">The new password for the user.</param>
+        /// <returns>The updated user.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound
+        /// exception if the user with the given id could not be found.
+        /// Alternatively returns PasswordTooWeak exception if the
+        /// provided password does not meet the policy requirements.
+        /// </exception>
+        [Authorize]
+        public async Task<User> UpdateUser(
+            [Service] IUserManager userManager,
+            int id,
+            string? userName,
+            string? password)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Adds a deployment plan to the application.
         /// </summary>
         /// <param name="deploymentPlanManager">The manager responsible for

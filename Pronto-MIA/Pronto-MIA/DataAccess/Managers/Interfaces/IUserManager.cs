@@ -47,6 +47,21 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
             Create(string userName, string password);
 
         /// <summary>
+        /// Method that updates the user with the given id according
+        /// to the provided information.
+        /// </summary>
+        /// <param name="id">Id of the user to be updated.</param>
+        /// <param name="userName">The new username of the user.</param>
+        /// <param name="password">The new password for the user.</param>
+        /// <returns>The updated user.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound
+        /// exception if the user with the given id could not be found.
+        /// Alternatively returns PasswordTooWeak exception if the
+        /// provided password does not meet the policy requirements.
+        /// </exception>
+        public Task<User> Update(int id, string? userName, string? password);
+
+        /// <summary>
         /// Removes the user with the given id.
         /// </summary>
         /// <param name="id">Id of the user to be removed.</param>
