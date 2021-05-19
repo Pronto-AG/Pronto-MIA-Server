@@ -12,6 +12,8 @@ namespace Pronto_MIA.DataAccess.Managers
     using Microsoft.IdentityModel.Tokens;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.Security;
+    using Pronto_MIA.BusinessLogic.Security.Abstract;
+    using Pronto_MIA.BusinessLogic.Security.Interfaces;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -20,6 +22,13 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class UserManager : IUserManager
     {
+        private static readonly IHashGeneratorOptions
+            DefaultHashGeneratorOptions = new Pbkdf2GeneratorOptions(1500);
+
+        private static readonly HashGenerator DefaultHashGenerator
+            = new Pbkdf2Generator(
+                (Pbkdf2GeneratorOptions)DefaultHashGeneratorOptions);
+
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
@@ -41,6 +50,9 @@ namespace Pronto_MIA.DataAccess.Managers
             this.cfg = cfg;
             this.logger = logger;
         }
+
+        private int MinPasswordLenght =>
+            this.cfg.GetValue<int>("User:MIN_PASSWORD_LENGHT");
 
         private string SigningKey =>
             this.cfg.GetValue<string>("JWT:SIGNING_KEY");
@@ -74,6 +86,12 @@ namespace Pronto_MIA.DataAccess.Managers
                 throw DataAccess.Error.WrongPassword.AsQueryException();
             }
 
+            if (hashGenerator.GetIdentifier() !=
+                DefaultHashGenerator.GetIdentifier())
+            {
+                await this.UpdateHash(password, user);
+            }
+
             this.logger.LogDebug(
                 "User {UserName} has been authenticated", userName);
             return this.GenerateToken(user);
@@ -90,6 +108,34 @@ namespace Pronto_MIA.DataAccess.Managers
                 this.logger.LogWarning(
                     "Invalid username {UserName}", userName);
             }
+
+            return user;
+        }
+
+        /// <inheritdoc/>
+        public async Task<User> Create(string userName, string password)
+        {
+            var checkUserName = await this.GetByUserName(userName);
+            if (checkUserName != default)
+            {
+                throw DataAccess.Error.UserAlreadyExists.AsQueryException();
+            }
+
+            var checkPassword = PasswordHelper
+                .PasswordPolicyMet(password, this.MinPasswordLenght);
+            if (checkPassword != PasswordHelper.PasswordPolicyError.None)
+            {
+                throw DataAccess.Error.PasswordTooWeak.AsQueryException();
+            }
+
+            var user = new User(
+                userName,
+                DefaultHashGenerator.HashPassword(password),
+                DefaultHashGenerator.GetIdentifier(),
+                DefaultHashGenerator.GetOptions().ToJson());
+
+            this.dbContext.Users.Add(user);
+            await this.dbContext.SaveChangesAsync();
 
             return user;
         }
@@ -121,6 +167,27 @@ namespace Pronto_MIA.DataAccess.Managers
                 user.UserName);
 
             return tokenString;
+        }
+
+        /// <summary>
+        /// Method to update a users hash to the latest defined default hash.
+        /// This has to be done if the default hash has been adjusted in order
+        /// to comply with new security regulations.
+        /// </summary>
+        /// <param name="password">The password for the user.</param>
+        /// <param name="user">The user to be updated.</param>
+        private async Task UpdateHash(string password, User user)
+        {
+            user.PasswordHash = DefaultHashGenerator.HashPassword(password);
+            user.HashGenerator = DefaultHashGenerator.GetIdentifier();
+            user.HashGeneratorOptions =
+                DefaultHashGenerator.GetOptions().ToJson();
+            this.dbContext.Users.Update(user);
+            await this.dbContext.SaveChangesAsync();
+
+            this.logger.LogDebug(
+                "Password-hash for User {UserName} has been updated",
+                user.UserName);
         }
     }
 }

@@ -23,6 +23,16 @@ namespace Pronto_MIA.BusinessLogic.API
     /// </summary>
     public class Mutation
     {
+        [Authorize]
+        [UseSingleOrDefault]
+        public async Task<User> CreateUser(
+            [Service] IUserManager userManager,
+            string userName,
+            string password)
+        {
+            return await userManager.Create(userName, password);
+        }
+
         /// <summary>
         /// Adds a deployment plan to the application.
         /// </summary>
@@ -39,7 +49,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <returns>The newly generated deployment plan.</returns>
         [Authorize]
         [UseSingleOrDefault]
-        public async Task<IQueryable<DeploymentPlan?>> AddDeploymentPlan(
+        public async Task<IQueryable<DeploymentPlan>> AddDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             IFile file,
             DateTime availableFrom,

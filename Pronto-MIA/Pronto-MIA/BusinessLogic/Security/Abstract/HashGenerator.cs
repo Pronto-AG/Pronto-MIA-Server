@@ -23,8 +23,7 @@ namespace Pronto_MIA.BusinessLogic.Security.Abstract
         /// object.
         /// </summary>
         /// <param name="password">The password to be hashed.</param>
-        /// <returns>A tuple containing the Password (first) and the salt
-        /// (second).</returns>
+        /// <returns>Hash encoded in base64.</returns>
         public abstract byte[] HashPassword(
             string password);
 

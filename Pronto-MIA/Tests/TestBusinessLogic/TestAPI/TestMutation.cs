@@ -29,6 +29,21 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
+        public async void TestCreateUser()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            await this.mutation.CreateUser(
+                userManager,
+                "Ruedi",
+                "HelloWorld1-");
+
+            await userManager.Received()
+                .Create("Ruedi", "HelloWorld1-");
+        }
+
+        [Fact]
         public async void TestAddDeploymentPlan()
         {
             var deploymentPlanManager =
