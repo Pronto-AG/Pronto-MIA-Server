@@ -32,8 +32,11 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
             GetByUserName(string userName);
 
         /// <summary>
-        /// Method that creates a new User object with the given Username.
+        /// Method that creates a new User object with the given Username
+        /// and password.
         /// </summary>
+        /// <param name="userName">The username for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
         /// <returns>The newly created user.</returns>
         public Task<User>
             Create(string userName, string password);

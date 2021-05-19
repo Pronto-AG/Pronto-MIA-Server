@@ -1,4 +1,4 @@
-namespace Tests.TestBusinessLogic.TestSecurity
+namespace Pronto_MIA.TestBusinessLogic.TestSecurity
 {
     using Pronto_MIA.BusinessLogic.Security.Abstract;
     using Pronto_MIA.BusinessLogic.Security.Interfaces;
@@ -16,7 +16,6 @@ namespace Tests.TestBusinessLogic.TestSecurity
         public const string Identifier = "NullGenerator";
 
         private readonly IHashGeneratorOptions options;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NullGenerator"/> class.
@@ -52,7 +51,7 @@ namespace Tests.TestBusinessLogic.TestSecurity
         /// <inheritdoc/>
         public override IHashGeneratorOptions GetOptions()
         {
-            return options;
+            return this.options;
         }
 
         /// <inheritdoc/>

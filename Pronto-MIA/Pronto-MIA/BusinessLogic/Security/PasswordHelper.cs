@@ -2,6 +2,10 @@ namespace Pronto_MIA.BusinessLogic.Security
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Class containing functions intended to
+    /// assist in password handling.
+    /// </summary>
     public static class PasswordHelper
     {
         private static int arraySize = 4;
@@ -10,14 +14,45 @@ namespace Pronto_MIA.BusinessLogic.Security
         private static int containsUppercaseIndex = 2;
         private static int containsNonAlphanumericIndex = 3;
 
-        public enum PasswordPolicyError
+        /// <summary>
+        /// Enum representing an error which can occur whilst
+        /// checking a password for policy compliance.
+        /// </summary>
+        public enum PasswordPolicyViolation
         {
+            /// <summary>
+            /// The password is to short.
+            /// </summary>
             Lenght,
+
+            /// <summary>
+            /// The password does not contain a non alphanumeric
+            /// character.
+            /// </summary>
             NonAlphanumeric,
+
+            /// <summary>
+            /// The password does not contain a uppercase
+            /// character.
+            /// </summary>
             Uppercase,
+
+            /// <summary>
+            /// The password does not contain a lowercase
+            /// character.
+            /// </summary>
             Lowercase,
+
+            /// <summary>
+            /// The password does not contain a digit.
+            /// </summary>
             Digit,
-            None
+
+            /// <summary>
+            /// The password provided is compliant with
+            /// the password policy.
+            /// </summary>
+            None,
         }
 
         /// <summary>
@@ -26,15 +61,19 @@ namespace Pronto_MIA.BusinessLogic.Security
         /// the password must contain a digit, a lowercase character,
         /// a uppercase character and a non alphanumeric character.
         /// </summary>
-        /// <param name="password"></param>
-        /// <param name="minLenght"></param>
-        /// <returns></returns>
-        public static PasswordPolicyError PasswordPolicyMet(
+        /// <param name="password">The password to check for policy
+        /// compliance.</param>
+        /// <param name="minLenght">The minimal lenght the password should have.
+        /// </param>
+        /// <returns>The first violation of the password policy that
+        /// occured or <see cref="PasswordPolicyViolation.None"/> if no
+        /// violation occured.</returns>
+        public static PasswordPolicyViolation PasswordPolicyMet(
             string password, int minLenght)
         {
             if (password.Length < minLenght)
             {
-                return PasswordPolicyError.Lenght;
+                return PasswordPolicyViolation.Lenght;
             }
 
             var state = new bool[arraySize];
@@ -73,26 +112,27 @@ namespace Pronto_MIA.BusinessLogic.Security
             return state;
         }
 
-        private static PasswordPolicyError CheckState(IReadOnlyList<bool> state)
+        private static PasswordPolicyViolation CheckState(
+            IReadOnlyList<bool> state)
         {
             if (!state[containsDigitIndex])
             {
-                return PasswordPolicyError.Digit;
+                return PasswordPolicyViolation.Digit;
             }
             else if (!state[containsLowercaseIndex])
             {
-                return PasswordPolicyError.Lowercase;
+                return PasswordPolicyViolation.Lowercase;
             }
             else if (!state[containsUppercaseIndex])
             {
-                return PasswordPolicyError.Uppercase;
+                return PasswordPolicyViolation.Uppercase;
             }
             else if (!state[containsNonAlphanumericIndex])
             {
-                return PasswordPolicyError.NonAlphanumeric;
+                return PasswordPolicyViolation.NonAlphanumeric;
             }
 
-            return PasswordPolicyError.None;
+            return PasswordPolicyViolation.None;
         }
     }
 }

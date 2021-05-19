@@ -123,7 +123,7 @@ namespace Pronto_MIA.DataAccess.Managers
 
             var checkPassword = PasswordHelper
                 .PasswordPolicyMet(password, this.MinPasswordLenght);
-            if (checkPassword != PasswordHelper.PasswordPolicyError.None)
+            if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
             {
                 throw DataAccess.Error.PasswordTooWeak.AsQueryException();
             }

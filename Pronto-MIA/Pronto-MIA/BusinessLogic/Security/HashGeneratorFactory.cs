@@ -1,11 +1,9 @@
-using Pronto_MIA.BusinessLogic.Security.Interfaces;
-using Tests.TestBusinessLogic.TestSecurity;
-
 namespace Pronto_MIA.BusinessLogic.Security
 {
     using System;
     using Pronto_MIA.BusinessLogic.Security.Abstract;
     using Pronto_MIA.Domain.Entities;
+    using Pronto_MIA.TestBusinessLogic.TestSecurity;
 
     /// <summary>
     /// Class responsible for creating hash generator instances.

@@ -1,17 +1,15 @@
-using System.Linq;
-using Pronto_MIA.BusinessLogic.Security;
-using Pronto_MIA.BusinessLogic.Security.Interfaces;
-using Pronto_MIA.Domain.Entities;
-using Tests.TestBusinessLogic.TestSecurity;
-
 namespace Tests.TestDataAccess.TestManagers
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Microsoft.Extensions.Logging;
     using NSubstitute;
+    using Pronto_MIA.BusinessLogic.Security;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
+    using Pronto_MIA.Domain.Entities;
+    using Pronto_MIA.TestBusinessLogic.TestSecurity;
     using Xunit;
 
     public class TestUserManager
@@ -59,8 +57,8 @@ namespace Tests.TestDataAccess.TestManagers
             Assert.Equal(
                 Pbkdf2Generator.Identifier, adjustedUser.HashGenerator);
 
-            dbContext.Users.Remove(adjustedUser);
-            await dbContext.SaveChangesAsync();
+            this.dbContext.Users.Remove(adjustedUser);
+            await this.dbContext.SaveChangesAsync();
         }
 
         [Fact]

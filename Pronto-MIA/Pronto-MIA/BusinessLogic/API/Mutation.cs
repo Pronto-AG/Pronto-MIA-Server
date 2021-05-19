@@ -23,6 +23,14 @@ namespace Pronto_MIA.BusinessLogic.API
     /// </summary>
     public class Mutation
     {
+        /// <summary>
+        /// Creates a new User.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="userName">The username of the new user.</param>
+        /// <param name="password">The password of the new user.</param>
+        /// <returns>The newly created user.</returns>
         [Authorize]
         [UseSingleOrDefault]
         public async Task<User> CreateUser(

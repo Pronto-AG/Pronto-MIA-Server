@@ -1,8 +1,6 @@
 namespace Tests.TestBusinessLogic.TestSecurity
 {
-    using System;
     using Pronto_MIA.BusinessLogic.Security;
-    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestPasswordHelper
@@ -11,28 +9,30 @@ namespace Tests.TestBusinessLogic.TestSecurity
         public void TestPasswordPolicyToShort()
         {
             var result = PasswordHelper.PasswordPolicyMet("H1-llo", 7);
-            Assert.Equal(PasswordHelper.PasswordPolicyError.Lenght, result);
+            Assert.Equal(PasswordHelper.PasswordPolicyViolation.Lenght, result);
         }
 
         [Fact]
         public void TestPasswordPolicyNoDigit()
         {
             var result = PasswordHelper.PasswordPolicyMet("He-llo", 4);
-            Assert.Equal(PasswordHelper.PasswordPolicyError.Digit, result);
+            Assert.Equal(PasswordHelper.PasswordPolicyViolation.Digit, result);
         }
 
         [Fact]
         public void TestPasswordPolicyNoLowercase()
         {
             var result = PasswordHelper.PasswordPolicyMet("H1-LLO", 4);
-            Assert.Equal(PasswordHelper.PasswordPolicyError.Lowercase, result);
+            Assert.Equal(
+                PasswordHelper.PasswordPolicyViolation.Lowercase, result);
         }
 
         [Fact]
         public void TestPasswordPolicyNoUppercase()
         {
             var result = PasswordHelper.PasswordPolicyMet("h1-llo", 4);
-            Assert.Equal(PasswordHelper.PasswordPolicyError.Uppercase, result);
+            Assert.Equal(
+                PasswordHelper.PasswordPolicyViolation.Uppercase, result);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Tests.TestBusinessLogic.TestSecurity
         {
             var result = PasswordHelper.PasswordPolicyMet("H1ello", 4);
             Assert.Equal(
-                PasswordHelper.PasswordPolicyError.NonAlphanumeric,
+                PasswordHelper.PasswordPolicyViolation.NonAlphanumeric,
                 result);
         }
 
@@ -49,7 +49,7 @@ namespace Tests.TestBusinessLogic.TestSecurity
         {
             var result = PasswordHelper.PasswordPolicyMet("H1-l", 4);
             Assert.Equal(
-                PasswordHelper.PasswordPolicyError.None,
+                PasswordHelper.PasswordPolicyViolation.None,
                 result);
         }
     }
