@@ -44,6 +44,22 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
+        public async void TestUpdateUser()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            await this.mutation.UpdateUser(
+                userManager,
+                1,
+                "Ruedi",
+                "HelloWorld1-");
+
+            await userManager.Received()
+                .Update(1, "Ruedi", "HelloWorld1-");
+        }
+
+        [Fact]
         public async void TestRemoveUser()
         {
             var userManager =

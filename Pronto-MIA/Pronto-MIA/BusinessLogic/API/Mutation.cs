@@ -91,7 +91,7 @@ namespace Pronto_MIA.BusinessLogic.API
             string? userName,
             string? password)
         {
-            return null;
+            return await userManager.Update(id, userName, password);
         }
 
         /// <summary>
