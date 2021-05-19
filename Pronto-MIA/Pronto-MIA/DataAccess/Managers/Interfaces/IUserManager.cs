@@ -38,7 +38,22 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// <param name="userName">The username for the new user.</param>
         /// <param name="password">The password for the new user.</param>
         /// <returns>The newly created user.</returns>
+        /// <exception cref="QueryException">Returns UserAlreadyExists exception
+        /// if the username already exists. Alternatively returns
+        /// PasswordTooWeak exception if the provided password does not meet the
+        /// policy requirements.
+        /// </exception>
         public Task<User>
             Create(string userName, string password);
+
+        /// <summary>
+        /// Removes the user with the given id.
+        /// </summary>
+        /// <param name="id">Id of the user to be removed.</param>
+        /// <returns>The id of the user that was removed.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound
+        /// exception if the user with the given id could not be found.
+        /// </exception>
+        public Task<int> Remove(int id);
     }
 }

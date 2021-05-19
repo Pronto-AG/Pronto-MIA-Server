@@ -35,19 +35,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                         .Build());
             }
 
-            var message = error.Message().Replace(
-                "{{MinLenght}}",
-                arguments["minLenght"]);
-            return new QueryException(
-                ErrorBuilder
-                    .New()
-                    .SetExtension("traceId", string.Empty)
-                    .SetExtension(
-                        "passwordPolicyViolation",
-                        arguments["passwordPolicyViolation"])
-                    .SetMessage(message)
-                    .SetCode(error.ToString())
-                    .Build());
+            return PasswordToWeakWithPolicy(error, arguments);
         }
 
         /// <summary>
@@ -95,6 +83,37 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                 default: throw new ArgumentException(
                     "Unhandled data access exception");
             }
+        }
+
+        /// <summary>
+        /// Method that creates a PasswordToWeak exception
+        /// which includes the policy which was violated
+        /// and the policies that have to be met.
+        /// </summary>
+        /// <param name="error">The error.</param>
+        /// <param name="arguments">The arguments to use
+        /// in order to include additional information.</param>
+        /// <returns>A query exception with additional password
+        /// policy information.</returns>
+        private static QueryException PasswordToWeakWithPolicy(
+            DataAccess.Error error, Dictionary<string, string> arguments)
+        {
+            var message = error.Message().Replace(
+                "{{MinLenght}}",
+                arguments["minLenght"]);
+            return new QueryException(
+                ErrorBuilder
+                    .New()
+                    .SetExtension("traceId", string.Empty)
+                    .SetMessage(message)
+                    .SetCode(error.ToString())
+                    .SetExtension(
+                        "passwordPolicyViolation",
+                        arguments["passwordPolicyViolation"])
+                    .SetExtension(
+                        "minLenght",
+                        arguments["minLenght"])
+                    .Build());
         }
     }
 }

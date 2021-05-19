@@ -7,6 +7,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
+    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
@@ -145,6 +146,18 @@ namespace Pronto_MIA.DataAccess.Managers
             return user;
         }
 
+        /// <inheritdoc/>
+        public async Task<int>
+            Remove(int id)
+        {
+            var deploymentPlan = await this.GetById(id);
+
+            this.dbContext.Remove(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+
+            return id;
+        }
+
         private string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -193,6 +206,28 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogDebug(
                 "Password-hash for User {UserName} has been updated",
                 user.UserName);
+        }
+
+        /// <summary>
+        /// Method to get a user with the help of its id.
+        /// </summary>
+        /// <param name="id">The id of the user.</param>
+        /// <returns>The user with the given id.</returns>
+        /// <exception cref="QueryException">If the user with the
+        /// given id could not be found.</exception>
+        private async Task<User> GetById(int id)
+        {
+            var user = await this.dbContext.Users
+                .SingleOrDefaultAsync(u => u.Id == id);
+            if (user != default)
+            {
+                return user;
+            }
+
+            this.logger.LogWarning(
+                "Invalid user id {Id}", id);
+            throw DataAccess.Error.UserNotFound
+                .AsQueryException();
         }
     }
 }

@@ -115,6 +115,7 @@ namespace Tests.TestDataAccess.TestManagers
                 await this.userManager.Create(
                     "Alice", "H1-ello");
             });
+
             Assert.Equal(
                 Error.UserAlreadyExists.ToString(),
                 error.Errors[0].Code);
@@ -134,6 +135,33 @@ namespace Tests.TestDataAccess.TestManagers
                 error.Errors[0].Code);
             var user = this.dbContext.Users.Where(u => u.UserName == "Alice2");
             Assert.Empty(user);
+        }
+
+        [Fact]
+        public async Task TestRemove()
+        {
+            var user = new User(
+                "Alice2", new byte[10], NullGenerator.Identifier, "{}");
+            this.dbContext.Add(user);
+            await this.dbContext.SaveChangesAsync();
+
+            await this.userManager.Remove(user.Id);
+
+            var users = this.dbContext.Users.Where(u => u.UserName == "Alice2");
+            Assert.Empty(users);
+        }
+
+        [Fact]
+        public async Task TestRemoveWrongId()
+        {
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.userManager.Remove(-5);
+            });
+
+            Assert.Equal(
+                Error.UserNotFound.ToString(),
+                error.Errors[0].Code);
         }
     }
 }
