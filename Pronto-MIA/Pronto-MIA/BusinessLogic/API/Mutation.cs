@@ -41,7 +41,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// PasswordTooWeak exception if the provided password does not meet the
         /// policy requirements.
         /// </exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditUsers")]
         [UseSingleOrDefault]
         public async Task<User> CreateUser(
             [Service] IUserManager userManager,
@@ -61,7 +61,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <exception cref="QueryException">Returns UserNotFound
         /// exception if the user with the given id could not be found.
         /// </exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditUsers")]
         public async Task<int> RemoveUser(
             [Service] IUserManager userManager,
             int id)
@@ -84,7 +84,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// Alternatively returns PasswordTooWeak exception if the
         /// provided password does not meet the policy requirements.
         /// </exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditUsers")]
+        [Sensitive("password")]
         public async Task<User> UpdateUser(
             [Service] IUserManager userManager,
             int id,
@@ -108,7 +109,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="description">Short description to identify the
         /// deployment plan.</param>
         /// <returns>The newly generated deployment plan.</returns>
-        [Authorize]
+        [Authorize(Policy = "CanEditDeploymentPlans")]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan>> CreateDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -144,7 +145,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <exception cref="QueryException">Returns DeploymentPlanNotFound
         /// exception if the deployment plan with given id could not be found.
         /// </exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditDeploymentPlans")]
         [UseSingleOrDefault]
         public async Task<IQueryable<DeploymentPlan>> UpdateDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -181,7 +182,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <exception cref="QueryException">If the deployment plan with the
         /// given id could not be found or the firebase manager encounters
         /// a sending error.</exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditDeploymentPlans")]
         [UseSingleOrDefault]
         public async Task<bool> PublishDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -225,7 +226,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// the deployment plan was already hidden.</returns>
         /// <exception cref="QueryException">If the deployment plan with the
         /// given id could not be found.</exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditDeploymentPlans")]
         [UseSingleOrDefault]
         public async Task<bool> HideDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -245,41 +246,12 @@ namespace Pronto_MIA.BusinessLogic.API
         /// exception if the deployment plan with the given id could not be
         /// found.
         /// </exception>
-        [Authorize]
+        [Authorize(Policy = "CanEditDeploymentPlans")]
         public async Task<int> RemoveDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             int id)
         {
             return await deploymentPlanManager.Remove(id);
-        }
-
-        /// <summary>
-        /// Sends a testing push message to the device with the given device
-        /// token.
-        /// </summary>
-        /// <param name="firebaseMessagingManager">The manager responsible for
-        /// managing firebase messaging.</param>
-        /// <param name="deviceToken">The firebase registration token of the
-        /// device the message should be sent to.</param>
-        /// <returns>True if the message could be sent false otherwise.
-        /// </returns>
-        [Authorize]
-        public async Task<bool> SendPushTo(
-            [Service] IFirebaseMessagingManager firebaseMessagingManager,
-            string deviceToken)
-        {
-            var message = new Message()
-            {
-                Notification = new Notification
-                {
-                    Title = "Test",
-                    Body = "This is a test.4",
-                },
-                Data = new Dictionary<string, string>()
-                { { "score", "850" }, { "time", "2:45" }, },
-                Token = deviceToken,
-            };
-            return await firebaseMessagingManager.SendAsync(message);
         }
 
         /// <summary>

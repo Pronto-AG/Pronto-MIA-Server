@@ -13,17 +13,6 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IFirebaseMessagingManager
     {
         /// <summary>
-        /// Sends the given message with firebase messaging to the device
-        /// specified within the message.
-        /// </summary>
-        /// <param name="message">Firebase messaging message object which
-        /// contains the information required to send a message.</param>
-        /// <returns>True if sending was successful.</returns>
-        /// <exception cref="QueryException">If an error occured with
-        /// the firebase operation.</exception>
-        public Task<bool> SendAsync(Message message);
-
-        /// <summary>
         /// Sends the given multicast message to all the FCM registration tokens
         /// specified in it.
         /// </summary>

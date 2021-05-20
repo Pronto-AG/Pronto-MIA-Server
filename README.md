@@ -69,3 +69,6 @@ The easiest way to run the application in production mode is to download the pre
 3. A directory where the application can persist files. This directory has to be mapped to the directory specified in the setting `StaticFiles:ROOT_DIRECTORY`.
 
 Theoretically since it is a dotnet application it can be run outside of the provided docker container with any .net 5.0 compatible runtime. This approach is however not supported.
+
+## Login
+The initially created user is called `Admin` and has the password `ProntoMIA.`. 

@@ -41,6 +41,7 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = default;
             this.HashGenerator = default;
             this.HashGeneratorOptions = default;
+            this.AccessControlList = default;
         }
 
         /// <summary>
@@ -53,6 +54,12 @@ namespace Pronto_MIA.Domain.Entities
         /// himself.
         /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the access control list associated with this
+        /// user.
+        /// </summary>
+        public virtual AccessControlList AccessControlList { get; set; }
 
         /// <summary>
         /// Gets or sets the hash of the password the user would like to use in
@@ -79,6 +86,6 @@ namespace Pronto_MIA.Domain.Entities
         /// Gets or sets list of <see cref="FcmToken"/> belonging to this user.
         /// </summary>
         [GraphQLIgnore]
-        public virtual ICollection<FcmToken> FCMTokens { get; set; }
+        public virtual ICollection<FcmToken> FcmTokens { get; set; }
     }
 }

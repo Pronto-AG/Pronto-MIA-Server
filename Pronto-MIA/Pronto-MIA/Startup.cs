@@ -71,6 +71,7 @@ namespace Pronto_MIA
                     });
             });
             services.AddAuthenticationService(this.Cfg);
+            services.AddAuthorizationService(this.Cfg);
             services.AddGraphQLService();
         }
 

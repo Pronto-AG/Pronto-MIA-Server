@@ -194,20 +194,6 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
-        public async void TestSendPushTo()
-        {
-            var firebaseMessagingManager =
-                Substitute.For<IFirebaseMessagingManager>();
-
-            await this.mutation.SendPushTo(
-                firebaseMessagingManager,
-                "token123");
-
-            await firebaseMessagingManager.ReceivedWithAnyArgs()
-                .SendAsync(Arg.Any<Message>());
-        }
-
-        [Fact]
         public async void TestRegisterFcmToken()
         {
             var firebaseTokenManager =

@@ -42,7 +42,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="deploymentPlanManager">The deployment plan manager
         /// responsible for managing deployment plans.</param>
         /// <returns>Queryable of all available deployment plans.</returns>
-        [Authorize]
+        [Authorize(Policy = "CanViewDeploymentPlans")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<DeploymentPlan> DeploymentPlans(
@@ -57,7 +57,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
         /// <returns>Queryable of all available deployment plans.</returns>
-        [Authorize]
+        [Authorize(Policy = "CanViewUsers")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<User> Users(
