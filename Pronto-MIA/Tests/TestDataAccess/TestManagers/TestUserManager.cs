@@ -4,6 +4,7 @@ namespace Tests.TestDataAccess.TestManagers
     using System.Text;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using NSubstitute;
     using Pronto_MIA.BusinessLogic.Security;
@@ -93,6 +94,27 @@ namespace Tests.TestDataAccess.TestManagers
             var user = await this.userManager.GetByUserName("_Alice");
 
             Assert.Null(user);
+        }
+
+        [Fact]
+        public async Task TestGetAllMultiple()
+        {
+            var users = this.userManager.GetAll();
+
+            Assert.Equal(2, await users.CountAsync());
+        }
+
+        [Fact]
+        public async Task TestGetAllEmpty()
+        {
+            this.dbContext.Users.RemoveRange(
+                this.dbContext.Users);
+            await this.dbContext.SaveChangesAsync();
+
+            var deploymentPlans = this.userManager.GetAll();
+            Assert.Empty(deploymentPlans);
+
+            TestDataProvider.InsertTestData(this.dbContext);
         }
 
         [Fact]

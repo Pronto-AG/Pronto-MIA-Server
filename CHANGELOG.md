@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Query endpoint "Users" to view and filter available users.
 - Mutation endpoint "CreateUser" to add a user to the application.
+- Mutation endpoint "UpdateUser" to update a user of the application.
+- Mutation endpoint "RemoveUser" to remove a user from the application.
 - Mutation endpoint "CreateDeploymentPlan" to replace "AddDeploymentPlan"
 
 ### Removed

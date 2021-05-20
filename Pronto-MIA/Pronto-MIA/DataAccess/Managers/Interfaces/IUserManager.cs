@@ -1,6 +1,7 @@
 #nullable enable
 namespace Pronto_MIA.DataAccess.Managers.Interfaces
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Pronto_MIA.Domain.Entities;
@@ -30,6 +31,12 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// <returns>User or default if user could not be found.</returns>
         public Task<User?>
             GetByUserName(string userName);
+
+        /// <summary>
+        /// Method to get all users.
+        /// </summary>
+        /// <returns>All users.</returns>
+        public IQueryable<User> GetAll();
 
         /// <summary>
         /// Method that creates a new User object with the given Username

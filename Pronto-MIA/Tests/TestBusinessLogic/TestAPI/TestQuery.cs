@@ -46,5 +46,16 @@ namespace Tests.TestBusinessLogic.TestAPI
 
             deploymentPlanManager.Received().GetAll();
         }
+
+        [Fact]
+        public void TestUsers()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            this.query.Users(userManager);
+
+            userManager.Received().GetAll();
+        }
     }
 }

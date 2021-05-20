@@ -4,6 +4,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System;
     using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
@@ -112,6 +113,12 @@ namespace Pronto_MIA.DataAccess.Managers
             }
 
             return user;
+        }
+
+        /// <inheritdoc/>
+        public IQueryable<User> GetAll()
+        {
+            return this.dbContext.Users;
         }
 
         /// <inheritdoc/>
