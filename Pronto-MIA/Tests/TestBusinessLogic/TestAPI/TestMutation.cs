@@ -3,6 +3,7 @@ namespace Tests.TestBusinessLogic.TestAPI
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
     using HotChocolate.Execution;
@@ -16,6 +17,10 @@ namespace Tests.TestBusinessLogic.TestAPI
     using Pronto_MIA.Domain.Entities;
     using Xunit;
 
+    [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN005",
+        Justification = "Test file may be more than 300 lines.")]
     public class TestMutation
     {
         private readonly ProntoMiaDbContext dbContext;
@@ -33,14 +38,27 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var userManager =
                 Substitute.For<IUserManager>();
+            userManager.Create(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(
+                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
+                    {
+                        Id = 1,
+                    });
+            var aclManager =
+                Substitute.For<IAccessControlListManager>();
+            var acl = new AccessControlList();
 
-            await this.mutation.CreateUser(
+            var user = await this.mutation.CreateUser(
                 userManager,
+                aclManager,
                 "Ruedi",
-                "HelloWorld1-");
+                "HelloWorld1-",
+                acl);
 
             await userManager.Received()
                 .Create("Ruedi", "HelloWorld1-");
+            await aclManager.Received()
+                .LinkAccessControlList(user.Id, acl);
         }
 
         [Fact]
@@ -48,15 +66,51 @@ namespace Tests.TestBusinessLogic.TestAPI
         {
             var userManager =
                 Substitute.For<IUserManager>();
+            userManager.Update(
+                    Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(
+                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
+                    {
+                        Id = 1,
+                    });
+            var aclManager =
+                Substitute.For<IAccessControlListManager>();
+            var acl = new AccessControlList();
 
             await this.mutation.UpdateUser(
                 userManager,
+                aclManager,
                 1,
                 "Ruedi",
-                "HelloWorld1-");
+                "HelloWorld1-",
+                acl);
 
             await userManager.Received()
                 .Update(1, "Ruedi", "HelloWorld1-");
+            await aclManager.Received()
+                .LinkAccessControlList(1, acl);
+        }
+
+        [Fact]
+        public async void TestUpdateUserEmptyAcl()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+            var aclManager =
+                Substitute.For<IAccessControlListManager>();
+
+            await this.mutation.UpdateUser(
+                userManager,
+                aclManager,
+                1,
+                "Ruedi",
+                "HelloWorld1-",
+                null);
+
+            await userManager.Received()
+                .Update(1, "Ruedi", "HelloWorld1-");
+            await aclManager.DidNotReceiveWithAnyArgs()
+                .LinkAccessControlList(Arg.Any<int>(), default);
         }
 
         [Fact]

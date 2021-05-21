@@ -34,6 +34,7 @@ namespace Pronto_MIA.Services
                 .AddHttpRequestInterceptor(AddUserState)
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
+                .AddType<AccessControlListInputType>()
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
                 .AddProjections()

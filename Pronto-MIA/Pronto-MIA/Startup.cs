@@ -58,6 +58,8 @@ namespace Pronto_MIA
             services.AddScoped<IFirebaseTokenManager, FirebaseTokenManager>();
             services.AddScoped<IFirebaseMessagingManager,
                 FirebaseMessagingManager>();
+            services.AddScoped<IAccessControlListManager,
+                AccessControlListManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization();
             services.AddCors(options =>

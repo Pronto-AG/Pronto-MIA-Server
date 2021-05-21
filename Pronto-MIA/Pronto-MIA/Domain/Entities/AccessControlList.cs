@@ -1,7 +1,5 @@
 namespace Pronto_MIA.Domain.Entities
 {
-    using System;
-
     /// <summary>
     /// Class containing the access control list of a specific user.
     /// </summary>

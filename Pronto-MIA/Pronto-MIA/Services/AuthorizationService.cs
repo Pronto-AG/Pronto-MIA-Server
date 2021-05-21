@@ -4,9 +4,9 @@ namespace Pronto_MIA.Services
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Pronto_MIA.BusinessLogic.Security.Authorization;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.Domain.Entities;
-    using Pronto_MIA.Services.AuthorizationHandlers;
 
     /// <summary>
     /// Class representing an authorization service which can be used to
@@ -27,19 +27,16 @@ namespace Pronto_MIA.Services
             services.AddAuthorization(options =>
             {
                 foreach (
-                    AccessControl ac in
+                    AccessControl accessControl in
                     (AccessControl[])Enum.GetValues(typeof(AccessControl)))
                 {
                     options.AddPolicy(
-                        ac.ToString(),
+                        accessControl.ToString(),
                         policy => policy.Requirements.Add(
-                            new AccessControlListRequirement(
-                                services.BuildServiceProvider()
-                                    .GetService<ProntoMiaDbContext>(),
-                                ac)));
+                            new AccessControlListRequirement(accessControl)));
                 }
             });
-            services.AddSingleton<IAuthorizationHandler,
+            services.AddScoped<IAuthorizationHandler,
                 AccessControlListAuthorizationHandler>();
         }
     }

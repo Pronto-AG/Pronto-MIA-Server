@@ -33,8 +33,12 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </summary>
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
+        /// <param name="aclManager">The manager responsible for managing
+        /// the access control lists linked to the users.</param>
         /// <param name="userName">The username of the new user.</param>
         /// <param name="password">The password of the new user.</param>
+        /// <param name="accessControlList">The access control list
+        /// that should be linked to the new user.</param>
         /// <returns>The newly created user.</returns>
         /// <exception cref="QueryException">Returns UserAlreadyExists exception
         /// if the username already exists. Alternatively returns
@@ -45,10 +49,14 @@ namespace Pronto_MIA.BusinessLogic.API
         [UseSingleOrDefault]
         public async Task<User> CreateUser(
             [Service] IUserManager userManager,
+            [Service] IAccessControlListManager aclManager,
             string userName,
-            string password)
+            string password,
+            AccessControlList accessControlList)
         {
-            return await userManager.Create(userName, password);
+            var user = await userManager.Create(userName, password);
+            await aclManager.LinkAccessControlList(user.Id, accessControlList);
+            return user;
         }
 
         /// <summary>
@@ -75,10 +83,15 @@ namespace Pronto_MIA.BusinessLogic.API
         /// </summary>
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
+        /// <param name="aclManager">The manager responsible for managing
+        /// the access control lists linked to the users.</param>
         /// <param name="id">Id of the user to be updated.</param>
         /// <param name="userName">The new username of the user.</param>
         /// <param name="password">The new password for the user.</param>
         /// <returns>The updated user.</returns>
+        /// <param name="accessControlList">The new
+        /// <see cref="AccessControlList"/> that will be linked to the user.
+        /// </param>
         /// <exception cref="QueryException">Returns UserNotFound
         /// exception if the user with the given id could not be found.
         /// Alternatively returns PasswordTooWeak exception if the
@@ -88,11 +101,20 @@ namespace Pronto_MIA.BusinessLogic.API
         [Sensitive("password")]
         public async Task<User> UpdateUser(
             [Service] IUserManager userManager,
+            [Service] IAccessControlListManager aclManager,
             int id,
             string? userName,
-            string? password)
+            string? password,
+            AccessControlList? accessControlList)
         {
-            return await userManager.Update(id, userName, password);
+            var user = await userManager.Update(id, userName, password);
+            if (accessControlList != null)
+            {
+                await aclManager.LinkAccessControlList(
+                    user.Id, accessControlList);
+            }
+
+            return user;
         }
 
         /// <summary>

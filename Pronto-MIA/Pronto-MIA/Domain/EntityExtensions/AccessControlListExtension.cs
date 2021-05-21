@@ -7,7 +7,7 @@ namespace Pronto_MIA.Domain.EntityExtensions
     /// Class containing helper methods for the
     /// <see cref="AccessControlList"/> entity.
     /// </summary>
-    public static class AclExtension
+    public static class AccessControlListExtension
     {
         /// <summary>
         /// Method that checks if an <see cref="AccessControlList"/>
@@ -35,7 +35,8 @@ namespace Pronto_MIA.Domain.EntityExtensions
                 case AccessControl.CanViewDeploymentPlans:
                     return acl.CanViewDeploymentPlans;
                 default:
-                    throw new ArgumentException("Unknown AccessControl");
+                    throw new ArgumentException(
+                        $"Unknown AccessControl \"{control.ToString()}\"");
             }
         }
     }
