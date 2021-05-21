@@ -1,4 +1,6 @@
-namespace Tests.TestDomain.TestEntityExtensions
+using Pronto_MIA.BusinessLogic.API.EntityExtensions;
+
+namespace Tests.TestBusinessLogic.TestAPI.TestEntityExtensions
 {
     using System;
     using Pronto_MIA.DataAccess;
@@ -6,25 +8,24 @@ namespace Tests.TestDomain.TestEntityExtensions
     using Pronto_MIA.Domain.EntityExtensions;
     using Xunit;
 
-    public class TestAccessControlListExtension
+    public class TestErrorExtension
     {
         private readonly ProntoMiaDbContext dbContext;
 
-        public TestAccessControlListExtension()
+        public TestErrorExtension()
         {
             this.dbContext = TestHelpers.InMemoryDbContext;
             TestDataProvider.InsertTestData(this.dbContext);
         }
 
         [Fact]
-        public void TestHasControl()
+        public void TestHasMessage()
         {
-            var acl = new AccessControlList(-1);
             foreach (
-                AccessControl accessControl in
-                (AccessControl[])Enum.GetValues(typeof(AccessControl)))
+                Error error in
+                (Error[])Enum.GetValues(typeof(Error)))
             {
-                Assert.False(acl.HasControl(accessControl));
+                Assert.NotNull(error.Message());
             }
         }
     }

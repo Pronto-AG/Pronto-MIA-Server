@@ -12,6 +12,7 @@ namespace Tests
         {
             InsertUsers(context);
             InsertTokens(context);
+            InsertDepartments(context);
         }
 
         [SuppressMessage(
@@ -58,6 +59,21 @@ namespace Tests
 
                 context.DeploymentPlans.AddRange(
                     deploymentPlan1, deploymentPlan2);
+                context.SaveChanges();
+            }
+        }
+
+        private static void InsertDepartments(ProntoMiaDbContext context)
+        {
+            if (!context.Departments.Any())
+            {
+                var department1 = new Department(
+                    "Administration");
+                var department2 = new Department(
+                    "Finance");
+
+                context.Departments.AddRange(
+                    department1, department2);
                 context.SaveChanges();
             }
         }

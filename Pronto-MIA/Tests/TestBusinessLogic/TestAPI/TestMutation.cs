@@ -17,10 +17,6 @@ namespace Tests.TestBusinessLogic.TestAPI
     using Pronto_MIA.Domain.Entities;
     using Xunit;
 
-    [SuppressMessage(
-        "Menees.Analyzers",
-        "MEN005",
-        Justification = "Test file may be more than 300 lines.")]
     public class TestMutation
     {
         private readonly ProntoMiaDbContext dbContext;
@@ -31,98 +27,6 @@ namespace Tests.TestBusinessLogic.TestAPI
             this.dbContext = TestHelpers.InMemoryDbContext;
             TestDataProvider.InsertTestData(this.dbContext);
             this.mutation = new Mutation();
-        }
-
-        [Fact]
-        public async void TestCreateUser()
-        {
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.Create(Arg.Any<string>(), Arg.Any<string>())
-                .ReturnsForAnyArgs(
-                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
-                    {
-                        Id = 1,
-                    });
-            var aclManager =
-                Substitute.For<IAccessControlListManager>();
-            var acl = new AccessControlList();
-
-            var user = await this.mutation.CreateUser(
-                userManager,
-                aclManager,
-                "Ruedi",
-                "HelloWorld1-",
-                acl);
-
-            await userManager.Received()
-                .Create("Ruedi", "HelloWorld1-");
-            await aclManager.Received()
-                .LinkAccessControlList(user.Id, acl);
-        }
-
-        [Fact]
-        public async void TestUpdateUser()
-        {
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.Update(
-                    Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
-                .ReturnsForAnyArgs(
-                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
-                    {
-                        Id = 1,
-                    });
-            var aclManager =
-                Substitute.For<IAccessControlListManager>();
-            var acl = new AccessControlList();
-
-            await this.mutation.UpdateUser(
-                userManager,
-                aclManager,
-                1,
-                "Ruedi",
-                "HelloWorld1-",
-                acl);
-
-            await userManager.Received()
-                .Update(1, "Ruedi", "HelloWorld1-");
-            await aclManager.Received()
-                .LinkAccessControlList(1, acl);
-        }
-
-        [Fact]
-        public async void TestUpdateUserEmptyAcl()
-        {
-            var userManager =
-                Substitute.For<IUserManager>();
-            var aclManager =
-                Substitute.For<IAccessControlListManager>();
-
-            await this.mutation.UpdateUser(
-                userManager,
-                aclManager,
-                1,
-                "Ruedi",
-                "HelloWorld1-",
-                null);
-
-            await userManager.Received()
-                .Update(1, "Ruedi", "HelloWorld1-");
-            await aclManager.DidNotReceiveWithAnyArgs()
-                .LinkAccessControlList(Arg.Any<int>(), default);
-        }
-
-        [Fact]
-        public async void TestRemoveUser()
-        {
-            var userManager =
-                Substitute.For<IUserManager>();
-
-            await this.mutation.RemoveUser(userManager, 1);
-
-            await userManager.Received()
-                .Remove(1);
         }
 
         [Fact]

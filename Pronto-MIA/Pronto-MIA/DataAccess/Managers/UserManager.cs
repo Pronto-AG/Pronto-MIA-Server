@@ -122,7 +122,8 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<User> Create(string userName, string password)
+        public async Task<User> Create(
+            string userName, string password)
         {
             var checkUserName = await this.GetByUserName(userName);
             if (checkUserName != default)

@@ -37,7 +37,8 @@ namespace Tests.TestDataAccess.TestManagers
 
             await
                 this.accessControlListManager.
-                    LinkAccessControlList(user.Id, new AccessControlList());
+                    LinkAccessControlList(
+                        user.Id, new AccessControlList(user.Id));
 
             var accessControlList =
                 await this.dbContext.AccessControlLists
@@ -55,16 +56,14 @@ namespace Tests.TestDataAccess.TestManagers
                 string.Empty);
             this.dbContext.Users.Add(user);
             await this.dbContext.SaveChangesAsync();
-            var previousAcl = new AccessControlList()
-            {
-                UserId = user.Id,
-            };
+            var previousAcl = new AccessControlList(user.Id);
             this.dbContext.AccessControlLists.Add(previousAcl);
             await this.dbContext.SaveChangesAsync();
 
             await
                 this.accessControlListManager.
-                    LinkAccessControlList(user.Id, new AccessControlList()
+                    LinkAccessControlList(
+                        user.Id, new AccessControlList(user.Id)
                     {
                         CanEditUsers = true,
                     });

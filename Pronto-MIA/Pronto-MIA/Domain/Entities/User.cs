@@ -2,6 +2,7 @@ namespace Pronto_MIA.Domain.Entities
 {
     using System.Collections.Generic;
     using HotChocolate;
+    using HotChocolate.AspNetCore.Authorization;
 
     /// <summary>
     /// Class representing a user of the application.
@@ -15,13 +16,14 @@ namespace Pronto_MIA.Domain.Entities
         /// <param name="passwordHash"><see cref="PasswordHash"/>.</param>
         /// <param name="hashGenerator"><see cref="HashGenerator"/>.</param>
         /// <param name="hashGeneratorOptions">
-        /// <see cref="HashGeneratorOptions"/>
         /// <see cref="HashGeneratorOptions"/>.</param>
+        /// <param name="departmentId">
+        /// <see cref="DepartmentId"/>.</param>
         public User(
             string userName,
             byte[] passwordHash,
             string hashGenerator,
-            string hashGeneratorOptions = "{}")
+            string hashGeneratorOptions)
         {
             this.UserName = userName;
             this.PasswordHash = passwordHash;
@@ -41,7 +43,6 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = default;
             this.HashGenerator = default;
             this.HashGeneratorOptions = default;
-            this.AccessControlList = default;
         }
 
         /// <summary>
@@ -60,6 +61,19 @@ namespace Pronto_MIA.Domain.Entities
         /// user.
         /// </summary>
         public virtual AccessControlList AccessControlList { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id of the department associated with this user.
+        /// </summary>
+        [GraphQLIgnore]
+        public int? DepartmentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the access control list associated with this
+        /// user.
+        /// </summary>
+        [Authorize(Policy = "CanViewDepartments")]
+        public virtual Department Department { get; set; }
 
         /// <summary>
         /// Gets or sets the hash of the password the user would like to use in

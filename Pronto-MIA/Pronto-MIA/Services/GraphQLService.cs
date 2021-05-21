@@ -12,6 +12,7 @@ namespace Pronto_MIA.Services
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.API.Types;
+    using Pronto_MIA.BusinessLogic.API.Types.Mutation;
 
     /// <summary>
     /// Service which initializes and contains all information regarding the
@@ -37,6 +38,8 @@ namespace Pronto_MIA.Services
                 .AddType<AccessControlListInputType>()
                 .AddQueryType<Query>()
                 .AddMutationType<Mutation>()
+                .AddTypeExtension<UserMutation>()
+                .AddTypeExtension<DepartmentMutation>()
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting()

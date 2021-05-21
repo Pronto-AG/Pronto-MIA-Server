@@ -66,7 +66,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Alternatively returns PasswordTooWeak exception if the
         /// provided password does not meet the policy requirements.
         /// </exception>
-        public Task<User> Update(int id, string? userName, string? password);
+        public Task<User> Update(
+            int id, string? userName, string? password);
 
         /// <summary>
         /// Removes the user with the given id.

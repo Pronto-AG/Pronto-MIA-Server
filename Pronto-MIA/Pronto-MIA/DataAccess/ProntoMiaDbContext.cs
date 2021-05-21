@@ -42,6 +42,11 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<AccessControlList> AccessControlLists { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing departments.
+        /// </summary>
+        public DbSet<Department> Departments { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
@@ -51,6 +56,7 @@ namespace Pronto_MIA.DataAccess
            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
            modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
+           modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
 
            this.AddAdminUser(modelBuilder);
        }
@@ -82,12 +88,13 @@ namespace Pronto_MIA.DataAccess
 
         private AccessControlList CreateAdminAcl()
         {
-            return new AccessControlList
+            return new AccessControlList(-1)
             {
                 Id = -1,
-                UserId = -1,
                 CanEditUsers = true,
                 CanViewUsers = true,
+                CanViewDepartments = true,
+                CanEditDepartments = true,
                 CanEditDeploymentPlans = true,
                 CanViewDeploymentPlans = true,
             };

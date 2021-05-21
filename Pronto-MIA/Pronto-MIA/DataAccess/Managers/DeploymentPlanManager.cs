@@ -46,7 +46,7 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>>
+        public async Task<DeploymentPlan>
             Create(
                 IFile file,
                 DateTime availableFrom,
@@ -74,11 +74,11 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogInformation(
                 "Deployment plan with id {Id} has been created",
                 deploymentPlan.Id);
-            return this.GetQueryableById(deploymentPlan.Id);
+            return deploymentPlan;
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>>
+        public async Task<DeploymentPlan>
             Update(
                 int id,
                 IFile? file,
@@ -99,7 +99,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogInformation(
                 "Deployment plan with id {Id} has been updated",
                 deploymentPlan.Id);
-            return this.GetQueryableById(id);
+            return deploymentPlan;
         }
 
         /// <inheritdoc/>

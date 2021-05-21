@@ -30,6 +30,10 @@ namespace Pronto_MIA.Domain.EntityExtensions
                     return acl.CanEditUsers;
                 case AccessControl.CanViewUsers:
                     return acl.CanViewUsers;
+                case AccessControl.CanEditDepartments:
+                    return acl.CanEditDepartments;
+                case AccessControl.CanViewDepartments:
+                    return acl.CanViewDepartments;
                 case AccessControl.CanEditDeploymentPlans:
                     return acl.CanEditDeploymentPlans;
                 case AccessControl.CanViewDeploymentPlans:
