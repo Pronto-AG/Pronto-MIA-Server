@@ -28,6 +28,8 @@ namespace Pronto_MIA.BusinessLogic.Security
                         user.HashGeneratorOptions);
                     return new Pbkdf2Generator(
                         (Pbkdf2GeneratorOptions)options);
+                case NullGenerator.Identifier:
+                    return new NullGenerator(null);
                 default:
                     throw new ArgumentException(
                         "Unknown hash generator");

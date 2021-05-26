@@ -29,12 +29,55 @@ namespace Tests.TestBusinessLogic.TestAPI
         }
 
         [Fact]
-        public async void TestAddDeploymentPlan()
+        public async void TestCreateUser()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            await this.mutation.CreateUser(
+                userManager,
+                "Ruedi",
+                "HelloWorld1-");
+
+            await userManager.Received()
+                .Create("Ruedi", "HelloWorld1-");
+        }
+
+        [Fact]
+        public async void TestUpdateUser()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            await this.mutation.UpdateUser(
+                userManager,
+                1,
+                "Ruedi",
+                "HelloWorld1-");
+
+            await userManager.Received()
+                .Update(1, "Ruedi", "HelloWorld1-");
+        }
+
+        [Fact]
+        public async void TestRemoveUser()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+
+            await this.mutation.RemoveUser(userManager, 1);
+
+            await userManager.Received()
+                .Remove(1);
+        }
+
+        [Fact]
+        public async void TestCreateDeploymentPlan()
         {
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            await this.mutation.AddDeploymentPlan(
+            await this.mutation.CreateDeploymentPlan(
                 deploymentPlanManager,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,

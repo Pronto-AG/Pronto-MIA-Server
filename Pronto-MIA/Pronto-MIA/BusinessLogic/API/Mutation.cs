@@ -3,6 +3,7 @@ namespace Pronto_MIA.BusinessLogic.API
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
@@ -21,8 +22,78 @@ namespace Pronto_MIA.BusinessLogic.API
     /// <summary>
     /// Class representing the mutation operation of graphql.
     /// </summary>
+    [SuppressMessage(
+    "Menees.Analyzers",
+    "MEN005",
+    Justification = "Ideally only one mutation class necessary.")]
     public class Mutation
     {
+        /// <summary>
+        /// Creates a new User.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="userName">The username of the new user.</param>
+        /// <param name="password">The password of the new user.</param>
+        /// <returns>The newly created user.</returns>
+        /// <exception cref="QueryException">Returns UserAlreadyExists exception
+        /// if the username already exists. Alternatively returns
+        /// PasswordTooWeak exception if the provided password does not meet the
+        /// policy requirements.
+        /// </exception>
+        [Authorize]
+        [UseSingleOrDefault]
+        public async Task<User> CreateUser(
+            [Service] IUserManager userManager,
+            string userName,
+            string password)
+        {
+            return await userManager.Create(userName, password);
+        }
+
+        /// <summary>
+        /// Method that removes the user with the given id.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="id">Id of the user to be removed.</param>
+        /// <returns>The id of the user which was removed.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound
+        /// exception if the user with the given id could not be found.
+        /// </exception>
+        [Authorize]
+        public async Task<int> RemoveUser(
+            [Service] IUserManager userManager,
+            int id)
+        {
+            return await userManager.Remove(id);
+        }
+
+        /// <summary>
+        /// Method that updates the user with the given id according
+        /// to the provided information.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="id">Id of the user to be updated.</param>
+        /// <param name="userName">The new username of the user.</param>
+        /// <param name="password">The new password for the user.</param>
+        /// <returns>The updated user.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound
+        /// exception if the user with the given id could not be found.
+        /// Alternatively returns PasswordTooWeak exception if the
+        /// provided password does not meet the policy requirements.
+        /// </exception>
+        [Authorize]
+        public async Task<User> UpdateUser(
+            [Service] IUserManager userManager,
+            int id,
+            string? userName,
+            string? password)
+        {
+            return await userManager.Update(id, userName, password);
+        }
+
         /// <summary>
         /// Adds a deployment plan to the application.
         /// </summary>
@@ -39,7 +110,7 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <returns>The newly generated deployment plan.</returns>
         [Authorize]
         [UseSingleOrDefault]
-        public async Task<IQueryable<DeploymentPlan?>> AddDeploymentPlan(
+        public async Task<IQueryable<DeploymentPlan>> CreateDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             IFile file,
             DateTime availableFrom,
@@ -171,7 +242,8 @@ namespace Pronto_MIA.BusinessLogic.API
         /// <param name="id">Id of the plan to be removed.</param>
         /// <returns>The id of the plan which was removed.</returns>
         /// <exception cref="QueryException">Returns DeploymentPlanNotFound
-        /// exception if the deployment plan with given id could not be found.
+        /// exception if the deployment plan with the given id could not be
+        /// found.
         /// </exception>
         [Authorize]
         public async Task<int> RemoveDeploymentPlan(

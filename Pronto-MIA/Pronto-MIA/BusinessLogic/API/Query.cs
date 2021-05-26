@@ -45,10 +45,25 @@ namespace Pronto_MIA.BusinessLogic.API
         [Authorize]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<DeploymentPlan?> DeploymentPlans(
+        public IQueryable<DeploymentPlan> DeploymentPlans(
             [Service] IDeploymentPlanManager deploymentPlanManager)
         {
             return deploymentPlanManager.GetAll();
+        }
+
+        /// <summary>
+        /// Method which retrieves the available deployment plans.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <returns>Queryable of all available deployment plans.</returns>
+        [Authorize]
+        [UseFiltering]
+        [UseSorting]
+        public IQueryable<User> Users(
+            [Service] IUserManager userManager)
+        {
+            return userManager.GetAll();
         }
     }
 }

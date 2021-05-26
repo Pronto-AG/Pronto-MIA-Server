@@ -1,11 +1,10 @@
 namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text;
     using HotChocolate;
     using HotChocolate.Execution;
-    using Pronto_MIA.BusinessLogic.API.Types;
 
     /// <summary>
     /// Class defining the extension methods regarding the
@@ -18,18 +17,25 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
         /// understood by the GraphQL Server.
         /// </summary>
         /// <param name="error">Extension method parameter.</param>
+        /// <param name="arguments">Additional error specific arguments.</param>
         /// <returns>QueryException that will be returned to the client of
         /// the API.</returns>
         public static QueryException AsQueryException(
-            this DataAccess.Error error)
+            this DataAccess.Error error,
+            Dictionary<string, string> arguments = null)
         {
-            return new QueryException(
-                ErrorBuilder
-                    .New()
-                    .SetExtension("traceId", string.Empty)
-                    .SetMessage(error.Message())
-                    .SetCode(error.ToString())
-                    .Build());
+            if (error != DataAccess.Error.PasswordTooWeak || arguments == null)
+            {
+                return new QueryException(
+                    ErrorBuilder
+                        .New()
+                        .SetExtension("traceId", string.Empty)
+                        .SetMessage(error.Message())
+                        .SetCode(error.ToString())
+                        .Build());
+            }
+
+            return PasswordToWeakWithPolicy(error, arguments);
         }
 
         /// <summary>
@@ -51,7 +57,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             {
                 case DataAccess.Error.PasswordTooWeak:
                     return "Minimum password requirement not met:" +
-                           " Min. 10 characters, 1 uppercase, 1 number";
+                           " Min. {{MinLenght}} characters, 1 lowercase, " +
+                           "1 uppercase, 1 number and 1 non alphanumeric";
                 case DataAccess.Error.UserAlreadyExists:
                     return "Username already taken";
                 case DataAccess.Error.UserNotFound:
@@ -76,6 +83,37 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                 default: throw new ArgumentException(
                     "Unhandled data access exception");
             }
+        }
+
+        /// <summary>
+        /// Method that creates a PasswordToWeak exception
+        /// which includes the policy which was violated
+        /// and the policies that have to be met.
+        /// </summary>
+        /// <param name="error">The error.</param>
+        /// <param name="arguments">The arguments to use
+        /// in order to include additional information.</param>
+        /// <returns>A query exception with additional password
+        /// policy information.</returns>
+        private static QueryException PasswordToWeakWithPolicy(
+            DataAccess.Error error, Dictionary<string, string> arguments)
+        {
+            var message = error.Message().Replace(
+                "{{MinLenght}}",
+                arguments["minLenght"]);
+            return new QueryException(
+                ErrorBuilder
+                    .New()
+                    .SetExtension("traceId", string.Empty)
+                    .SetMessage(message)
+                    .SetCode(error.ToString())
+                    .SetExtension(
+                        "passwordPolicyViolation",
+                        arguments["passwordPolicyViolation"])
+                    .SetExtension(
+                        "minLenght",
+                        arguments["minLenght"])
+                    .Build());
         }
     }
 }

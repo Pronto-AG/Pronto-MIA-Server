@@ -2,16 +2,21 @@
 namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
+    using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
+    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.IdentityModel.Tokens;
     using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.Security;
+    using Pronto_MIA.BusinessLogic.Security.Abstract;
+    using Pronto_MIA.BusinessLogic.Security.Interfaces;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -20,6 +25,13 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class UserManager : IUserManager
     {
+        private static readonly IHashGeneratorOptions
+            DefaultHashGeneratorOptions = new Pbkdf2GeneratorOptions(1500);
+
+        private static readonly HashGenerator DefaultHashGenerator
+            = new Pbkdf2Generator(
+                (Pbkdf2GeneratorOptions)DefaultHashGeneratorOptions);
+
         private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
@@ -41,6 +53,9 @@ namespace Pronto_MIA.DataAccess.Managers
             this.cfg = cfg;
             this.logger = logger;
         }
+
+        private int MinPasswordLenght =>
+            this.cfg.GetValue<int>("User:MIN_PASSWORD_LENGHT");
 
         private string SigningKey =>
             this.cfg.GetValue<string>("JWT:SIGNING_KEY");
@@ -74,6 +89,12 @@ namespace Pronto_MIA.DataAccess.Managers
                 throw DataAccess.Error.WrongPassword.AsQueryException();
             }
 
+            if (hashGenerator.GetIdentifier() !=
+                DefaultHashGenerator.GetIdentifier())
+            {
+                await this.UpdateHash(password, user);
+            }
+
             this.logger.LogDebug(
                 "User {UserName} has been authenticated", userName);
             return this.GenerateToken(user);
@@ -92,6 +113,70 @@ namespace Pronto_MIA.DataAccess.Managers
             }
 
             return user;
+        }
+
+        /// <inheritdoc/>
+        public IQueryable<User> GetAll()
+        {
+            return this.dbContext.Users;
+        }
+
+        /// <inheritdoc/>
+        public async Task<User> Create(string userName, string password)
+        {
+            var checkUserName = await this.GetByUserName(userName);
+            if (checkUserName != default)
+            {
+                throw DataAccess.Error.UserAlreadyExists.AsQueryException();
+            }
+
+            this.CheckPasswordPolicy(password);
+
+            var user = new User(
+                userName,
+                DefaultHashGenerator.HashPassword(password),
+                DefaultHashGenerator.GetIdentifier(),
+                DefaultHashGenerator.GetOptions().ToJson());
+            this.dbContext.Users.Add(user);
+            await this.dbContext.SaveChangesAsync();
+            return user;
+        }
+
+        /// <inheritdoc/>
+        public async Task<User> Update(
+            int id, string? userName, string? password)
+        {
+            var user = await this.GetById(id);
+            if (userName == null && password == null)
+            {
+                return user;
+            }
+
+            if (userName != null)
+            {
+                await this.UpdateUserName(userName, user);
+            }
+
+            if (password != null)
+            {
+                this.UpdatePassword(password, user);
+            }
+
+            this.dbContext.Users.Update(user);
+            await this.dbContext.SaveChangesAsync();
+            return user;
+        }
+
+        /// <inheritdoc/>
+        public async Task<int>
+            Remove(int id)
+        {
+            var user = await this.GetById(id);
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+
+            return id;
         }
 
         private string GenerateToken(User user)
@@ -121,6 +206,91 @@ namespace Pronto_MIA.DataAccess.Managers
                 user.UserName);
 
             return tokenString;
+        }
+
+        /// <summary>
+        /// Method to update a users hash to the latest defined default hash.
+        /// This has to be done if the default hash has been adjusted in order
+        /// to comply with new security regulations.
+        /// </summary>
+        /// <param name="password">The password for the user.</param>
+        /// <param name="user">The user to be updated.</param>
+        private async Task UpdateHash(string password, User user)
+        {
+            user.PasswordHash = DefaultHashGenerator.HashPassword(password);
+            user.HashGenerator = DefaultHashGenerator.GetIdentifier();
+            user.HashGeneratorOptions =
+                DefaultHashGenerator.GetOptions().ToJson();
+            this.dbContext.Users.Update(user);
+            await this.dbContext.SaveChangesAsync();
+
+            this.logger.LogDebug(
+                "Password-hash for User {UserName} has been updated",
+                user.UserName);
+        }
+
+        /// <summary>
+        /// Method to get a user with the help of its id.
+        /// </summary>
+        /// <param name="id">The id of the user.</param>
+        /// <returns>The user with the given id.</returns>
+        /// <exception cref="QueryException">If the user with the
+        /// given id could not be found.</exception>
+        private async Task<User> GetById(int id)
+        {
+            var user = await this.dbContext.Users
+                .SingleOrDefaultAsync(u => u.Id == id);
+            if (user != default)
+            {
+                return user;
+            }
+
+            this.logger.LogWarning(
+                "Invalid user id {Id}", id);
+            throw DataAccess.Error.UserNotFound
+                .AsQueryException();
+        }
+
+        /// <summary>
+        /// Checks the given password against the password
+        /// policy.
+        /// </summary>
+        /// <param name="password">The password to be checked.</param>
+        /// <exception cref="QueryException">Throws a PasswordTooWeak
+        /// exception if the password does not meet the policy requirements.
+        /// </exception>
+        private void CheckPasswordPolicy(string password)
+        {
+            var checkPassword = PasswordHelper
+                .PasswordPolicyMet(password, this.MinPasswordLenght);
+            if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
+            {
+                var arguments = new Dictionary<string, string>
+                {
+                    ["minLenght"] = this.MinPasswordLenght.ToString(),
+                    ["passwordPolicyViolation"] = checkPassword.ToString(),
+                };
+                throw DataAccess.Error.PasswordTooWeak
+                    .AsQueryException(arguments);
+            }
+        }
+
+        private async Task UpdateUserName(string userName, User user)
+        {
+            var userCheck = await this.GetByUserName(userName);
+            if (userCheck != default)
+            {
+                throw DataAccess.Error.UserAlreadyExists.AsQueryException();
+            }
+
+            user.UserName = userName;
+        }
+
+        private void UpdatePassword(string password, User user)
+        {
+            this.CheckPasswordPolicy(password);
+            var generator = HashGeneratorFactory.GetGeneratorForUser(user);
+            user.PasswordHash = generator.HashPassword(password);
         }
     }
 }

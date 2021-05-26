@@ -15,7 +15,7 @@ namespace Pronto_MIA.BusinessLogic.Security
     public class Pbkdf2Generator : HashGenerator
     {
         /// <summary>
-        /// Identifier of this generator. Used to differenciate between
+        /// Identifier of this generator. Used to differentiate between
         /// implementations of the HashGenerator.
         /// </summary>
         public const string Identifier = "Pbkdf2Generator";
