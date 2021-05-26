@@ -7,15 +7,24 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.Logging;
+    using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
+    /// <summary>
+    /// Class representing the mutation operation of graphql.
+    /// Contains all mutations that concern <see cref="User"/>
+    /// objects.
+    /// </summary>
     [ExtendObjectType(typeof(API.Mutation))]
     public class UserMutation
     {
         /// <summary>
         /// Creates a new User.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure transactional safety.</param>
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
         /// <param name="aclManager">The manager responsible for managing
@@ -37,6 +46,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [Authorize(Policy = "CanEditUsers")]
         [Authorize(Policy = "CanEditDepartments")]
         public async Task<User> CreateUser(
+            [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
             [Service] IAccessControlListManager aclManager,
             [Service] IDepartmentManager departmentManager,
@@ -45,10 +55,21 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             AccessControlList accessControlList,
             int departmentId)
         {
-            var user = await userManager.Create(userName, password);
-            await departmentManager.AddUser(departmentId, user);
-            await aclManager.LinkAccessControlList(user.Id, accessControlList);
-            return user;
+            userManager.SetDbContext(dbContext);
+            departmentManager.SetDbContext(dbContext);
+            aclManager.SetDbContext(dbContext);
+
+            await using (var dbContextTransaction = await
+                dbContext.Database.BeginTransactionAsync())
+            {
+                var user = await userManager.Create(userName, password);
+                await departmentManager.AddUser(departmentId, user);
+                await aclManager.LinkAccessControlList(
+                    user.Id, accessControlList);
+                await dbContextTransaction.CommitAsync();
+
+                return user;
+            }
         }
 
         /// <summary>
@@ -73,6 +94,9 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// Method that updates the user with the given id according
         /// to the provided information.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure transactional safety.</param>
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
         /// <param name="aclManager">The manager responsible for managing
@@ -96,6 +120,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [Authorize(Policy = "CanEditUsers")]
         [Sensitive("password")]
         public async Task<User> UpdateUser(
+            [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
             [Service] IAccessControlListManager aclManager,
             [Service] IDepartmentManager departmentManager,
@@ -105,31 +130,46 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             AccessControlList? accessControlList,
             int? departmentId)
         {
-            var user = await userManager.Update(id, userName, password);
+            userManager.SetDbContext(dbContext);
+            departmentManager.SetDbContext(dbContext);
+            aclManager.SetDbContext(dbContext);
+
+            await using (var dbContextTransaction = await
+                dbContext.Database.BeginTransactionAsync())
+            {
+                var user = await userManager.Update(id, userName, password);
+                await this.UpdateUserAcl(aclManager, accessControlList, user);
+                await this.UpdateUserDepartment(
+                    departmentManager,
+                    departmentId,
+                    user);
+                await dbContextTransaction.CommitAsync();
+                return user;
+            }
+        }
+
+        private async Task UpdateUserAcl(
+            IAccessControlListManager aclManager,
+            AccessControlList? accessControlList,
+            User user)
+        {
             if (accessControlList != null)
             {
                 await aclManager.LinkAccessControlList(
                     user.Id, accessControlList);
             }
-
-            if (departmentId != null)
-            {
-                await this.UpdateUserDepartment(
-                    departmentManager,
-                    departmentId.Value,
-                    user);
-            }
-
-            return user;
         }
 
         [Authorize(Policy = "CanEditDepartments")]
         private async Task UpdateUserDepartment(
             IDepartmentManager departmentManager,
-            int departmentId,
+            int? departmentId,
             User user)
         {
-            await departmentManager.AddUser(departmentId, user);
+            if (departmentId != null)
+            {
+                await departmentManager.AddUser(departmentId.Value, user);
+            }
         }
     }
 }

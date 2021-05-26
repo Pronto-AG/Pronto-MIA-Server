@@ -196,19 +196,6 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <summary>
-        /// Method to get a deployment plan queryable with the help of the
-        /// deployment plan id.
-        /// </summary>
-        /// <param name="id">The id of the deployment plan.</param>
-        /// <returns>IQueryable witch might contain the Deployment plan
-        /// with said id.</returns>
-        private IQueryable<DeploymentPlan> GetQueryableById(int id)
-        {
-            return this.dbContext.DeploymentPlans
-                .Where(dP => dP.Id == id);
-        }
-
-        /// <summary>
         /// Updates the file of a given deployment plan.
         /// </summary>
         /// <param name="deploymentPlan">The deployment plan to be updated.

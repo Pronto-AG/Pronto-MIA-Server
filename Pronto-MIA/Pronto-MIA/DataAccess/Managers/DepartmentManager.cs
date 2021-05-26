@@ -15,8 +15,8 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class DepartmentManager : IDepartmentManager
     {
-        private readonly ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -32,6 +32,12 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             this.logger = logger;
             this.dbContext = dbContext;
+        }
+
+        /// <inheritdoc/>
+        public void SetDbContext(ProntoMiaDbContext context)
+        {
+            this.dbContext = context;
         }
 
         /// <inheritdoc/>
@@ -92,7 +98,9 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <inheritdoc/>
         public async Task AddUser(int departmentId, User user)
         {
-            var checkId = await this.GetById(departmentId);
+            // Check if id exists
+            await this.GetById(departmentId);
+
             user.DepartmentId = departmentId;
             this.dbContext.Update(user);
             await this.dbContext.SaveChangesAsync();

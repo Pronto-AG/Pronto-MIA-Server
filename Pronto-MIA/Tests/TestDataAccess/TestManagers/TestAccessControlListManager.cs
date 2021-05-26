@@ -20,8 +20,7 @@ namespace Tests.TestDataAccess.TestManagers
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.accessControlListManager = new AccessControlListManager(
-                this.dbContext,
-                Substitute.For<ILogger<AccessControlListManager>>());
+                this.dbContext);
         }
 
         [Fact]

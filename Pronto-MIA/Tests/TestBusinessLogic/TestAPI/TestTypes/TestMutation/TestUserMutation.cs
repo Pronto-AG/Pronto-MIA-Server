@@ -23,14 +23,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         [Fact]
         public async void TestCreateUser()
         {
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.Create(Arg.Any<string>(), Arg.Any<string>())
-                .ReturnsForAnyArgs(
-                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
-                    {
-                        Id = 1,
-                    });
+            var userManager = this.CreateUserManager();
             var aclManager =
                 Substitute.For<IAccessControlListManager>();
             var departmentManager =
@@ -38,6 +31,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             var acl = new AccessControlList(1);
 
             var user = await this.userMutation.CreateUser(
+                this.dbContext,
                 userManager,
                 aclManager,
                 departmentManager,
@@ -57,15 +51,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         [Fact]
         public async void TestUpdateUser()
         {
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.Update(
-                    Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
-                .ReturnsForAnyArgs(
-                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
-                    {
-                        Id = 1,
-                    });
+            var userManager = this.CreateUserManager();
             var aclManager =
                 Substitute.For<IAccessControlListManager>();
             var departmentManager =
@@ -73,6 +59,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             var acl = new AccessControlList(1);
 
             await this.userMutation.UpdateUser(
+                this.dbContext,
                 userManager,
                 aclManager,
                 departmentManager,
@@ -101,6 +88,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 Substitute.For<IDepartmentManager>();
 
             await this.userMutation.UpdateUser(
+                this.dbContext,
                 userManager,
                 aclManager,
                 departmentManager,
@@ -121,21 +109,14 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         [Fact]
         public async void TestUpdateUserEmptyDepartment()
         {
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.Update(
-                    Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
-                .ReturnsForAnyArgs(
-                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
-                    {
-                        Id = 1,
-                    });
+            var userManager = this.CreateUserManager();
             var aclManager =
                 Substitute.For<IAccessControlListManager>();
             var departmentManager =
                 Substitute.For<IDepartmentManager>();
 
             await this.userMutation.UpdateUser(
+                this.dbContext,
                 userManager,
                 aclManager,
                 departmentManager,
@@ -164,6 +145,26 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
             await userManager.Received()
                 .Remove(1);
+        }
+
+        private IUserManager CreateUserManager()
+        {
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.Update(
+                    Arg.Any<int>(), Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(
+                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
+                    {
+                        Id = 1,
+                    });
+            userManager.Create(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(
+                    new User("Ruedi", new byte[5], string.Empty, string.Empty)
+                    {
+                        Id = 1,
+                    });
+            return userManager;
         }
     }
 }

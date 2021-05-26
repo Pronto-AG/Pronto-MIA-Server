@@ -1,19 +1,20 @@
 namespace Tests.TestDataAccess.TestManagers
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
-    using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using NSubstitute;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers;
-    using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
     using Xunit;
 
+    [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN005",
+        Justification = "Test file may be more than 300 lines.")]
     public class TestDepartmentManager
     {
         private readonly DepartmentManager departmentManager;
@@ -283,6 +284,24 @@ namespace Tests.TestDataAccess.TestManagers
             Assert.Empty(deploymentPlans);
 
             TestDataProvider.InsertTestData(this.dbContext);
+        }
+
+        [Fact]
+        public async Task TestAddUser()
+        {
+            var departmentName = "HR";
+            var department = new Department(departmentName);
+            this.dbContext.Departments.Add(department);
+            await this.dbContext.SaveChangesAsync();
+            var user = await this.dbContext.Users
+                .FirstAsync(u => u.UserName == "Bob");
+
+            await this.departmentManager.AddUser(department.Id, user);
+
+            Assert.Equal(department.Id, user.DepartmentId);
+
+            this.dbContext.Departments.Remove(department);
+            await this.dbContext.SaveChangesAsync();
         }
 
         private async Task<User> AddUserToDb()

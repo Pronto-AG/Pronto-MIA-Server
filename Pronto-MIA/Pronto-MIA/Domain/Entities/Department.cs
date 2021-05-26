@@ -1,8 +1,10 @@
 namespace Pronto_MIA.Domain.Entities
 {
     using System.Collections.Generic;
-    using HotChocolate;
 
+    /// <summary>
+    /// Class representing a department.
+    /// </summary>
     public class Department
     {
         /// <summary>
@@ -14,8 +16,14 @@ namespace Pronto_MIA.Domain.Entities
             this.Name = name;
         }
 
+        /// <summary>
+        /// Gets or sets the id of the department.
+        /// </summary>
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets the name of the department.
+        /// </summary>
         public string Name { get; set; }
 
         /// <summary>

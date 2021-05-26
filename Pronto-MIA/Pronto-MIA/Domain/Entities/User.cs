@@ -17,8 +17,6 @@ namespace Pronto_MIA.Domain.Entities
         /// <param name="hashGenerator"><see cref="HashGenerator"/>.</param>
         /// <param name="hashGeneratorOptions">
         /// <see cref="HashGeneratorOptions"/>.</param>
-        /// <param name="departmentId">
-        /// <see cref="DepartmentId"/>.</param>
         public User(
             string userName,
             byte[] passwordHash,

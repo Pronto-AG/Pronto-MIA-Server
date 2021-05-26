@@ -99,5 +99,14 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// </summary>
         /// <returns>All available deployment plans.</returns>
         public IQueryable<DeploymentPlan> GetAll();
+
+        /// <summary>
+        /// Method to get a deployment plan with the help of its id.
+        /// </summary>
+        /// <param name="id">The id of the deployment plan.</param>
+        /// <returns>The deployment plan with the given id.</returns>
+        /// <exception cref="QueryException">If the deployment plan
+        /// with the given id could not be found.</exception>
+        public Task<DeploymentPlan> GetById(int id);
     }
 }

@@ -6,8 +6,21 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     using HotChocolate.Execution;
     using Pronto_MIA.Domain.Entities;
 
+    /// <summary>
+    /// Interface declaring the operations needed of a department manager
+    /// service.
+    /// </summary>
     public interface IDepartmentManager
     {
+        /// <summary>
+        /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
+        /// used by the manager. This can be used if transactions
+        /// over multiple managers have to be implemented.
+        /// </summary>
+        /// <param name="dbContext">The db context to be used by the
+        /// manager.</param>
+        public void SetDbContext(ProntoMiaDbContext dbContext);
+
         /// <summary>
         /// Method which creates a new department object.
         /// </summary>

@@ -1,11 +1,8 @@
-using Pronto_MIA.BusinessLogic.API.EntityExtensions;
-
 namespace Tests.TestBusinessLogic.TestAPI.TestEntityExtensions
 {
     using System;
+    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.DataAccess;
-    using Pronto_MIA.Domain.Entities;
-    using Pronto_MIA.Domain.EntityExtensions;
     using Xunit;
 
     public class TestErrorExtension
