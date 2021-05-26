@@ -45,7 +45,7 @@ namespace Tests.TestBusinessLogic.TestSecurity
         }
 
         [Fact]
-        public void TestPasswordPolicyExactLenght()
+        public void TestPasswordPolicyExactLength()
         {
             var result = PasswordHelper.PasswordPolicyMet("H1-l", 4);
             Assert.Equal(
