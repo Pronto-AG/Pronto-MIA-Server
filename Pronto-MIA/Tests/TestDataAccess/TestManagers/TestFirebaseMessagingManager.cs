@@ -161,58 +161,5 @@ namespace Tests.TestDataAccess.TestManagers
 
             this.firebaseMessagingAdapter.ClearSubstitute();
         }
-
-        [Fact]
-        public async void TestSendAsync()
-        {
-            var message = new Message()
-            {
-                Notification = new Notification
-                {
-                    Title = "Test",
-                    Body = "This is a test.",
-                },
-                Data = new Dictionary<string, string>()
-                    { { "score", "850" }, { "time", "2:45" }, },
-                Token = "Hello World",
-            };
-
-            await this.firebaseMessagingManager
-                .SendAsync(message);
-
-            await this.firebaseMessagingAdapter.Received().SendAsync(message);
-
-            this.firebaseMessagingAdapter.ClearReceivedCalls();
-        }
-
-        [Fact]
-        public async void TestSendAsyncError()
-        {
-            var message = new Message()
-            {
-                Notification = new Notification
-                {
-                    Title = "Test",
-                    Body = "This is a test.",
-                },
-                Data = new Dictionary<string, string>()
-                    { { "score", "850" }, { "time", "2:45" }, },
-                Token = "Hello World",
-            };
-            this.firebaseMessagingAdapter.SendAsync(default)
-                .ReturnsForAnyArgs(
-                    Task.FromException<string>(new IOException()));
-
-            var error = await Assert.ThrowsAsync<QueryException>(async () =>
-            {
-                await this.firebaseMessagingManager.SendAsync(message);
-            });
-
-            Assert.Equal(
-                Error.FirebaseOperationError.ToString(),
-                error.Errors[0].Code);
-
-            this.firebaseMessagingAdapter.ClearSubstitute();
-        }
     }
 }

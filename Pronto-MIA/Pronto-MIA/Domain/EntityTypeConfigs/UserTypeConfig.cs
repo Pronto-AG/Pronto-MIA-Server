@@ -25,8 +25,11 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.Property(u => u.HashGeneratorOptions)
                 .IsRequired()
                 .HasColumnType("jsonb");
-            builder.HasMany<FcmToken>(u => u.FCMTokens)
+            builder.HasMany<FcmToken>(u => u.FcmTokens)
                 .WithOne(t => t.Owner);
+            builder.HasOne<AccessControlList>(u => u.AccessControlList)
+                .WithOne(a => a.User)
+                .HasForeignKey<AccessControlList>(acl => acl.UserId);
         }
     }
 }

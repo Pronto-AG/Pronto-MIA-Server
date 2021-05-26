@@ -1,5 +1,6 @@
 namespace Pronto_MIA.DataAccess
 {
+    using System;
     using Microsoft.EntityFrameworkCore;
     using Pronto_MIA.BusinessLogic.Security;
     using Pronto_MIA.Domain.Entities;
@@ -36,6 +37,11 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<FcmToken> FcmTokens { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing AccessControlLists.
+        /// </summary>
+        public DbSet<AccessControlList> AccessControlLists { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
@@ -44,21 +50,47 @@ namespace Pronto_MIA.DataAccess
            modelBuilder.ApplyConfiguration(new UserTypeConfig());
            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
+           modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
 
-           /*var generatorOptions = new Pbkdf2GeneratorOptions(
-               1500);
-           var generator = new Pbkdf2Generator(generatorOptions);
-           var hash = generator.HashPassword("HelloWorld");
-           var franz = new User(
-               "Franz",
-               hash,
-               Pbkdf2Generator.Identifier,
-               generator.GetOptions().ToJson())
-           {
-               Id = -1,
-           };
-
-           modelBuilder.Entity<User>().HasData(franz);*/
+           this.AddAdminUser(modelBuilder);
        }
+
+        private void AddAdminUser(ModelBuilder modelBuilder)
+        {
+            var acl = this.CreateAdminAcl();
+
+            var generatorOptions = new Pbkdf2GeneratorOptions(
+                1500, salt: Convert.FromBase64String(
+                    "A+16bv/SvaC7ZJgS7u+CB8nN32PBUAbJuT09NigsCzQx6/CxS1I/5l" +
+                    "aUaFoJNZ3QhTm4TqFnWYzokdrvrUxbOEN0MN3ZhINcblSLF9LwbZeiT0" +
+                    "nYOnQgTBEPL0KoszXdm8x2mYXHAJFYQ9KOsIZregzuiBQfSqsFfR2uDn" +
+                    "FHm9o="));
+            var generator = new Pbkdf2Generator(generatorOptions);
+            var hash = generator.HashPassword("ProntoMIA.");
+            var admin = new User(
+                "Admin",
+                hash,
+                Pbkdf2Generator.Identifier,
+                generator.GetOptions().ToJson())
+            {
+                Id = -1,
+            };
+
+            modelBuilder.Entity<AccessControlList>().HasData(acl);
+            modelBuilder.Entity<User>().HasData(admin);
+        }
+
+        private AccessControlList CreateAdminAcl()
+        {
+            return new AccessControlList
+            {
+                Id = -1,
+                UserId = -1,
+                CanEditUsers = true,
+                CanViewUsers = true,
+                CanEditDeploymentPlans = true,
+                CanViewDeploymentPlans = true,
+            };
+        }
     }
 }

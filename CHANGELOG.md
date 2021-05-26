@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Mutation endpoint "AddDeploymentPlan" for consistent naming.
+- Mutation endpoint "SendPushTo" since it is no longer necessary due to the "PublishDeploymentPlan" endpoint.
 
 ## [0.2.0] - 2021-05-18
 ### Added

@@ -81,24 +81,6 @@ namespace Pronto_MIA.DataAccess.Managers
             return invalidTokens;
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> SendAsync(Message message)
-        {
-            try
-            {
-                string response = await this.instance.SendAsync(message);
-                this.logger.LogTrace(
-                    "Successfully sent message {Message}", response);
-            }
-            catch (Exception error)
-            {
-                this.logger.LogWarning("Firebase error: {Error}", error);
-                throw Error.FirebaseOperationError.AsQueryException();
-            }
-
-            return true;
-        }
-
         /// <summary>
         /// Method to split the given list of tokens into a list of lists
         /// each containing a maximum of <see cref="maxTokensPerMessage"/>
