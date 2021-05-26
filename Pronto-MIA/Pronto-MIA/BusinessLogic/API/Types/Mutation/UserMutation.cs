@@ -1,3 +1,6 @@
+using System;
+using Microsoft.AspNetCore.Authorization;
+
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
@@ -118,6 +121,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// provided password does not meet the policy requirements.
         /// </exception>
         [Authorize(Policy = "CanEditUsers")]
+        [Authorize(Policy = "CanEditDepartments")]
         [Sensitive("password")]
         public async Task<User> UpdateUser(
             [Service] ProntoMiaDbContext dbContext,
@@ -160,7 +164,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             }
         }
 
-        [Authorize(Policy = "CanEditDepartments")]
         private async Task UpdateUserDepartment(
             IDepartmentManager departmentManager,
             int? departmentId,
