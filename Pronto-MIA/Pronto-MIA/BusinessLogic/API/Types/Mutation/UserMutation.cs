@@ -1,6 +1,3 @@
-using System;
-using Microsoft.AspNetCore.Authorization;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
@@ -137,7 +134,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             userManager.SetDbContext(dbContext);
             departmentManager.SetDbContext(dbContext);
             aclManager.SetDbContext(dbContext);
-
             await using (var dbContextTransaction = await
                 dbContext.Database.BeginTransactionAsync())
             {
