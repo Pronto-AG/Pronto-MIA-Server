@@ -9,7 +9,7 @@ namespace Tests.TestBusinessLogic.TestSecurity
         public void TestPasswordPolicyToShort()
         {
             var result = PasswordHelper.PasswordPolicyMet("H1-llo", 7);
-            Assert.Equal(PasswordHelper.PasswordPolicyViolation.Lenght, result);
+            Assert.Equal(PasswordHelper.PasswordPolicyViolation.Length, result);
         }
 
         [Fact]

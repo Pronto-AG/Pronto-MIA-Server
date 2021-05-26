@@ -23,7 +23,7 @@ namespace Pronto_MIA.BusinessLogic.Security
             /// <summary>
             /// The password is to short.
             /// </summary>
-            Lenght,
+            Length,
 
             /// <summary>
             /// The password does not contain a non alphanumeric
@@ -57,13 +57,13 @@ namespace Pronto_MIA.BusinessLogic.Security
 
         /// <summary>
         /// Checks if the currently active password policy ist met.
-        /// Whilst the password lenght can be defined by the config
+        /// Whilst the password length can be defined by the config
         /// the password must contain a digit, a lowercase character,
         /// a uppercase character and a non alphanumeric character.
         /// </summary>
         /// <param name="password">The password to check for policy
         /// compliance.</param>
-        /// <param name="minLenght">The minimal lenght the password should have.
+        /// <param name="minLength">The minimal length the password should have.
         /// </param>
         /// <returns>The first violation of the password policy that
         /// occured or <see cref="PasswordPolicyViolation.None"/> if no
@@ -71,9 +71,9 @@ namespace Pronto_MIA.BusinessLogic.Security
         public static PasswordPolicyViolation PasswordPolicyMet(
             string password, int minLenght)
         {
-            if (password.Length < minLenght)
+            if (password.Length < minLength)
             {
-                return PasswordPolicyViolation.Lenght;
+                return PasswordPolicyViolation.Length;
             }
 
             var state = new bool[arraySize];

@@ -34,7 +34,7 @@ The following options are available and have to be set in order for the applicat
 - `StaticFiles:ROOT_DIRECTORY` -> The directory where static files served by the application will be stored. This option contains an absolute path to the target directory.
 
 #### User
-- `User:MIN_PASSWORD_LENGHT` -> The minimum lenght a users Password must have. Since the password always needs to contain a digit, a lowercase character, a uppercase character and a non alphanumeric character this value has to be over `4`. Setting this value lower than `10` is not recommendet.
+- `User:MIN_PASSWORD_LENGTH` -> The minimum length a users Password must have. Since the password always needs to contain a digit, a lowercase character, a uppercase character and a non alphanumeric character this value has to be over `4`. Setting this value lower than `10` is not recommendet.
 
 #### JWT
 - `JWT:ISSUER` -> The issuer used to sign authentication tokens created by this application.
