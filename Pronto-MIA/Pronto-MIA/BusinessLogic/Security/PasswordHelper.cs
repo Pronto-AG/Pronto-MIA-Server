@@ -69,7 +69,7 @@ namespace Pronto_MIA.BusinessLogic.Security
         /// occured or <see cref="PasswordPolicyViolation.None"/> if no
         /// violation occured.</returns>
         public static PasswordPolicyViolation PasswordPolicyMet(
-            string password, int minLenght)
+            string password, int minLength)
         {
             if (password.Length < minLength)
             {
