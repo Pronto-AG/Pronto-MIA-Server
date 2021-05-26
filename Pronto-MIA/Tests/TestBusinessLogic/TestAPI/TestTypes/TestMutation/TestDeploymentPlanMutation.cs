@@ -1,32 +1,25 @@
-#nullable enable
-namespace Tests.TestBusinessLogic.TestAPI
+namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
     using FirebaseAdmin.Messaging;
-    using HotChocolate.Execution;
     using HotChocolate.Types;
-    using Microsoft.EntityFrameworkCore;
     using NSubstitute;
-    using Pronto_MIA.BusinessLogic.API;
-    using Pronto_MIA.BusinessLogic.API.Types;
+    using Pronto_MIA.BusinessLogic.API.Types.Mutation;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
-    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
-    public class TestMutation
+    public class TestDeploymentPlanMutation
     {
         private readonly ProntoMiaDbContext dbContext;
-        private readonly Mutation mutation;
+        private readonly DeploymentPlanMutation deploymentPlanMutation;
 
-        public TestMutation()
+        public TestDeploymentPlanMutation()
         {
             this.dbContext = TestHelpers.InMemoryDbContext;
             TestDataProvider.InsertTestData(this.dbContext);
-            this.mutation = new Mutation();
+            this.deploymentPlanMutation = new DeploymentPlanMutation();
         }
 
         [Fact]
@@ -35,7 +28,7 @@ namespace Tests.TestBusinessLogic.TestAPI
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            await this.mutation.CreateDeploymentPlan(
+            await this.deploymentPlanMutation.CreateDeploymentPlan(
                 deploymentPlanManager,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,
@@ -52,7 +45,7 @@ namespace Tests.TestBusinessLogic.TestAPI
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            await this.mutation.UpdateDeploymentPlan(
+            await this.deploymentPlanMutation.UpdateDeploymentPlan(
                 deploymentPlanManager,
                 5,
                 Substitute.For<IFile>(),
@@ -76,7 +69,7 @@ namespace Tests.TestBusinessLogic.TestAPI
             firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
-            var result = await this.mutation.PublishDeploymentPlan(
+            var res = await this.deploymentPlanMutation.PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
                 firebaseTokenManager,
@@ -84,7 +77,7 @@ namespace Tests.TestBusinessLogic.TestAPI
                 "Hello World",
                 "This is the notification body.");
 
-            Assert.True(result);
+            Assert.True(res);
             await deploymentPlanManager.ReceivedWithAnyArgs().Publish(default);
             await firebaseMessagingManager.ReceivedWithAnyArgs()
                 .SendMulticastAsync(
@@ -108,7 +101,8 @@ namespace Tests.TestBusinessLogic.TestAPI
             firebaseTokenManager.GetAllFcmToken().Returns(
                 this.dbContext.FcmTokens);
 
-            var result = await this.mutation.PublishDeploymentPlan(
+            var result = await this.deploymentPlanMutation
+                .PublishDeploymentPlan(
                 deploymentPlanManager,
                 firebaseMessagingManager,
                 firebaseTokenManager,
@@ -131,7 +125,7 @@ namespace Tests.TestBusinessLogic.TestAPI
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            await this.mutation
+            await this.deploymentPlanMutation
                 .HideDeploymentPlan(deploymentPlanManager, 1);
 
             await deploymentPlanManager.Received().Hide(1);
@@ -143,73 +137,12 @@ namespace Tests.TestBusinessLogic.TestAPI
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
 
-            await this.mutation.RemoveDeploymentPlan(
+            await this.deploymentPlanMutation.RemoveDeploymentPlan(
                 deploymentPlanManager,
                 5);
 
             await deploymentPlanManager.Received()
                 .Remove(5);
-        }
-
-        [Fact]
-        public async void TestRegisterFcmToken()
-        {
-            var firebaseTokenManager =
-                Substitute.For<IFirebaseTokenManager>();
-            var userTask = this.dbContext.Users
-                .SingleOrDefaultAsync(u => u.UserName == "Bob");
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.GetByUserName("Bob").Returns(userTask);
-
-            await this.mutation.RegisterFcmToken(
-                firebaseTokenManager,
-                userManager,
-                new ApiUserState("5", "Bob"),
-                "Hello World");
-
-            await userManager.Received().GetByUserName("Bob");
-            await firebaseTokenManager.Received()
-                .RegisterFcmToken(await userTask, "Hello World");
-        }
-
-        [Fact]
-        public async void TestRegisterFcmTokenError()
-        {
-            var firebaseTokenManager =
-                Substitute.For<IFirebaseTokenManager>();
-            var userManager =
-                Substitute.For<IUserManager>();
-            userManager.GetByUserName("Bob").Returns(
-                Task.FromResult<User?>(default));
-
-            var error = await Assert.ThrowsAsync<QueryException>(
-                async () =>
-                {
-                    await this.mutation.RegisterFcmToken(
-                        firebaseTokenManager,
-                        userManager,
-                        new ApiUserState("5", "Bob"),
-                        "Hello World");
-                });
-
-            Assert.Equal(
-                Error.UserNotFound.ToString(),
-                error.Errors[0].Code);
-        }
-
-        [Fact]
-        public async void TestUnregisterFcmToken()
-        {
-            var firebaseTokenManager =
-                Substitute.For<IFirebaseTokenManager>();
-
-            await this.mutation.UnregisterFcmToken(
-                firebaseTokenManager,
-                "Hello World");
-
-            await firebaseTokenManager.Received()
-                .UnregisterFcmToken("Hello World");
         }
     }
 }
