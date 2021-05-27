@@ -13,7 +13,8 @@ namespace Tests.TestBusinessLogic.TestSecurity
             var user = new User(
                 "Fritz",
                 new byte[2],
-                Pbkdf2Generator.Identifier);
+                Pbkdf2Generator.Identifier,
+                "{}");
             var generator = HashGeneratorFactory.GetGeneratorForUser(user);
 
             Assert.IsType<Pbkdf2Generator>(generator);
@@ -25,7 +26,8 @@ namespace Tests.TestBusinessLogic.TestSecurity
             var user = new User(
                 "Fritz",
                 new byte[2],
-                "Bcrypt");
+                "Bcrypt",
+                "{}");
 
             Assert.Throws<ArgumentException>(() =>
                 HashGeneratorFactory.GetGeneratorForUser(user));

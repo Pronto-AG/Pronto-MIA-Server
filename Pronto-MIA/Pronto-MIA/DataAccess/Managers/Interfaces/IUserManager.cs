@@ -12,6 +12,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IUserManager
     {
         /// <summary>
+        /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
+        /// used by the manager. This can be used if transactions
+        /// over multiple managers have to be implemented.
+        /// </summary>
+        /// <param name="dbContext">The db context to be used by the
+        /// manager.</param>
+        public void SetDbContext(ProntoMiaDbContext dbContext);
+
+        /// <summary>
         /// Method to authenticate a user.
         /// </summary>
         /// <param name="userName">The username of the user to be authenticated.
@@ -66,7 +75,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Alternatively returns PasswordTooWeak exception if the
         /// provided password does not meet the policy requirements.
         /// </exception>
-        public Task<User> Update(int id, string? userName, string? password);
+        public Task<User> Update(
+            int id, string? userName, string? password);
 
         /// <summary>
         /// Removes the user with the given id.
@@ -77,5 +87,14 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// exception if the user with the given id could not be found.
         /// </exception>
         public Task<int> Remove(int id);
+
+        /// <summary>
+        /// Method to get a user with the help of its id.
+        /// </summary>
+        /// <param name="id">The id of the user.</param>
+        /// <returns>The user with the given id.</returns>
+        /// <exception cref="QueryException">If the user with the
+        /// given id could not be found.</exception>
+        public Task<User> GetById(int id);
     }
 }

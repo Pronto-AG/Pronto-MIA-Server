@@ -17,6 +17,16 @@ namespace Pronto_MIA.Domain.Entities
         CanEditUsers,
 
         /// <summary>
+        /// Permission to view all departments.
+        /// </summary>
+        CanViewDepartments,
+
+        /// <summary>
+        /// Permission to edit all departments.
+        /// </summary>
+        CanEditDepartments,
+
+        /// <summary>
         /// Permission to view all deployment plans.
         /// </summary>
         CanViewDeploymentPlans,

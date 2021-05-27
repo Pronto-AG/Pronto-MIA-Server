@@ -28,9 +28,8 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
         private async Task TestAllowed()
         {
             var user = await this.AddUserToDb();
-            var acl = new AccessControlList()
+            var acl = new AccessControlList(user.Id)
             {
-                UserId = user.Id,
                 CanViewDeploymentPlans = true,
             };
             this.dbContext.AccessControlLists.Add(acl);
@@ -53,9 +52,8 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
         private async Task TestForbidden()
         {
             var user = await this.AddUserToDb();
-            var acl = new AccessControlList()
+            var acl = new AccessControlList(user.Id)
             {
-                UserId = user.Id,
                 CanViewDeploymentPlans = true,
             };
             this.dbContext.AccessControlLists.Add(acl);

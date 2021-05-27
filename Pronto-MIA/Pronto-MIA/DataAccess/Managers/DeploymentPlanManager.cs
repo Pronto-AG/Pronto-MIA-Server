@@ -46,7 +46,7 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>>
+        public async Task<DeploymentPlan>
             Create(
                 IFile file,
                 DateTime availableFrom,
@@ -74,11 +74,11 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogInformation(
                 "Deployment plan with id {Id} has been created",
                 deploymentPlan.Id);
-            return this.GetQueryableById(deploymentPlan.Id);
+            return deploymentPlan;
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<DeploymentPlan>>
+        public async Task<DeploymentPlan>
             Update(
                 int id,
                 IFile? file,
@@ -99,7 +99,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogInformation(
                 "Deployment plan with id {Id} has been updated",
                 deploymentPlan.Id);
-            return this.GetQueryableById(id);
+            return deploymentPlan;
         }
 
         /// <inheritdoc/>
@@ -193,19 +193,6 @@ namespace Pronto_MIA.DataAccess.Managers
             }
 
             throw Error.DeploymentPlanImpossibleTime.AsQueryException();
-        }
-
-        /// <summary>
-        /// Method to get a deployment plan queryable with the help of the
-        /// deployment plan id.
-        /// </summary>
-        /// <param name="id">The id of the deployment plan.</param>
-        /// <returns>IQueryable witch might contain the Deployment plan
-        /// with said id.</returns>
-        private IQueryable<DeploymentPlan> GetQueryableById(int id)
-        {
-            return this.dbContext.DeploymentPlans
-                .Where(dP => dP.Id == id);
         }
 
         /// <summary>

@@ -10,6 +10,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IAccessControlListManager
     {
         /// <summary>
+        /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
+        /// used by the manager. This can be used if transactions
+        /// over multiple managers have to be implemented.
+        /// </summary>
+        /// <param name="dbContext">The db context to be used by the
+        /// manager.</param>
+        public void SetDbContext(ProntoMiaDbContext dbContext);
+
+        /// <summary>
         /// Links a given <see cref="AccessControlList"/>
         /// to the user identified by the id. If a
         /// <see cref="AccessControlList"/> for the user

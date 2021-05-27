@@ -63,6 +63,13 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Username already taken";
                 case DataAccess.Error.UserNotFound:
                     return "Could not find given user";
+                case DataAccess.Error.DepartmentAlreadyExists:
+                    return "Name of department already in use";
+                case DataAccess.Error.DepartmentNotFound:
+                    return "Could not find given department";
+                case DataAccess.Error.DepartmentInUse:
+                    return "Department cannot be deleted since it still has " +
+                           "members.";
                 case DataAccess.Error.DeploymentPlanNotFound:
                     return "Could not find given deployment plan";
                 case DataAccess.Error.DeploymentPlanImpossibleTime:
@@ -80,8 +87,10 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "A file operation error occured";
                 case DataAccess.Error.UnknownError:
                     return "An unknown internal error occured";
-                default: throw new ArgumentException(
-                    "Unhandled data access exception");
+                default:
+                    throw new ArgumentException(
+                        "Unknown data access exception " +
+                        $"\"{error.ToString()}\"");
             }
         }
 

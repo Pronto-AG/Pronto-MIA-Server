@@ -60,6 +60,7 @@ namespace Pronto_MIA
                 FirebaseMessagingManager>();
             services.AddScoped<IAccessControlListManager,
                 AccessControlListManager>();
+            services.AddScoped<IDepartmentManager, DepartmentManager>();
             services.AddDatabaseService(this.Cfg);
             services.AddAuthorization();
             services.AddCors(options =>

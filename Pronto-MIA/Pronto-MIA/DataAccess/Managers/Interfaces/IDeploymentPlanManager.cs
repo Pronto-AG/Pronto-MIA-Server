@@ -31,8 +31,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// is treated as active.</param>
         /// <param name="description">A short description to identify the
         /// deployment plan.</param>
-        /// <returns>Queryable object of the deployment plan.</returns>
-        public Task<IQueryable<DeploymentPlan>>
+        /// <returns>The new deployment plan.</returns>
+        public Task<DeploymentPlan>
             Create(
                 IFile file,
                 DateTime availableFrom,
@@ -40,7 +40,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
                 string? description);
 
         /// <summary>
-        /// Updates the deployment plan with the given id.
+        /// Updates the deployment plan identified by the given id.
         /// </summary>
         /// <param name="id">The id of the deployment plan to be updated.
         /// </param>
@@ -52,10 +52,10 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// plan is treated as active.</param>
         /// <param name="description">New description to identify the
         /// deployment plan.</param>
-        /// <returns>Queryable object of the deployment plan.</returns>
+        /// <returns>The updated deployment plan.</returns>
         /// <exception cref="QueryException">If the deployment plan to be
         /// updated could not be found.</exception>
-        public Task<IQueryable<DeploymentPlan>>
+        public Task<DeploymentPlan>
             Update(
                 int id,
                 IFile? file,
@@ -64,7 +64,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
                 string? description);
 
         /// <summary>
-        /// Sets the status of the deployment plan with the given id to
+        /// Sets the status of the deployment plan identified by the given id to
         /// published.
         /// </summary>
         /// <param name="id">Id of the deployment plan to be published.</param>
@@ -75,7 +75,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         public Task<bool> Publish(int id);
 
         /// <summary>
-        /// Sets the status of the deployment plan with the given id to
+        /// Sets the status of the deployment plan identified by the given id to
         /// not published.
         /// </summary>
         /// <param name="id">Id of the deployment plan.</param>
@@ -86,7 +86,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         public Task<bool> Hide(int id);
 
         /// <summary>
-        /// Removes the deployment plan with the given id.
+        /// Removes the deployment plan identified by the given id.
         /// </summary>
         /// <param name="id">Id of the deployment plan to be removed.</param>
         /// <returns>The id of the deployment plan that was removed.</returns>
@@ -105,8 +105,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// </summary>
         /// <param name="id">The id of the deployment plan.</param>
         /// <returns>The deployment plan with the given id.</returns>
-        /// <exception cref="QueryException">If the deployment plan with the
-        /// given id could not be found.</exception>
+        /// <exception cref="QueryException">If the deployment plan
+        /// with the given id could not be found.</exception>
         public Task<DeploymentPlan> GetById(int id);
     }
 }

@@ -13,23 +13,24 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class AccessControlListManager : IAccessControlListManager
     {
-        private readonly ProntoMiaDbContext dbContext;
-        private readonly ILogger logger;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the
         /// <see cref="AccessControlListManager"/> class.
         /// </summary>
-        /// <param name="logger">The logger to be used in order to document
-        /// events regarding this manager.</param>
         /// <param name="dbContext">The database context where object are
         /// persisted.</param>
         public AccessControlListManager(
-            ProntoMiaDbContext dbContext,
-            ILogger<AccessControlListManager> logger)
+            ProntoMiaDbContext dbContext)
         {
-            this.logger = logger;
             this.dbContext = dbContext;
+        }
+
+        /// <inheritdoc/>
+        public void SetDbContext(ProntoMiaDbContext context)
+        {
+            this.dbContext = context;
         }
 
         /// <inheritdoc/>

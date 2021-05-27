@@ -24,6 +24,25 @@ namespace Pronto_MIA.DataAccess
         UserNotFound,
 
         /// <summary>
+        /// Error code representing that the department which should have been
+        /// created already exists and can therefore not be created in a unique
+        /// manner.
+        /// </summary>
+        DepartmentAlreadyExists,
+
+        /// <summary>
+        /// Error code representing that the department searched for could not
+        /// be found.
+        /// </summary>
+        DepartmentNotFound,
+
+        /// <summary>
+        /// Error code representing that the department to be deleted still has
+        /// users associated.
+        /// </summary>
+        DepartmentInUse,
+
+        /// <summary>
         /// Error code representing that the deployment plan searched for could
         /// not be found.
         /// </summary>

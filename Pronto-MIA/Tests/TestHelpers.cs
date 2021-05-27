@@ -2,6 +2,7 @@ namespace Tests
 {
     using System;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Diagnostics;
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.DataAccess;
 
@@ -13,6 +14,11 @@ namespace Tests
             {
                 var options = new DbContextOptionsBuilder<ProntoMiaDbContext>()
                     .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                    .ConfigureWarnings(builder =>
+                    {
+                        builder.Ignore(
+                            InMemoryEventId.TransactionIgnoredWarning);
+                    })
                     .Options;
                 options.Freeze();
                 return new ProntoMiaDbContext(options);

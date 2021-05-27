@@ -32,9 +32,9 @@ namespace Pronto_MIA.DataAccess.Managers
             = new Pbkdf2Generator(
                 (Pbkdf2GeneratorOptions)DefaultHashGeneratorOptions);
 
-        private readonly ProntoMiaDbContext dbContext;
         private readonly IConfiguration cfg;
         private readonly ILogger logger;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserManager"/> class.
@@ -68,6 +68,12 @@ namespace Pronto_MIA.DataAccess.Managers
 
         private int ValidForDays =>
             this.cfg.GetValue<int>("JWT:VALID_FOR_DAYS");
+
+        /// <inheritdoc/>
+        public void SetDbContext(ProntoMiaDbContext context)
+        {
+            this.dbContext = context;
+        }
 
         /// <inheritdoc/>
         public async Task<string> Authenticate(
@@ -122,7 +128,8 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<User> Create(string userName, string password)
+        public async Task<User> Create(
+            string userName, string password)
         {
             var checkUserName = await this.GetByUserName(userName);
             if (checkUserName != default)
@@ -179,6 +186,22 @@ namespace Pronto_MIA.DataAccess.Managers
             return id;
         }
 
+        /// <inheritdoc/>
+        public async Task<User> GetById(int id)
+        {
+            var user = await this.dbContext.Users
+                .SingleOrDefaultAsync(u => u.Id == id);
+            if (user != default)
+            {
+                return user;
+            }
+
+            this.logger.LogWarning(
+                "Invalid user id {Id}", id);
+            throw DataAccess.Error.UserNotFound
+                .AsQueryException();
+        }
+
         private string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -227,28 +250,6 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger.LogDebug(
                 "Password-hash for User {UserName} has been updated",
                 user.UserName);
-        }
-
-        /// <summary>
-        /// Method to get a user with the help of its id.
-        /// </summary>
-        /// <param name="id">The id of the user.</param>
-        /// <returns>The user with the given id.</returns>
-        /// <exception cref="QueryException">If the user with the
-        /// given id could not be found.</exception>
-        private async Task<User> GetById(int id)
-        {
-            var user = await this.dbContext.Users
-                .SingleOrDefaultAsync(u => u.Id == id);
-            if (user != default)
-            {
-                return user;
-            }
-
-            this.logger.LogWarning(
-                "Invalid user id {Id}", id);
-            throw DataAccess.Error.UserNotFound
-                .AsQueryException();
         }
 
         /// <summary>
