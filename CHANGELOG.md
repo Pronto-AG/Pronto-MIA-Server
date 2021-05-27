@@ -10,7 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mutation endpoint "CreateUser" to add a user to the application.
 - Mutation endpoint "UpdateUser" to update a user of the application.
 - Mutation endpoint "RemoveUser" to remove a user from the application.
-- Mutation endpoint "CreateDeploymentPlan" to replace "AddDeploymentPlan"
+- Mutation endpoint "CreateDeploymentPlan" to replace "AddDeploymentPlan".
+- Mutation endpoint "CreateDepartment" to add a Department to the application.
+- Mutation endpoint "UpdateDepartment" to update a Department of the application.
+- Mutation endpoint "RemoveDepartment" to remove a Department from the application.
+
+## Changed
+- Permissions are no longer global but can be defined more specific in the users access control list.
 
 ### Removed
 - Mutation endpoint "AddDeploymentPlan" for consistent naming.

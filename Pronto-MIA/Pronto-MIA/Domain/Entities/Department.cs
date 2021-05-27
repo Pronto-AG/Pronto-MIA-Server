@@ -31,5 +31,11 @@ namespace Pronto_MIA.Domain.Entities
         /// department.
         /// </summary>
         public virtual ICollection<User> Users { get; set; }
+
+        /// <summary>
+        /// Gets or sets list of <see cref="DeploymentPlan"/> belonging to this
+        /// department.
+        /// </summary>
+        public virtual ICollection<DeploymentPlan> DeploymentPlans { get; set; }
     }
 }

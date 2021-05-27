@@ -25,6 +25,10 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
                 .WithOne(u => u.Department)
                 .HasForeignKey(u => u.DepartmentId)
                 .OnDelete(DeleteBehavior.SetNull);
+            builder.HasMany<DeploymentPlan>(d => d.DeploymentPlans)
+                .WithOne(dp => dp.Department)
+                .HasForeignKey(dp => dp.DepartmentId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
