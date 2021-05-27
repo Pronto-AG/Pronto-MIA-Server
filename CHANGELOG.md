@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Changed
 - Permissions are no longer global but can be defined more specific in the users access control list.
+- Adjusted mutation endpoint "PublishDeploymentPlan" to only send notifications to the department linked to the deployment plan.
 
 ### Removed
 - Mutation endpoint "AddDeploymentPlan" for consistent naming.
