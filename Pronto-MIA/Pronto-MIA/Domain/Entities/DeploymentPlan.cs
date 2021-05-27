@@ -102,7 +102,7 @@ namespace Pronto_MIA.Domain.Entities
         /// deployment plan.
         /// </summary>
         [GraphQLIgnore]
-        public int DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
 
         /// <summary>
         /// Gets or sets the department associated with this deployment

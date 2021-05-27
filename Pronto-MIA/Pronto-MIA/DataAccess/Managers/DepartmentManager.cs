@@ -106,6 +106,18 @@ namespace Pronto_MIA.DataAccess.Managers
             await this.dbContext.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
+        public async Task AddDeploymentPlan(
+            int departmentId, DeploymentPlan deploymentPlan)
+        {
+            // Check if id exists
+            await this.GetById(departmentId);
+
+            deploymentPlan.DepartmentId = departmentId;
+            this.dbContext.Update(deploymentPlan);
+            await this.dbContext.SaveChangesAsync();
+        }
+
         private async Task<Department> GetById(int id)
         {
             var department = await this.dbContext.Departments

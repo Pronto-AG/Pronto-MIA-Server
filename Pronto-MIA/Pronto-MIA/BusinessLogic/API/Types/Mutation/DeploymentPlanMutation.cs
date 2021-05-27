@@ -12,6 +12,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
+    using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -26,39 +27,66 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <summary>
         /// Adds a deployment plan to the application.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure transactional safety.</param>
         /// <param name="deploymentPlanManager">The manager responsible for
         /// managing deployment plans.</param>
+        /// <param name="departmentManager">The manager responsible for managing
+        /// the departments linked to the deployment plans.</param>
         /// <param name="file">The file to be associated with the new deployment
         /// plan.</param>
         /// <param name="availableFrom">The moment from which the deployment
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="departmentId">The id of the department the new
+        /// deployment plan should be linked to.</param>
         /// <param name="description">Short description to identify the
         /// deployment plan.</param>
         /// <returns>The newly generated deployment plan.</returns>
         [Authorize(Policy = "CanEditDeploymentPlans")]
         [UseSingleOrDefault]
         public async Task<DeploymentPlan> CreateDeploymentPlan(
+            [Service] ProntoMiaDbContext dbContext,
             [Service] IDeploymentPlanManager deploymentPlanManager,
+            [Service] IDepartmentManager departmentManager,
             IFile file,
             DateTime availableFrom,
             DateTime availableUntil,
+            int departmentId,
             string? description)
         {
-            return await deploymentPlanManager.Create(
-                file,
-                availableFrom,
-                availableUntil,
-                description);
+            deploymentPlanManager.SetDbContext(dbContext);
+            departmentManager.SetDbContext(dbContext);
+
+            await using (var dbContextTransaction = await
+                dbContext.Database.BeginTransactionAsync())
+            {
+                var deploymentPlan = await deploymentPlanManager.Create(
+                    file,
+                    availableFrom,
+                    availableUntil,
+                    description);
+                await departmentManager.AddDeploymentPlan(
+                    departmentId, deploymentPlan);
+
+                await dbContextTransaction.CommitAsync();
+                return deploymentPlan;
+            }
         }
 
         /// <summary>
         /// Method that updates the deployment plan with the given id according
         /// to the provided information.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure transactional safety.</param>
         /// <param name="deploymentPlanManager">The manager responsible for
         /// managing deployment plans.</param>
+        /// <param name="departmentManager">The manager responsible for managing
+        /// the departments linked to the deployment plans.</param>
         /// <param name="id">The id of the deployment plan to be adjusted.
         /// </param>
         /// <param name="file">The file to be associated with the new deployment
@@ -67,6 +95,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// plan will be treated as active.</param>
         /// <param name="availableUntil">The moment until which the deployment
         /// plan will be treated as active.</param>
+        /// <param name="departmentId">The id of the department the
+        /// deployment plan should be linked to.</param>
         /// <param name="description">Short description to identify the
         /// deployment plan.</param>
         /// <returns>The updated deployment plan.</returns>
@@ -75,15 +105,33 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// </exception>
         [Authorize(Policy = "CanEditDeploymentPlans")]
         public async Task<DeploymentPlan> UpdateDeploymentPlan(
+            [Service] ProntoMiaDbContext dbContext,
             [Service] IDeploymentPlanManager deploymentPlanManager,
+            [Service] IDepartmentManager departmentManager,
             int id,
             IFile? file,
             DateTime? availableFrom,
             DateTime? availableUntil,
+            int? departmentId,
             string? description)
         {
-            return await deploymentPlanManager.Update(
-                id, file, availableFrom, availableUntil, description);
+            deploymentPlanManager.SetDbContext(dbContext);
+            departmentManager.SetDbContext(dbContext);
+
+            await using (var dbContextTransaction = await
+                dbContext.Database.BeginTransactionAsync())
+            {
+                var deploymentPlan = await deploymentPlanManager.Update(
+                    id,
+                    file,
+                    availableFrom,
+                    availableUntil,
+                    description);
+                await this.UpdateDeploymentPlanDepartment(
+                    departmentManager, departmentId, deploymentPlan);
+                await dbContextTransaction.CommitAsync();
+                return deploymentPlan;
+            }
         }
 
         /// <summary>
@@ -179,6 +227,18 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             int id)
         {
             return await deploymentPlanManager.Remove(id);
+        }
+
+        private async Task UpdateDeploymentPlanDepartment(
+            IDepartmentManager departmentManager,
+            int? departmentId,
+            DeploymentPlan deploymentPlan)
+        {
+            if (departmentId != null)
+            {
+                await departmentManager.AddDeploymentPlan(
+                    departmentId.Value, deploymentPlan);
+            }
         }
     }
 }

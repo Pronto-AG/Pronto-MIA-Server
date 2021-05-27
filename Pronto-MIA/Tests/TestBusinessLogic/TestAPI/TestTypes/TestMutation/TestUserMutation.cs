@@ -40,6 +40,9 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 acl,
                 5);
 
+            userManager.Received().SetDbContext(this.dbContext);
+            aclManager.Received().SetDbContext(this.dbContext);
+            departmentManager.Received().SetDbContext(this.dbContext);
             await userManager.Received()
                 .Create("Ruedi", "HelloWorld1-");
             await aclManager.Received()
@@ -69,12 +72,13 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 acl,
                 5);
 
+            userManager.Received().SetDbContext(this.dbContext);
+            aclManager.Received().SetDbContext(this.dbContext);
+            departmentManager.Received().SetDbContext(this.dbContext);
             await userManager.Received()
                 .Update(1, "Ruedi", "HelloWorld1-");
-            await aclManager.Received()
-                .LinkAccessControlList(1, acl);
-            await departmentManager.Received()
-                .AddUser(5, Arg.Any<User>());
+            await aclManager.Received().LinkAccessControlList(1, acl);
+            await departmentManager.Received().AddUser(5, Arg.Any<User>());
         }
 
         [Fact]
@@ -98,12 +102,13 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 null,
                 5);
 
+            userManager.Received().SetDbContext(this.dbContext);
+            departmentManager.Received().SetDbContext(this.dbContext);
             await userManager.Received()
                 .Update(1, "Ruedi", "HelloWorld1-");
             await aclManager.DidNotReceiveWithAnyArgs()
                 .LinkAccessControlList(Arg.Any<int>(), default);
-            await departmentManager.Received()
-                .AddUser(5, Arg.Any<User>());
+            await departmentManager.Received().AddUser(5, Arg.Any<User>());
         }
 
         [Fact]
@@ -126,6 +131,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 new AccessControlList(0),
                 null);
 
+            userManager.Received().SetDbContext(this.dbContext);
+            aclManager.Received().SetDbContext(this.dbContext);
             await userManager.Received()
                 .Update(1, "Ruedi", "HelloWorld1-");
             await aclManager.Received()

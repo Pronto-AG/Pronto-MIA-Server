@@ -77,5 +77,28 @@ namespace Tests
                 context.SaveChanges();
             }
         }
+        
+        private static void InsertDeploymentPlans(ProntoMiaDbContext context)
+        {
+            if (!context.DeploymentPlans.Any())
+            {
+                var deploymentPlan1 = new DeploymentPlan(
+                    DateTime.MinValue,
+                    DateTime.MaxValue,
+                    Guid.NewGuid(), 
+                    ".exe",
+                    "First test plan");
+                var deploymentPlan2 = new DeploymentPlan(
+                    DateTime.MinValue.AddDays(2),
+                    DateTime.MaxValue.AddDays(-2),
+                    Guid.NewGuid(),
+                    ".exe",
+                    "First test plan");
+
+                context.DeploymentPlans.AddRange(
+                    deploymentPlan1, deploymentPlan2);
+                context.SaveChanges();
+            }
+        }
     }
 }

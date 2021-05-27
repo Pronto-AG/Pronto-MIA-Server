@@ -304,6 +304,28 @@ namespace Tests.TestDataAccess.TestManagers
             await this.dbContext.SaveChangesAsync();
         }
 
+        [Fact]
+        public async Task TestAddDeploymentPlan()
+        {
+            var departmentName = "HR";
+            var department = new Department(departmentName);
+            this.dbContext.Departments.Add(department);
+            await this.dbContext.SaveChangesAsync();
+            var deploymentPlan = await this.dbContext.DeploymentPlans
+                .FirstAsync();
+
+            await this.departmentManager.AddDeploymentPlan(
+                department.Id, deploymentPlan);
+
+            Assert.NotNull(deploymentPlan.DepartmentId);
+            Assert.Equal(
+                department.Id,
+                deploymentPlan.DepartmentId);
+
+            this.dbContext.Departments.Remove(department);
+            await this.dbContext.SaveChangesAsync();
+        }
+
         private async Task<User> AddUserToDb()
         {
             var user = new User(

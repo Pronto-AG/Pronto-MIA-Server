@@ -8,6 +8,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
     using Pronto_MIA.BusinessLogic.API.Types.Mutation;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestDeploymentPlanMutation
@@ -27,16 +28,25 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         {
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
+            var departmentManager =
+                Substitute.For<IDepartmentManager>();
 
             await this.deploymentPlanMutation.CreateDeploymentPlan(
+                this.dbContext,
                 deploymentPlanManager,
+                departmentManager,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,
                 DateTime.UtcNow,
+                5,
                 string.Empty);
 
+            deploymentPlanManager.Received().SetDbContext(this.dbContext);
+            departmentManager.Received().SetDbContext(this.dbContext);
             await deploymentPlanManager.ReceivedWithAnyArgs()
                 .Create(default!, default, default, default);
+            await departmentManager.Received().AddDeploymentPlan(
+                5, Arg.Any<DeploymentPlan>());
         }
 
         [Fact]
@@ -44,17 +54,52 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         {
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
+            var departmentManager =
+                Substitute.For<IDepartmentManager>();
 
             await this.deploymentPlanMutation.UpdateDeploymentPlan(
+                this.dbContext,
                 deploymentPlanManager,
+                departmentManager,
                 5,
                 Substitute.For<IFile>(),
                 DateTime.UtcNow,
                 DateTime.UtcNow,
+                5,
                 string.Empty);
 
+            deploymentPlanManager.Received().SetDbContext(this.dbContext);
+            departmentManager.Received().SetDbContext(this.dbContext);
             await deploymentPlanManager.ReceivedWithAnyArgs()
                 .Update(default, default, default, default, default);
+            await departmentManager.Received().AddDeploymentPlan(
+                5, Arg.Any<DeploymentPlan>());
+        }
+
+        [Fact]
+        public async void TestUpdateDeploymentPlanEmptyDepartment()
+        {
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+            var departmentManager =
+                Substitute.For<IDepartmentManager>();
+
+            await this.deploymentPlanMutation.UpdateDeploymentPlan(
+                this.dbContext,
+                deploymentPlanManager,
+                departmentManager,
+                5,
+                Substitute.For<IFile>(),
+                DateTime.UtcNow,
+                DateTime.UtcNow,
+                null,
+                string.Empty);
+
+            deploymentPlanManager.Received().SetDbContext(this.dbContext);
+            await deploymentPlanManager.ReceivedWithAnyArgs()
+                .Update(default, default, default, default, default);
+            await departmentManager.DidNotReceiveWithAnyArgs()
+                .AddDeploymentPlan(Arg.Any<int>(), Arg.Any<DeploymentPlan>());
         }
 
         [Fact]
