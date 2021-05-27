@@ -247,8 +247,8 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.Departments.Add(department);
             await this.dbContext.SaveChangesAsync();
 
-            var deploymentPlans = this.departmentManager.GetAll();
-            Assert.Equal(3, await deploymentPlans.CountAsync());
+            var departments = this.departmentManager.GetAll();
+            Assert.Equal(3, await departments.CountAsync());
 
             this.dbContext.Remove(department);
             await this.dbContext.SaveChangesAsync();
@@ -265,8 +265,8 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.Departments.Add(department2);
             await this.dbContext.SaveChangesAsync();
 
-            var deploymentPlans = this.departmentManager.GetAll();
-            Assert.Equal(4, await deploymentPlans.CountAsync());
+            var departments = this.departmentManager.GetAll();
+            Assert.Equal(4, await departments.CountAsync());
 
             this.dbContext.Remove(department1);
             this.dbContext.Remove(department2);
@@ -280,8 +280,8 @@ namespace Tests.TestDataAccess.TestManagers
                 this.dbContext.Departments);
             await this.dbContext.SaveChangesAsync();
 
-            var deploymentPlans = this.departmentManager.GetAll();
-            Assert.Empty(deploymentPlans);
+            var departments = this.departmentManager.GetAll();
+            Assert.Empty(departments);
 
             TestDataProvider.InsertTestData(this.dbContext);
         }

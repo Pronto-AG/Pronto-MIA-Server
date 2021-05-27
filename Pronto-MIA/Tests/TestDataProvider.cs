@@ -13,6 +13,7 @@ namespace Tests
             InsertUsers(context);
             InsertTokens(context);
             InsertDepartments(context);
+            InsertDeploymentPlans(context);
         }
 
         [SuppressMessage(

@@ -154,6 +154,80 @@ namespace Tests.TestDataAccess.TestManagers
                 .GetAllFcmToken().ToListAsync();
 
             Assert.Equal(result.First(), testToken);
+
+            this.dbContext.Remove(testToken);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async void TestGetDepartmentTokensNone()
+        {
+            var department = await this.dbContext.Departments.FirstAsync();
+            var testToken = new FcmToken(
+                Guid.NewGuid().ToString(), this.dbContext.Users.First());
+            this.dbContext.FcmTokens.Add(testToken);
+            await this.dbContext.SaveChangesAsync();
+
+            var result = await this.firebaseTokenManager
+                .GetDepartmentFcmToken(department.Id).ToListAsync();
+
+            Assert.Empty(result);
+
+            this.dbContext.Remove(testToken);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async void TestGetDepartmentTokensOne()
+        {
+            var department = await this.dbContext.Departments.FirstAsync();
+            var user = await this.dbContext.Users.FirstAsync();
+            user.DepartmentId = department.Id;
+            this.dbContext.Users.Update(user);
+            var testToken = new FcmToken(
+                Guid.NewGuid().ToString(), user);
+            this.dbContext.FcmTokens.Add(testToken);
+            await this.dbContext.SaveChangesAsync();
+
+            var result = await this.firebaseTokenManager
+                .GetDepartmentFcmToken(department.Id).ToListAsync();
+
+            Assert.Equal(testToken, result.FirstOrDefault());
+
+            user.DepartmentId = null;
+            this.dbContext.Update(user);
+            this.dbContext.Remove(testToken);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async void TestGetDepartmentTokensMultiple()
+        {
+            var department = await this.dbContext.Departments.FirstAsync();
+            var user = await this.dbContext.Users.FindAsync(1);
+            var user2 = await this.dbContext.Users.FindAsync(2);
+            user.DepartmentId = department.Id;
+            user2.DepartmentId = department.Id;
+            this.dbContext.Users.UpdateRange(user, user2);
+            var testToken = new FcmToken(
+                Guid.NewGuid().ToString(), user);
+            var testToken2 = new FcmToken(
+                Guid.NewGuid().ToString(), user2);
+            var controlToken = new FcmToken(
+                Guid.NewGuid().ToString(), null);
+            this.dbContext.FcmTokens.AddRange(
+                testToken, testToken2, controlToken);
+            await this.dbContext.SaveChangesAsync();
+
+            var result = await this.firebaseTokenManager
+                .GetDepartmentFcmToken(department.Id).ToListAsync();
+
+            Assert.Equal(2, result.Count());
+
+            this.dbContext.Users.RemoveRange(this.dbContext.Users);
+            this.dbContext.FcmTokens.RemoveRange(this.dbContext.FcmTokens);
+            await this.dbContext.SaveChangesAsync();
+            TestDataProvider.InsertTestData(this.dbContext);
         }
     }
 }

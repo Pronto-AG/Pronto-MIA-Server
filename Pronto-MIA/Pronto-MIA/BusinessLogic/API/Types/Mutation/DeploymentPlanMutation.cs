@@ -173,14 +173,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 return false;
             }
 
+            var deploymentPlan = await deploymentPlanManager.GetById(id);
             var tokens = await firebaseTokenManager
-                .GetAllFcmToken().Select(token => token.Id).ToListAsync();
+                .GetDepartmentFcmToken(deploymentPlan.DepartmentId!.Value)
+                .Select(token => token.Id).ToListAsync();
             var notification = new Notification { Title = title, Body = body };
-            var data = new Dictionary<string, string>()
-            {
-                { "Action", "publish" }, { "TargetType", "deploymentPlan" },
-                { "TargetId", id.ToString() },
-            };
+            var data = this.CreateNotificationData(id);
 
             var badTokens = await firebaseMessagingManager
                 .SendMulticastAsync(tokens, notification, data);
@@ -239,6 +237,16 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 await departmentManager.AddDeploymentPlan(
                     departmentId.Value, deploymentPlan);
             }
+        }
+
+        private Dictionary<string, string> CreateNotificationData(
+            int deploymentPlanId)
+        {
+            return new ()
+            {
+                { "Action", "publish" }, { "TargetType", "deploymentPlan" },
+                { "TargetId", deploymentPlanId.ToString() },
+            };
         }
     }
 }

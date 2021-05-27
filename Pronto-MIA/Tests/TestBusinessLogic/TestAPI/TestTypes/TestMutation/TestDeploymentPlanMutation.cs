@@ -108,11 +108,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             var firebaseMessagingManager =
                 Substitute.For<IFirebaseMessagingManager>();
             var firebaseTokenManager = Substitute.For<IFirebaseTokenManager>();
-            var deploymentPlanManager =
-                Substitute.For<IDeploymentPlanManager>();
+            var deploymentPlanManager = this.CreateManagerWithGetId(1);
             deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
-            firebaseTokenManager.GetAllFcmToken().Returns(
-                this.dbContext.FcmTokens);
+            firebaseTokenManager.GetDepartmentFcmToken(default)
+                .ReturnsForAnyArgs(this.dbContext.FcmTokens);
 
             var res = await this.deploymentPlanMutation.PublishDeploymentPlan(
                 deploymentPlanManager,
@@ -129,6 +128,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                     Arg.Any<List<string>>(),
                     Arg.Any<Notification>(),
                     Arg.Any<Dictionary<string, string>>());
+            firebaseTokenManager.Received().GetDepartmentFcmToken(1);
             await firebaseTokenManager.ReceivedWithAnyArgs()
                 .UnregisterMultipleFcmToken(Arg.Any<HashSet<string>>());
         }
@@ -143,8 +143,6 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
             deploymentPlanManager.Publish(default).ReturnsForAnyArgs(false);
-            firebaseTokenManager.GetAllFcmToken().Returns(
-                this.dbContext.FcmTokens);
 
             var result = await this.deploymentPlanMutation
                 .PublishDeploymentPlan(
@@ -188,6 +186,24 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
             await deploymentPlanManager.Received()
                 .Remove(5);
+        }
+
+        private IDeploymentPlanManager CreateManagerWithGetId(int departmentId)
+        {
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+            deploymentPlanManager.Publish(default).ReturnsForAnyArgs(true);
+            deploymentPlanManager.GetById(default).ReturnsForAnyArgs(
+                new DeploymentPlan(
+                    DateTime.UtcNow,
+                    DateTime.UtcNow.AddDays(2),
+                    Guid.NewGuid(),
+                    string.Empty)
+                {
+                    DepartmentId = departmentId,
+                });
+
+            return deploymentPlanManager;
         }
     }
 }
