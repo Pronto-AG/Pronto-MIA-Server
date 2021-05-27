@@ -15,6 +15,12 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IDeploymentPlanManager
     {
         /// <summary>
+        /// Gets the subdirectory into which files associated with deployment
+        /// plans are persisted.
+        /// </summary>
+        public static string FileDirectory { get; } = "deployment_plans";
+
+        /// <summary>
         /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
         /// used by the manager. This can be used if transactions
         /// over multiple managers have to be implemented.
@@ -22,12 +28,6 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// <param name="dbContext">The db context to be used by the
         /// manager.</param>
         public void SetDbContext(ProntoMiaDbContext dbContext);
-
-        /// <summary>
-        /// Gets the subdirectory into which files associated with deployment
-        /// plans are persisted.
-        /// </summary>
-        public static string FileDirectory { get; } = "deployment_plans";
 
         /// <summary>
         /// Method which creates a new deployment plan object.
