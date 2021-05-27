@@ -77,7 +77,7 @@ namespace Tests
                 context.SaveChanges();
             }
         }
-        
+
         private static void InsertDeploymentPlans(ProntoMiaDbContext context)
         {
             if (!context.DeploymentPlans.Any())
@@ -85,7 +85,7 @@ namespace Tests
                 var deploymentPlan1 = new DeploymentPlan(
                     DateTime.MinValue,
                     DateTime.MaxValue,
-                    Guid.NewGuid(), 
+                    Guid.NewGuid(),
                     ".exe",
                     "First test plan");
                 var deploymentPlan2 = new DeploymentPlan(
