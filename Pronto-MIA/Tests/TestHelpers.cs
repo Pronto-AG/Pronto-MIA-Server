@@ -8,23 +8,6 @@ namespace Tests
 
     public static class TestHelpers
     {
-        public static ProntoMiaDbContext InMemoryDbContext
-        {
-            get
-            {
-                var options = new DbContextOptionsBuilder<ProntoMiaDbContext>()
-                    .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                    .ConfigureWarnings(builder =>
-                    {
-                        builder.Ignore(
-                            InMemoryEventId.TransactionIgnoredWarning);
-                    })
-                    .Options;
-                options.Freeze();
-                return new ProntoMiaDbContext(options);
-            }
-        }
-
         public static IConfiguration TestConfiguration
         {
             get
@@ -35,6 +18,34 @@ namespace Tests
                     "./Files/appsettings.test.json", false, false);
                 return configurationBuilder.Build();
             }
+        }
+
+        public static DbContextOptions<ProntoMiaDbContext>
+            GetInMemoryDbOptions(string name)
+        {
+            var options = new DbContextOptionsBuilder<ProntoMiaDbContext>()
+                .UseInMemoryDatabase(name)
+                .ConfigureWarnings(builder =>
+                {
+                    builder.Ignore(
+                        InMemoryEventId.TransactionIgnoredWarning);
+                })
+                .Options;
+            options.Freeze();
+
+            return options;
+        }
+
+        public static ProntoMiaDbContext InMemoryDbContext(
+            string name = "")
+        {
+            if (name == string.Empty)
+            {
+                name = Guid.NewGuid().ToString();
+            }
+
+            var options = TestHelpers.GetInMemoryDbOptions(name);
+            return new ProntoMiaDbContext(options);
         }
     }
 }

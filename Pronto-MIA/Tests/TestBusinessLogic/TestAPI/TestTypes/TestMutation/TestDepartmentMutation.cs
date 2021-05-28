@@ -13,7 +13,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
         public TestDepartmentMutation()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.departmentMutation = new DepartmentMutation();
         }

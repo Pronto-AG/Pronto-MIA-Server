@@ -15,7 +15,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
         public TestUserMutation()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.userMutation = new UserMutation();
         }

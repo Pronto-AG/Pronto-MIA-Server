@@ -12,7 +12,7 @@ namespace Tests.TestDomain.TestEntityExtensions
 
         public TestAccessControlListExtension()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
         }
 

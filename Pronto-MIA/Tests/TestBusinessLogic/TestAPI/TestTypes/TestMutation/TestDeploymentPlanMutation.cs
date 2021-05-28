@@ -18,7 +18,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
         public TestDeploymentPlanMutation()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.deploymentPlanMutation = new DeploymentPlanMutation();
         }

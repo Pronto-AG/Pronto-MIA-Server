@@ -16,7 +16,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestAccessControlListManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.accessControlListManager = new AccessControlListManager(

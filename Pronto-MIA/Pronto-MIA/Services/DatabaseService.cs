@@ -22,13 +22,35 @@ namespace Pronto_MIA.Services
             this IServiceCollection services,
             IConfiguration cfg)
         {
-            Action<DbContextOptionsBuilder> optionsAction = (options) =>
+            services.AddDbContext<ProntoMiaDbContext>((options) =>
             {
-                options.UseNpgsql(
-                    cfg.GetConnectionString("ProntoMIADbContext"));
-                options.UseLazyLoadingProxies();
-            };
-            services.AddDbContext<ProntoMiaDbContext>(optionsAction);
+                DatabaseService.ConfigureOptions(cfg, options);
+            });
+        }
+
+        /// <summary>
+        /// Method to get the options defined on the DbContext.
+        /// May be used to create DbContext instances manually.
+        /// </summary>
+        /// <param name="cfg">The configuration to be used
+        /// with the options.</param>
+        /// <returns>The DbContext options currently used by
+        /// the database service.</returns>
+        public static DbContextOptions<ProntoMiaDbContext>
+            GetOptions(IConfiguration cfg)
+        {
+            var builder = new DbContextOptionsBuilder<ProntoMiaDbContext>();
+            DatabaseService.ConfigureOptions(cfg, builder);
+            return builder.Options;
+        }
+
+        private static void ConfigureOptions(
+            IConfiguration cfg,
+            DbContextOptionsBuilder options)
+        {
+            options.UseNpgsql(
+                cfg.GetConnectionString("ProntoMIADbContext"));
+            options.UseLazyLoadingProxies();
         }
     }
 }
