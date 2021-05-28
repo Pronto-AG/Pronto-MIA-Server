@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Services
 {
+    using System;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -21,12 +22,13 @@ namespace Pronto_MIA.Services
             this IServiceCollection services,
             IConfiguration cfg)
         {
-            services.AddDbContext<ProntoMiaDbContext>(options =>
-                {
-                    options.UseNpgsql(
-                        cfg.GetConnectionString("ProntoMIADbContext"));
-                    options.UseLazyLoadingProxies();
-                });
+            Action<DbContextOptionsBuilder> optionsAction = (options) =>
+            {
+                options.UseNpgsql(
+                    cfg.GetConnectionString("ProntoMIADbContext"));
+                options.UseLazyLoadingProxies();
+            };
+            services.AddDbContext<ProntoMiaDbContext>(optionsAction);
         }
     }
 }

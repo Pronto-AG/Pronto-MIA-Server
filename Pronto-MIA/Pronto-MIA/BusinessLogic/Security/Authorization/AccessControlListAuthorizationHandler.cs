@@ -1,13 +1,12 @@
-using System.Linq;
-
 namespace Pronto_MIA.BusinessLogic.Security.Authorization
 {
+    using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using HotChocolate.Resolvers;
     using Microsoft.AspNetCore.Authorization;
-    using Microsoft.EntityFrameworkCore;
     using Pronto_MIA.DataAccess;
+    using Pronto_MIA.Domain.Entities;
     using Pronto_MIA.Domain.EntityExtensions;
 
     /// <summary>
@@ -40,26 +39,30 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         /// <param name="resource">The resolver context.</param>
         /// <returns>A completed task. Also signals the context if
         /// the requirement is fulfilled.</returns>
-        protected override async Task HandleRequirementAsync(
+        protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             AccessControlListRequirement requirement,
             IResolverContext resource)
         {
             var userId = int.Parse(
                 context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            AccessControlList accessControlList = default;
+
             lock (this)
             {
-                var accessControlList = this.dbContext
+                accessControlList = this.dbContext
                     .AccessControlLists.SingleOrDefault(
                         acl => acl.UserId == userId);
-
-                if (
-                    accessControlList != default &&
-                    accessControlList.HasControl(requirement.Control))
-                {
-                    context.Succeed(requirement);
-                }
             }
+
+            if (
+                accessControlList != default &&
+                accessControlList.HasControl(requirement.Control))
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }
