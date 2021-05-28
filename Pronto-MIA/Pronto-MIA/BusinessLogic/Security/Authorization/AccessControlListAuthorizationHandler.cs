@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Pronto_MIA.BusinessLogic.Security.Authorization
 {
     using System.Security.Claims;
@@ -45,14 +47,18 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         {
             var userId = int.Parse(
                 context.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var accessControlList = await this.dbContext
-                .AccessControlLists.SingleOrDefaultAsync(
-                    acl => acl.UserId == userId);
-            if (
-                accessControlList != default &&
-                accessControlList.HasControl(requirement.Control))
+            lock (this)
             {
-                context.Succeed(requirement);
+                var accessControlList = this.dbContext
+                    .AccessControlLists.SingleOrDefault(
+                        acl => acl.UserId == userId);
+
+                if (
+                    accessControlList != default &&
+                    accessControlList.HasControl(requirement.Control))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }
