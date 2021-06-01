@@ -1,11 +1,12 @@
 namespace Pronto_MIA.Domain.Entities
 {
     using System.Collections.Generic;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Interfaces;
 
     /// <summary>
     /// Class representing a department.
     /// </summary>
-    public class Department
+    public class Department : IDepartmentComparable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Department"/> class.
@@ -37,5 +38,13 @@ namespace Pronto_MIA.Domain.Entities
         /// department.
         /// </summary>
         public virtual ICollection<DeploymentPlan> DeploymentPlans { get; set; }
+
+        public int? DepartmentId
+        {
+            get
+            {
+                return Id;
+            }
+        }
     }
 }

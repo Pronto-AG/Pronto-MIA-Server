@@ -6,6 +6,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Execution;
     using HotChocolate.Types;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -27,7 +28,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">Returns DepartmentAlreadyExists
         /// exception if the department with the given name already exists.
         /// </exception>
-        [Authorize(Policy = "CanEditDepartments")]
+        [Authorize(Policy = "EditDepartment")]
         public async Task<Department> CreateDepartment(
             [Service] IDepartmentManager departmentManager,
             string name)
@@ -46,7 +47,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">Returns DepartmentNotFound
         /// exception if the department with the given id could not be found.
         /// </exception>
-        [Authorize(Policy = "CanEditDepartments")]
+        [Authorize(Policy = "EditDepartment")]
+        [AccessObjectIdArgument("id")]
         public async Task<Department> UpdateDepartment(
             [Service] IDepartmentManager departmentManager,
             int id,
@@ -65,7 +67,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">Returns DepartmentNotFound
         /// exception if the department with the given id could not be found.
         /// </exception>
-        [Authorize(Policy = "CanEditDepartments")]
+        [Authorize(Policy = "EditDepartment")]
+        [AccessObjectIdArgument("id")]
         public async Task<int> RemoveDepartment(
             [Service] IDepartmentManager departmentManager,
             int id)

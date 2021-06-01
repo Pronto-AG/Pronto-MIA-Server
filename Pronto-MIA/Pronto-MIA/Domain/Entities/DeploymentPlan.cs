@@ -1,13 +1,16 @@
+using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
+
 namespace Pronto_MIA.Domain.Entities
 {
     using System;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Interfaces;
 
     /// <summary>
     /// Class which represents a deployment plan object.
     /// </summary>
-    public class DeploymentPlan
+    public class DeploymentPlan : IDepartmentComparable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeploymentPlan"/>
@@ -109,7 +112,8 @@ namespace Pronto_MIA.Domain.Entities
         /// Gets or sets the department associated with this deployment
         /// plan.
         /// </summary>
-        [Authorize(Policy = "CanViewDepartments")]
+        [Authorize(Policy = "ViewDepartment")]
+        [AccessObjectIdArgument("IGNORED")]
         public virtual Department Department { get; set; }
     }
 }

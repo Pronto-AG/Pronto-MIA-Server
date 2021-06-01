@@ -1,11 +1,13 @@
 namespace Pronto_MIA.Services
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Security.Claims;
     using System.Threading;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.BusinessLogic.API;
@@ -14,11 +16,14 @@ namespace Pronto_MIA.Services
     using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.BusinessLogic.API.Types.Mutation;
     using Pronto_MIA.BusinessLogic.API.Types.Query;
+    using Pronto_MIA.DataAccess;
 
     /// <summary>
     /// Service which initializes and contains all information regarding the
     /// GraphQL-API.
     /// </summary>
+    [ExcludeFromCodeCoverage]
+
     // ReSharper disable once InconsistentNaming
     public static class GraphQLService
     {
@@ -31,9 +36,14 @@ namespace Pronto_MIA.Services
         // ReSharper disable once InconsistentNaming
         public static void AddGraphQLService(this IServiceCollection services)
         {
+            var serviceProvider = services.BuildServiceProvider();
+            var config = serviceProvider.GetService<IConfiguration>();
+
             services.AddGraphQLServer()
                 .AddAuthorization()
-                .AddHttpRequestInterceptor(AddUserState)
+                .AddHttpRequestInterceptor(
+                    (context, executor, builder, token) =>
+                        AddUserState(config, context, executor, builder, token))
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
                 .AddType<AccessControlListInputType>()
@@ -60,20 +70,26 @@ namespace Pronto_MIA.Services
         /// accessed in a query.
         /// </summary>
         private static ValueTask AddUserState(
+            IConfiguration cfg,
             HttpContext context,
             IRequestExecutor executor,
             IQueryRequestBuilder builder,
             CancellationToken token)
         {
+            var dbContext = new ProntoMiaDbContext(
+                DatabaseService.GetOptions(cfg));
+
             ApiUserState apiUserState = default;
             var identity = context.User.Identity;
-            if (identity != null && identity.IsAuthenticated)
+            if (identity is { IsAuthenticated: true })
             {
-                var userId = context
-                    .User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = int.Parse(context
+                    .User.FindFirstValue(ClaimTypes.NameIdentifier));
                 var userName = context
                     .User.FindFirstValue(ClaimTypes.Name);
-                apiUserState = new ApiUserState(userId, userName);
+                var user = dbContext.Users.Find(userId);
+                
+                apiUserState = new ApiUserState(user);
             }
 
             builder.SetProperty(

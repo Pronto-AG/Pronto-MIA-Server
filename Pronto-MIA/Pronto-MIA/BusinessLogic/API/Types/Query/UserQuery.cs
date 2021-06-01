@@ -1,3 +1,6 @@
+using Pronto_MIA.BusinessLogic.Security.Authorization;
+using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
+
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
     using System.Linq;
@@ -44,13 +47,21 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
         /// <returns>Queryable of all available users.</returns>
-        [Authorize(Policy = "CanViewUsers")]
+        [Authorize(Policy = "ViewUser")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<User> Users(
-            [Service] IUserManager userManager)
+            [Service] IUserManager userManager,
+            [ApiUserGlobalState] ApiUserState userState)
         {
-            return userManager.GetAll();
+            if (userState.User.AccessControlList.CanViewDeploymentPlans)
+            {
+                return userManager.GetAll();
+            }
+
+            return userManager.GetAll().Where(
+                u => u.DepartmentId == userState.User.DepartmentId);
         }
     }
 }

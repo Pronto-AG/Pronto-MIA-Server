@@ -28,16 +28,28 @@ namespace Pronto_MIA.Domain.EntityExtensions
             {
                 case AccessControl.CanEditUsers:
                     return acl.CanEditUsers;
+                case AccessControl.CanEditDepartmentUsers:
+                    return acl.CanEditDepartmentUsers;
                 case AccessControl.CanViewUsers:
                     return acl.CanViewUsers;
+                case AccessControl.CanViewDepartmentUsers:
+                    return acl.CanViewDepartmentUsers;
                 case AccessControl.CanEditDepartments:
                     return acl.CanEditDepartments;
+                case AccessControl.CanEditOwnDepartment:
+                    return acl.CanEditOwnDepartment;
                 case AccessControl.CanViewDepartments:
                     return acl.CanViewDepartments;
+                case AccessControl.CanViewOwnDepartment:
+                    return acl.CanViewOwnDepartment;
                 case AccessControl.CanEditDeploymentPlans:
                     return acl.CanEditDeploymentPlans;
+                case AccessControl.CanEditDepartmentDeploymentPlans:
+                    return acl.CanEditDepartmentDeploymentPlans;
                 case AccessControl.CanViewDeploymentPlans:
                     return acl.CanViewDeploymentPlans;
+                case AccessControl.CanViewDepartmentDeploymentPlans:
+                    return acl.CanViewDepartmentDeploymentPlans;
                 default:
                     throw new ArgumentException(
                         $"Unknown AccessControl \"{control.ToString()}\"");

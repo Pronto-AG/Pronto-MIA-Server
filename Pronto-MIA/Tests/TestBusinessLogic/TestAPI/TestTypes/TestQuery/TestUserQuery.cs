@@ -1,7 +1,10 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using NSubstitute;
+    using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.BusinessLogic.API.Types.Query;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
@@ -31,12 +34,15 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
-        public void TestUsers()
+        public async Task TestUsers()
         {
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(this.dbContext, "Fredi");
+            var userState = new ApiUserState(user);
             var userManager =
                 Substitute.For<IUserManager>();
 
-            this.userQuery.Users(userManager);
+            this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
         }

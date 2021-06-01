@@ -1,3 +1,9 @@
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Pronto_MIA.BusinessLogic.API.Types;
+using Pronto_MIA.Domain.Entities;
+
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
@@ -20,14 +26,20 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
-        public void TestDepartments()
+        public async Task TestDepartments()
         {
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(this.dbContext, "Fredi");
+            var userState = new ApiUserState(user);
             var departmentManager =
                 Substitute.For<IDepartmentManager>();
 
-            this.departmentQuery.Departments(departmentManager);
+            this.departmentQuery.Departments(departmentManager, userState);
 
             departmentManager.Received().GetAll();
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

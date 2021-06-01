@@ -1,3 +1,6 @@
+using Pronto_MIA.BusinessLogic.Security.Authorization;
+using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
+
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
@@ -23,13 +26,21 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// <param name="departmentManager">The department manager responsible
         /// for managing application departments.</param>
         /// <returns>Queryable of all available departments.</returns>
-        [Authorize(Policy = "CanViewDepartments")]
+        [Authorize(Policy = "ViewDepartment")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<Department> Departments(
-            [Service] IDepartmentManager departmentManager)
+            [Service] IDepartmentManager departmentManager,
+            [ApiUserGlobalState] ApiUserState userState)
         {
-            return departmentManager.GetAll();
+            if (userState.User.AccessControlList.CanViewDepartments)
+            {
+                return departmentManager.GetAll();
+            }
+
+            return departmentManager.GetAll().Where(
+                d => d.Id == userState.User.DepartmentId);
         }
     }
 }

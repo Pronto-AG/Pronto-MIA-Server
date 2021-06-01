@@ -1,3 +1,5 @@
+using Pronto_MIA.DataAccess;
+
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
     using System.Linq;
@@ -5,6 +7,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
     using HotChocolate.Types;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -22,13 +25,21 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// <param name="deploymentPlanManager">The deployment plan manager
         /// responsible for managing deployment plans.</param>
         /// <returns>Queryable of all available deployment plans.</returns>
-        [Authorize(Policy = "CanViewDeploymentPlans")]
+        [Authorize(Policy = "ViewDeploymentPlan")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<DeploymentPlan> DeploymentPlans(
-            [Service] IDeploymentPlanManager deploymentPlanManager)
+            [Service] IDeploymentPlanManager deploymentPlanManager,
+            [ApiUserGlobalState] ApiUserState userState)
         {
-            return deploymentPlanManager.GetAll();
+            if (userState.User.AccessControlList.CanViewDeploymentPlans)
+            {
+                return deploymentPlanManager.GetAll();
+            }
+
+            return deploymentPlanManager.GetAll().Where(
+                dP => dP.DepartmentId == userState.User.DepartmentId);
         }
     }
 }

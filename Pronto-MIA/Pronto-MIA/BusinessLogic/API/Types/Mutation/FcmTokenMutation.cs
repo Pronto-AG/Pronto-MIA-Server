@@ -41,12 +41,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
-            var user = await userManager.GetByUserName(userState.UserName);
-            if (user == default)
-            {
-                throw DataAccess.Error.UserNotFound.AsQueryException();
-            }
-
+            var user = userState.User;
             return
                 await firebaseTokenManager.RegisterFcmToken(user, fcmToken);
         }

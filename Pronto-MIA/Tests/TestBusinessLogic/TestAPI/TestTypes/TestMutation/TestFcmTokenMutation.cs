@@ -38,7 +38,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             await this.fcmTokenMutation.RegisterFcmToken(
                 firebaseTokenManager,
                 userManager,
-                new ApiUserState("5", "Bob"),
+                new ApiUserState(await userTask),
                 "Hello World");
 
             await userManager.Received().GetByUserName("Bob");
@@ -55,6 +55,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 Substitute.For<IUserManager>();
             userManager.GetByUserName("Bob").Returns(
                 Task.FromResult<User?>(default));
+            var user = await this.dbContext.Users
+                .SingleOrDefaultAsync(u => u.UserName == "Bob");
 
             var error = await Assert.ThrowsAsync<QueryException>(
                 async () =>
@@ -62,7 +64,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                     await this.fcmTokenMutation.RegisterFcmToken(
                         firebaseTokenManager,
                         userManager,
-                        new ApiUserState("5", "Bob"),
+                        new ApiUserState(user),
                         "Hello World");
                 });
 

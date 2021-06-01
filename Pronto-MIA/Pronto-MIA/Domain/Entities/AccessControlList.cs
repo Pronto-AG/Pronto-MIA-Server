@@ -50,9 +50,21 @@ namespace Pronto_MIA.Domain.Entities
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has permission to
+        /// view all users of his department.
+        /// </summary>
+        public bool CanViewDepartmentUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
         /// edit all users.
         /// </summary>
         public bool CanEditUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all users of his department.
+        /// </summary>
+        public bool CanEditDepartmentUsers { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has permission to
@@ -62,9 +74,21 @@ namespace Pronto_MIA.Domain.Entities
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has permission to
+        /// view his own department.
+        /// </summary>
+        public bool CanViewOwnDepartment { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
         /// edit all departments.
         /// </summary>
         public bool CanEditDepartments { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit his own department.
+        /// </summary>
+        public bool CanEditOwnDepartment { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has permission to
@@ -74,8 +98,20 @@ namespace Pronto_MIA.Domain.Entities
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has permission to
+        /// view all deployment plans of his department.
+        /// </summary>
+        public bool CanViewDepartmentDeploymentPlans { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
         /// edit all deployment plans.
         /// </summary>
         public bool CanEditDeploymentPlans { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all deployment plans of his department.
+        /// </summary>
+        public bool CanEditDepartmentDeploymentPlans { get; set; }
     }
 }

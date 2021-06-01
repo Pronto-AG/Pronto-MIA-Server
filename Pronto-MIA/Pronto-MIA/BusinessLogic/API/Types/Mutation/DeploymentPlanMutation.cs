@@ -12,6 +12,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Microsoft.EntityFrameworkCore;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
@@ -45,7 +46,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <param name="description">Short description to identify the
         /// deployment plan.</param>
         /// <returns>The newly generated deployment plan.</returns>
-        [Authorize(Policy = "CanEditDeploymentPlans")]
+        [Authorize(Policy = "EditDeploymentPlan")]
+        [AccessObjectIdArgument("departmentId", true)]
         [UseSingleOrDefault]
         public async Task<DeploymentPlan> CreateDeploymentPlan(
             [Service] ProntoMiaDbContext dbContext,
@@ -103,7 +105,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">Returns DeploymentPlanNotFound
         /// exception if the deployment plan with given id could not be found.
         /// </exception>
-        [Authorize(Policy = "CanEditDeploymentPlans")]
+        [Authorize(Policy = "EditDeploymentPlan")]
+        [AccessObjectIdArgument("id")]
         public async Task<DeploymentPlan> UpdateDeploymentPlan(
             [Service] ProntoMiaDbContext dbContext,
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -157,7 +160,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">If the deployment plan with the
         /// given id could not be found or the firebase manager encounters
         /// a sending error.</exception>
-        [Authorize(Policy = "CanEditDeploymentPlans")]
+        [Authorize(Policy = "EditDeploymentPlan")]
+        [AccessObjectIdArgument("id")]
         [UseSingleOrDefault]
         public async Task<bool> PublishDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -199,7 +203,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// the deployment plan was already hidden.</returns>
         /// <exception cref="QueryException">If the deployment plan with the
         /// given id could not be found.</exception>
-        [Authorize(Policy = "CanEditDeploymentPlans")]
+        [Authorize(Policy = "EditDeploymentPlan")]
+        [AccessObjectIdArgument("id")]
         [UseSingleOrDefault]
         public async Task<bool> HideDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
@@ -219,7 +224,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// exception if the deployment plan with the given id could not be
         /// found.
         /// </exception>
-        [Authorize(Policy = "CanEditDeploymentPlans")]
+        [Authorize(Policy = "EditDeploymentPlan")]
+        [AccessObjectIdArgument("id")]
         public async Task<int> RemoveDeploymentPlan(
             [Service] IDeploymentPlanManager deploymentPlanManager,
             int id)
