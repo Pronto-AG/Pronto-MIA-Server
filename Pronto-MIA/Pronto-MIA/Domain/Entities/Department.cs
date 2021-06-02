@@ -39,12 +39,10 @@ namespace Pronto_MIA.Domain.Entities
         /// </summary>
         public virtual ICollection<DeploymentPlan> DeploymentPlans { get; set; }
 
-        public int? DepartmentId
-        {
-            get
-            {
-                return Id;
-            }
-        }
+        /// <summary>
+        /// Gets the id of this department. Needed for
+        /// <see cref="IDepartmentComparable"/> interface.
+        /// </summary>
+        public int? DepartmentId => this.Id;
     }
 }

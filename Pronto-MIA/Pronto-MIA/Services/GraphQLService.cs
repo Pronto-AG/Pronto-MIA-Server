@@ -88,7 +88,7 @@ namespace Pronto_MIA.Services
                 var userName = context
                     .User.FindFirstValue(ClaimTypes.Name);
                 var user = dbContext.Users.Find(userId);
-                
+
                 apiUserState = new ApiUserState(user);
             }
 

@@ -1,8 +1,8 @@
-using Pronto_MIA.Domain.Entities;
-
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API.Types
 {
+    using Pronto_MIA.Domain.Entities;
+
     /// <summary>
     /// Class representing the state of an api user.
     /// </summary>

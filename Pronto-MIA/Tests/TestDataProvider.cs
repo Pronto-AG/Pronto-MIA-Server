@@ -35,6 +35,10 @@ namespace Tests
             "Menees.Analyzers",
             "MEN002",
             Justification = "Inline hashes and salts.")]
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Trivial setup code.")]
         private static void InsertUsers(ProntoMiaDbContext context)
         {
             if (!context.Users.Any())
@@ -82,6 +86,10 @@ namespace Tests
             }
         }
 
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Trivial setup code.")]
         private static void InsertDeploymentPlans(ProntoMiaDbContext context)
         {
             if (!context.DeploymentPlans.Any())

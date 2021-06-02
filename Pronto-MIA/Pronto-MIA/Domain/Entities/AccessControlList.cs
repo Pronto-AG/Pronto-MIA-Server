@@ -34,12 +34,12 @@ namespace Pronto_MIA.Domain.Entities
         /// <summary>
         /// Gets or sets the id of the user associated with this list.
         /// </summary>
+        [GraphQLIgnore]
         public int UserId { get; set; }
 
         /// <summary>
         /// Gets or sets the user associated with this list.
         /// </summary>
-        [GraphQLIgnore]
         public virtual User User { get; set; }
 
         /// <summary>

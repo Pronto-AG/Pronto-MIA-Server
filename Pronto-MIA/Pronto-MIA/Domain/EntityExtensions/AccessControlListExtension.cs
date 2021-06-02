@@ -1,6 +1,7 @@
 namespace Pronto_MIA.Domain.EntityExtensions
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -21,6 +22,10 @@ namespace Pronto_MIA.Domain.EntityExtensions
         /// the given list.</returns>
         /// <exception cref="ArgumentException">If a control
         /// is used that has not yet been specified.</exception>
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Trivial switch case.")]
         public static bool HasControl(
             this AccessControlList acl, AccessControl control)
         {

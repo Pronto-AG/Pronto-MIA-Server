@@ -18,7 +18,7 @@ namespace Pronto_MIA.Services
         /// <summary>
         /// Method to add the authorization service to the service collection.
         /// In this method the different available authorization policies are
-        /// configured.
+        /// configured and added to the authorization workflow.
         /// </summary>
         /// <param name="services">Service collection.</param>
         /// <param name="cfg">Application configuration.</param>
@@ -27,21 +27,30 @@ namespace Pronto_MIA.Services
         {
             services.AddAuthorization(options =>
             {
-                AddDepartmentPolicies(options);
-                AddUserPolicies(options);
-                AddDeploymentPlanPolicies(options);
+                AddEditDepartment(options);
+                AddViewDepartment(options);
+                AddEditUser(options);
+                AddViewUser(options);
+                AddEditDeploymentPlan(options);
+                AddViewDeploymentPlan(options);
             });
             services.AddScoped<IAuthorizationHandler,
                 DepartmentAccessAuthorizationHandler>();
         }
 
-        private static void AddDepartmentPolicies(AuthorizationOptions options)
+        private static void AddEditDepartment(AuthorizationOptions options)
         {
             var editDepartmentControls =
                 new Dictionary<AccessControl, AccessMode>()
                 {
-                    { AccessControl.CanEditDepartments, AccessMode.Unrestricted },
-                    { AccessControl.CanEditOwnDepartment, AccessMode.Department },
+                    {
+                        AccessControl.CanEditDepartments,
+                        AccessMode.Unrestricted
+                    },
+                    {
+                        AccessControl.CanEditOwnDepartment,
+                        AccessMode.Department
+                    },
                 };
             options.AddPolicy(
                 "EditDepartment",
@@ -53,12 +62,22 @@ namespace Pronto_MIA.Services
                             typeof(Department),
                             editDepartmentControls));
                 });
+        }
 
-            var viewDepartmentControls = new Dictionary<AccessControl, AccessMode>()
-            {
-                { AccessControl.CanViewDepartments, AccessMode.Unrestricted },
-                { AccessControl.CanViewOwnDepartment, AccessMode.Department },
-            };
+        private static void AddViewDepartment(AuthorizationOptions options)
+        {
+            var viewDepartmentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewDepartments,
+                        AccessMode.Unrestricted
+                    },
+                    {
+                        AccessControl.CanViewOwnDepartment,
+                        AccessMode.Department
+                    },
+                };
             options.AddPolicy(
                 "ViewDepartment",
                 policy =>
@@ -71,12 +90,18 @@ namespace Pronto_MIA.Services
                 });
         }
 
-        private static void AddUserPolicies(AuthorizationOptions options)
+        private static void AddEditUser(AuthorizationOptions options)
         {
             var editUserControls = new Dictionary<AccessControl, AccessMode>()
             {
-                { AccessControl.CanEditUsers, AccessMode.Unrestricted },
-                { AccessControl.CanEditDepartmentUsers, AccessMode.Department },
+                {
+                    AccessControl.CanEditUsers,
+                    AccessMode.Unrestricted
+                },
+                {
+                    AccessControl.CanEditDepartmentUsers,
+                    AccessMode.Department
+                },
             };
             options.AddPolicy(
                 "EditUser",
@@ -88,11 +113,20 @@ namespace Pronto_MIA.Services
                             typeof(User),
                             editUserControls));
                 });
+        }
 
+        private static void AddViewUser(AuthorizationOptions options)
+        {
             var viewUsersControls = new Dictionary<AccessControl, AccessMode>()
             {
-                { AccessControl.CanViewUsers, AccessMode.Unrestricted },
-                { AccessControl.CanViewDepartmentUsers, AccessMode.Department },
+                {
+                    AccessControl.CanViewUsers,
+                    AccessMode.Unrestricted
+                },
+                {
+                    AccessControl.CanViewDepartmentUsers,
+                    AccessMode.Department
+                },
             };
             options.AddPolicy(
                 "ViewUser",
@@ -106,13 +140,19 @@ namespace Pronto_MIA.Services
                 });
         }
 
-        private static void AddDeploymentPlanPolicies(
-            AuthorizationOptions options)
+        private static void AddEditDeploymentPlan(AuthorizationOptions options)
         {
-            var editDeploymentPlanControls = new Dictionary<AccessControl, AccessMode>()
+            var editDeploymentPlanControls =
+                new Dictionary<AccessControl, AccessMode>()
                 {
-                    { AccessControl.CanEditDeploymentPlans, AccessMode.Unrestricted },
-                    { AccessControl.CanEditDepartmentDeploymentPlans, AccessMode.Department },
+                    {
+                        AccessControl.CanEditDeploymentPlans,
+                        AccessMode.Unrestricted
+                    },
+                    {
+                        AccessControl.CanEditDepartmentDeploymentPlans,
+                        AccessMode.Department
+                    },
                 };
             options.AddPolicy(
                 "EditDeploymentPlan",
@@ -124,12 +164,22 @@ namespace Pronto_MIA.Services
                             typeof(DeploymentPlan),
                             editDeploymentPlanControls));
                 });
+        }
 
-            var viewDeploymentPlanControls = new Dictionary<AccessControl, AccessMode>()
-            {
-                { AccessControl.CanViewDeploymentPlans, AccessMode.Unrestricted },
-                { AccessControl.CanViewDepartmentDeploymentPlans, AccessMode.Department },
-            };
+        private static void AddViewDeploymentPlan(AuthorizationOptions options)
+        {
+            var viewDeploymentPlanControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewDeploymentPlans,
+                        AccessMode.Unrestricted
+                    },
+                    {
+                        AccessControl.CanViewDepartmentDeploymentPlans,
+                        AccessMode.Department
+                    },
+                };
             options.AddPolicy(
                 "ViewDeploymentPlan",
                 policy =>

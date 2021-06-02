@@ -1,11 +1,10 @@
-using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
-using Pronto_MIA.BusinessLogic.Security.Authorization.Interfaces;
-
 namespace Pronto_MIA.Domain.Entities
 {
     using System.Collections.Generic;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Interfaces;
 
     /// <summary>
     /// Class representing a user of the application.

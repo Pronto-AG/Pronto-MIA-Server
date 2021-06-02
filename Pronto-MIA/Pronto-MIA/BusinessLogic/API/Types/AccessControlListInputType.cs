@@ -14,9 +14,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types
         protected override void Configure(
             IInputObjectTypeDescriptor<AccessControlList> descriptor)
         {
-            descriptor.Field(t => t.Id).Ignore();
-            descriptor.Field(t => t.UserId).Ignore();
-            descriptor.Field(t => t.User).Ignore();
+            IgnoreFields(descriptor);
             descriptor.Field(t => t.CanEditUsers)
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanEditDepartmentUsers)
@@ -41,6 +39,14 @@ namespace Pronto_MIA.BusinessLogic.API.Types
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanViewDepartmentDeploymentPlans)
                 .Type<BooleanType>().DefaultValue(false);
+        }
+
+        private static void IgnoreFields(
+            IInputObjectTypeDescriptor<AccessControlList> descriptor)
+        {
+            descriptor.Field(t => t.Id).Ignore();
+            descriptor.Field(t => t.UserId).Ignore();
+            descriptor.Field(t => t.User).Ignore();
         }
     }
 }

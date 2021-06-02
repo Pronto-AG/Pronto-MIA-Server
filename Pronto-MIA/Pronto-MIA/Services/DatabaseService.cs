@@ -1,6 +1,5 @@
 namespace Pronto_MIA.Services
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;

@@ -61,7 +61,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         {
             deploymentPlanManager.SetDbContext(dbContext);
             departmentManager.SetDbContext(dbContext);
-
             await using (var dbContextTransaction = await
                 dbContext.Database.BeginTransactionAsync())
             {
@@ -120,7 +119,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         {
             deploymentPlanManager.SetDbContext(dbContext);
             departmentManager.SetDbContext(dbContext);
-
             await using (var dbContextTransaction = await
                 dbContext.Database.BeginTransactionAsync())
             {

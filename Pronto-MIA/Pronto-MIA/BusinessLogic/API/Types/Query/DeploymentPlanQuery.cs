@@ -1,5 +1,3 @@
-using Pronto_MIA.DataAccess;
-
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
     using System.Linq;
@@ -20,11 +18,16 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
     public class DeploymentPlanQuery
     {
         /// <summary>
-        /// Method which retrieves the available deployment plans.
+        /// Method which retrieves the available deployment plans. Depending
+        /// on the requesting users access rights only a fraction of the
+        /// available plans might be returned.
         /// </summary>
         /// <param name="deploymentPlanManager">The deployment plan manager
         /// responsible for managing deployment plans.</param>
-        /// <returns>Queryable of all available deployment plans.</returns>
+        /// <param name="userState">Provides information about the user
+        /// requesting this endpoint.</param>
+        /// <returns>Queryable of all deployment plans available to the user.
+        /// </returns>
         [Authorize(Policy = "ViewDeploymentPlan")]
         [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
