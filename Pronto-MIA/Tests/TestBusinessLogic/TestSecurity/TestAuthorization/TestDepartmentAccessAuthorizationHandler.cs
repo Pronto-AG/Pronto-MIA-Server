@@ -229,6 +229,58 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
             await this.dbContext.SaveChangesAsync();
         }
 
+        [Fact]
+        public async Task TestRestrictedWithDepartmentIdWrongDepartmentId()
+        {
+            var user = await this.CreateUser(new AccessControlList(-1)
+            {
+                CanViewOwnDepartment = true,
+            });
+            var departmentId = (await this.dbContext.Departments.SingleAsync(
+                d => d.Name == "Finance")).Id.ToString();
+            var resource = CreateResource(
+                "id", true, departmentId);
+            var requirement = CreateRequirement(
+                AccessControl.CanViewOwnDepartment, AccessMode.Department);
+            var context = new AuthorizationHandlerContext(
+                new List<IAuthorizationRequirement>() { requirement },
+                CreateClaimsPrincipal(user),
+                resource);
+
+            await this.authorizationHandler.HandleAsync(context);
+
+            Assert.False(context.HasSucceeded);
+
+            this.dbContext.Users.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestRestrictedWithDepartmentId()
+        {
+            var user = await this.CreateUser(new AccessControlList(-1)
+            {
+                CanViewOwnDepartment = true,
+            });
+            var departmentId = (await this.dbContext.Departments.SingleAsync(
+                d => d.Name == "Administration")).Id.ToString();
+            var resource = CreateResource(
+                "id", true, departmentId);
+            var requirement = CreateRequirement(
+                AccessControl.CanViewOwnDepartment, AccessMode.Department);
+            var context = new AuthorizationHandlerContext(
+                new List<IAuthorizationRequirement>() { requirement },
+                CreateClaimsPrincipal(user),
+                resource);
+
+            await this.authorizationHandler.HandleAsync(context);
+
+            Assert.True(context.HasSucceeded);
+
+            this.dbContext.Users.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
         private static ClaimsPrincipal CreateClaimsPrincipal(User user)
         {
             var claims = new[]
