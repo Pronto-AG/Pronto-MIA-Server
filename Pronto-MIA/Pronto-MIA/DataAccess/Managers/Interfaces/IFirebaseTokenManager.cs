@@ -44,5 +44,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// </summary>
         /// <returns>The IQueryable of all available fcm tokens.</returns>
         public IQueryable<FcmToken> GetAllFcmToken();
+
+        /// <summary>
+        /// Method to retrieve all currently registered fcm tokens
+        /// for the given department.
+        /// </summary>
+        /// <param name="departmentId">The id of the department from
+        /// which the fcm tokens should be retrieved.</param>
+        /// <returns>IQueryable of all fcm tokens of the given department.
+        /// </returns>
+        public IQueryable<FcmToken> GetDepartmentFcmToken(int departmentId);
     }
 }

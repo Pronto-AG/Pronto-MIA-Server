@@ -20,9 +20,9 @@ namespace Pronto_MIA.DataAccess.Managers
     /// </summary>
     public class DeploymentPlanManager : IDeploymentPlanManager
     {
-        private readonly ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
         private readonly IFileManager fileManager;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -43,6 +43,12 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger = logger;
             this.dbContext = dbContext;
             this.fileManager = fileManager;
+        }
+
+        /// <inheritdoc/>
+        public void SetDbContext(ProntoMiaDbContext context)
+        {
+            this.dbContext = context;
         }
 
         /// <inheritdoc/>

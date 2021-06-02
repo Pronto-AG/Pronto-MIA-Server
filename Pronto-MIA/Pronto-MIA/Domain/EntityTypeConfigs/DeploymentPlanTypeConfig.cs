@@ -31,6 +31,8 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
                     uuid => uuid.ToString(),
                     uuid => Guid.Parse(uuid));
             builder.Property(dP => dP.FileExtension).IsRequired();
+            builder.HasOne<Department>(dP => dP.Department)
+                .WithMany(d => d.DeploymentPlans);
         }
     }
 }

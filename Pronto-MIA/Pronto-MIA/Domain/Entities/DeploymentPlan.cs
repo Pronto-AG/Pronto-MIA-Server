@@ -96,5 +96,18 @@ namespace Pronto_MIA.Domain.Entities
         /// </summary>
         [GraphQLIgnore]
         public string FileExtension { get; set; }
+
+        /// <summary>
+        /// Gets or sets the id of the department associated with this
+        /// deployment plan.
+        /// </summary>
+        [GraphQLIgnore]
+        public int? DepartmentId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the department associated with this deployment
+        /// plan.
+        /// </summary>
+        public virtual Department Department { get; set; }
     }
 }

@@ -21,6 +21,15 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         public static string FileDirectory { get; } = "deployment_plans";
 
         /// <summary>
+        /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
+        /// used by the manager. This can be used if transactions
+        /// over multiple managers have to be implemented.
+        /// </summary>
+        /// <param name="dbContext">The db context to be used by the
+        /// manager.</param>
+        public void SetDbContext(ProntoMiaDbContext dbContext);
+
+        /// <summary>
         /// Method which creates a new deployment plan object.
         /// </summary>
         /// <param name="file">The file to be associated with the new deployment

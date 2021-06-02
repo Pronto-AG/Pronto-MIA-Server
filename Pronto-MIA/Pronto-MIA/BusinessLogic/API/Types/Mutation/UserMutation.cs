@@ -44,7 +44,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// policy requirements.
         /// </exception>
         [Authorize(Policy = "CanEditUsers")]
-        [Authorize(Policy = "CanEditDepartments")]
         public async Task<User> CreateUser(
             [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
@@ -118,7 +117,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// provided password does not meet the policy requirements.
         /// </exception>
         [Authorize(Policy = "CanEditUsers")]
-        [Authorize(Policy = "CanEditDepartments")]
         [Sensitive("password")]
         public async Task<User> UpdateUser(
             [Service] ProntoMiaDbContext dbContext,

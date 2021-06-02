@@ -83,6 +83,16 @@
             return this.dbContext.FcmTokens;
         }
 
+        /// <inheritdoc/>
+        public IQueryable<FcmToken> GetDepartmentFcmToken(int departmentId)
+        {
+            var users =
+                this.dbContext.Users.Where(u => u.DepartmentId == departmentId);
+            var tokens = this.dbContext.FcmTokens
+                .Where(fcmToken => users.Contains(fcmToken.Owner));
+            return tokens;
+        }
+
         /// <summary>
         /// If a fcm token already exists it will be moved else a new token will
         /// be created.

@@ -42,7 +42,7 @@ namespace Tests.TestDataAccess.TestManagers
             var file = Substitute.For<IFile>();
             file.Name.Returns("Important.pdf");
 
-            await this.deploymentPlanManager.Create(
+            var deploymentPlan = await this.deploymentPlanManager.Create(
                 file,
                 DateTime.MinValue,
                 DateTime.MaxValue,
@@ -52,11 +52,12 @@ namespace Tests.TestDataAccess.TestManagers
                 IDeploymentPlanManager.FileDirectory,
                 Arg.Any<string>(),
                 file);
-            var deploymentPlan = await this.dbContext.DeploymentPlans
+            deploymentPlan = await this.dbContext.DeploymentPlans
                 .FirstOrDefaultAsync(
-                    dP => dP.AvailableUntil == DateTime.MaxValue);
+                    dP => dP.Id == deploymentPlan.Id);
             Assert.NotNull(deploymentPlan);
             Assert.Equal(DateTime.MinValue, deploymentPlan.AvailableFrom);
+            Assert.Equal(DateTime.MaxValue, deploymentPlan.AvailableUntil);
             Assert.Equal("Hello World", deploymentPlan.Description);
 
             this.dbContext.DeploymentPlans.Remove(deploymentPlan);
@@ -70,7 +71,7 @@ namespace Tests.TestDataAccess.TestManagers
             var file = Substitute.For<IFile>();
             file.Name.Returns("Important.pdf");
 
-            await this.deploymentPlanManager.Create(
+            var deploymentPlan = await this.deploymentPlanManager.Create(
                 file,
                 DateTime.MinValue,
                 DateTime.MaxValue,
@@ -80,11 +81,12 @@ namespace Tests.TestDataAccess.TestManagers
                 IDeploymentPlanManager.FileDirectory,
                 Arg.Any<string>(),
                 file);
-            var deploymentPlan = await this.dbContext.DeploymentPlans
+            deploymentPlan = await this.dbContext.DeploymentPlans
                 .FirstOrDefaultAsync(
-                    dP => dP.AvailableUntil == DateTime.MaxValue);
+                    dP => dP.Id == deploymentPlan.Id);
             Assert.NotNull(deploymentPlan);
             Assert.Equal(DateTime.MinValue, deploymentPlan.AvailableFrom);
+            Assert.Equal(DateTime.MaxValue, deploymentPlan.AvailableUntil);
             Assert.Null(deploymentPlan.Description);
 
             this.dbContext.DeploymentPlans.Remove(deploymentPlan);
