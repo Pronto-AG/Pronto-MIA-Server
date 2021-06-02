@@ -113,7 +113,7 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
                 return null;
             }
 
-            var accessObjectIdArgument = 
+            var accessObjectIdArgument =
                 (AccessObjectIdArgumentAttribute?)attributes[0];
 
             return accessObjectIdArgument;
