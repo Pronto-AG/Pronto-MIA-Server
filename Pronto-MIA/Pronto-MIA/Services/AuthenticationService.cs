@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Services
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.Extensions.Configuration;
@@ -10,6 +11,7 @@ namespace Pronto_MIA.Services
     /// Class representing an authentication service which can be used to
     /// authenticate incoming users with the api.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class AuthenticationService
     {
         /// <summary>

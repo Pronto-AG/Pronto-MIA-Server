@@ -14,21 +14,39 @@ namespace Pronto_MIA.BusinessLogic.API.Types
         protected override void Configure(
             IInputObjectTypeDescriptor<AccessControlList> descriptor)
         {
-            descriptor.Field(t => t.Id).Ignore();
-            descriptor.Field(t => t.UserId).Ignore();
-            descriptor.Field(t => t.User).Ignore();
+            IgnoreFields(descriptor);
             descriptor.Field(t => t.CanEditUsers)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditDepartmentUsers)
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanViewUsers)
                 .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewDepartmentUsers)
+                .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanEditDepartments)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditOwnDepartment)
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanViewDepartments)
                 .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewOwnDepartment)
+                .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanEditDeploymentPlans)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditDepartmentDeploymentPlans)
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanViewDeploymentPlans)
                 .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewDepartmentDeploymentPlans)
+                .Type<BooleanType>().DefaultValue(false);
+        }
+
+        private static void IgnoreFields(
+            IInputObjectTypeDescriptor<AccessControlList> descriptor)
+        {
+            descriptor.Field(t => t.Id).Ignore();
+            descriptor.Field(t => t.UserId).Ignore();
+            descriptor.Field(t => t.User).Ignore();
         }
     }
 }

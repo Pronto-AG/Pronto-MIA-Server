@@ -1,6 +1,7 @@
 namespace Pronto_MIA.Domain.EntityExtensions
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
@@ -21,6 +22,10 @@ namespace Pronto_MIA.Domain.EntityExtensions
         /// the given list.</returns>
         /// <exception cref="ArgumentException">If a control
         /// is used that has not yet been specified.</exception>
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Trivial switch case.")]
         public static bool HasControl(
             this AccessControlList acl, AccessControl control)
         {
@@ -28,16 +33,28 @@ namespace Pronto_MIA.Domain.EntityExtensions
             {
                 case AccessControl.CanEditUsers:
                     return acl.CanEditUsers;
+                case AccessControl.CanEditDepartmentUsers:
+                    return acl.CanEditDepartmentUsers;
                 case AccessControl.CanViewUsers:
                     return acl.CanViewUsers;
+                case AccessControl.CanViewDepartmentUsers:
+                    return acl.CanViewDepartmentUsers;
                 case AccessControl.CanEditDepartments:
                     return acl.CanEditDepartments;
+                case AccessControl.CanEditOwnDepartment:
+                    return acl.CanEditOwnDepartment;
                 case AccessControl.CanViewDepartments:
                     return acl.CanViewDepartments;
+                case AccessControl.CanViewOwnDepartment:
+                    return acl.CanViewOwnDepartment;
                 case AccessControl.CanEditDeploymentPlans:
                     return acl.CanEditDeploymentPlans;
+                case AccessControl.CanEditDepartmentDeploymentPlans:
+                    return acl.CanEditDepartmentDeploymentPlans;
                 case AccessControl.CanViewDeploymentPlans:
                     return acl.CanViewDeploymentPlans;
+                case AccessControl.CanViewDepartmentDeploymentPlans:
+                    return acl.CanViewDepartmentDeploymentPlans;
                 default:
                     throw new ArgumentException(
                         $"Unknown AccessControl \"{control.ToString()}\"");

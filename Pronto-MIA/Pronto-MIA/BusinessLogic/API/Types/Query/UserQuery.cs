@@ -7,6 +7,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
     using HotChocolate.Data;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.Logging;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -39,18 +40,31 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         }
 
         /// <summary>
-        /// Method which retrieves the available deployment plans.
+        /// Method which retrieves the available users. Depending
+        /// on the requesting users access rights only a fraction of the
+        /// available users might be returned.
         /// </summary>
         /// <param name="userManager">The user manager responsible for
         /// managing application users.</param>
-        /// <returns>Queryable of all available users.</returns>
-        [Authorize(Policy = "CanViewUsers")]
+        /// <param name="userState">Provides information about the user
+        /// requesting this endpoint.</param>
+        /// <returns>Queryable of all users available to the requesting
+        /// user.</returns>
+        [Authorize(Policy = "ViewUser")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<User> Users(
-            [Service] IUserManager userManager)
+            [Service] IUserManager userManager,
+            [ApiUserGlobalState] ApiUserState userState)
         {
-            return userManager.GetAll();
+            if (userState.User.AccessControlList.CanViewUsers)
+            {
+                return userManager.GetAll();
+            }
+
+            return userManager.GetAll().Where(
+                u => u.DepartmentId == userState.User.DepartmentId);
         }
     }
 }

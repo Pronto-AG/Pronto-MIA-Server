@@ -26,8 +26,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// </summary>
         /// <param name="firebaseTokenManager">The manager responsible for
         /// firebase token operations.</param>
-        /// <param name="userManager">The manager managing the users lifecycle.
-        /// </param>
         /// <param name="userState">Information about the current user.</param>
         /// <param name="fcmToken">The token to be registered.</param>
         /// <returns>True if the token was saved successfully.</returns>
@@ -37,16 +35,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
             [Service] IFirebaseTokenManager firebaseTokenManager,
-            [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
-            var user = await userManager.GetByUserName(userState.UserName);
-            if (user == default)
-            {
-                throw DataAccess.Error.UserNotFound.AsQueryException();
-            }
-
+            var user = userState.User;
             return
                 await firebaseTokenManager.RegisterFcmToken(user, fcmToken);
         }

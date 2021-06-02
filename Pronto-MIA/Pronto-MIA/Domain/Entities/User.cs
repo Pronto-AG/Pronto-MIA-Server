@@ -3,11 +3,13 @@ namespace Pronto_MIA.Domain.Entities
     using System.Collections.Generic;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Interfaces;
 
     /// <summary>
     /// Class representing a user of the application.
     /// </summary>
-    public class User
+    public class User : IDepartmentComparable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="User"/> class.
@@ -70,7 +72,8 @@ namespace Pronto_MIA.Domain.Entities
         /// Gets or sets the department associated with this
         /// user.
         /// </summary>
-        [Authorize(Policy = "CanViewDepartments")]
+        [Authorize(Policy = "ViewDepartment")]
+        [AccessObjectIdArgument("IGNORED")]
         public virtual Department Department { get; set; }
 
         /// <summary>

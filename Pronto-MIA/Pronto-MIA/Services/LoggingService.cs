@@ -1,11 +1,13 @@
 namespace Pronto_MIA.Services
 {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Class representing the logging service.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class LoggingService
     {
         /// <summary>

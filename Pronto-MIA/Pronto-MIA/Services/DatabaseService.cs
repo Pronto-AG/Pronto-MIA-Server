@@ -1,6 +1,6 @@
 namespace Pronto_MIA.Services
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +9,7 @@ namespace Pronto_MIA.Services
     /// <summary>
     /// Class containing all logic regarding the database service.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class DatabaseService
     {
         /// <summary>

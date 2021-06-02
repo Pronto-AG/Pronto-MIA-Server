@@ -1,10 +1,15 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using NSubstitute;
+    using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.BusinessLogic.API.Types.Query;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestDepartmentQuery
@@ -20,14 +25,51 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
-        public void TestDepartments()
+        public async Task TestDepartmentsUnlimited()
         {
+            var acl = new AccessControlList(-1) { CanViewDepartments = true };
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(
+                    this.dbContext, "Eric", acl);
+            var userState = new ApiUserState(user);
             var departmentManager =
                 Substitute.For<IDepartmentManager>();
+            departmentManager.GetAll().Returns(
+                this.dbContext.Departments);
+            var departmentCount = await this.dbContext.Departments.CountAsync();
 
-            this.departmentQuery.Departments(departmentManager);
+            var result =
+                this.departmentQuery.Departments(departmentManager, userState);
 
             departmentManager.Received().GetAll();
+            Assert.Equal(departmentCount, await result.CountAsync());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestDepartmentsLimited()
+        {
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(
+                    this.dbContext, "Eric");
+            user.DepartmentId =
+                (await this.dbContext.Departments.FirstAsync()).Id;
+            var userState = new ApiUserState(user);
+            var departmentManager =
+                Substitute.For<IDepartmentManager>();
+            departmentManager.GetAll().Returns(
+                this.dbContext.Departments);
+
+            var result =
+                this.departmentQuery.Departments(departmentManager, userState);
+
+            departmentManager.Received().GetAll();
+            Assert.Equal(1, result.Count());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

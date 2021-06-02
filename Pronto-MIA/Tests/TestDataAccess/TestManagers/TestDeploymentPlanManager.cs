@@ -490,7 +490,7 @@ namespace Tests.TestDataAccess.TestManagers
             await this.dbContext.SaveChangesAsync();
 
             var deploymentPlans = this.deploymentPlanManager.GetAll();
-            Assert.Equal(3, await deploymentPlans.CountAsync());
+            Assert.Equal(4, await deploymentPlans.CountAsync());
 
             this.dbContext.Remove(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
@@ -506,7 +506,7 @@ namespace Tests.TestDataAccess.TestManagers
             await this.dbContext.SaveChangesAsync();
 
             var deploymentPlans = this.deploymentPlanManager.GetAll();
-            Assert.Equal(4, await deploymentPlans.CountAsync());
+            Assert.Equal(5, await deploymentPlans.CountAsync());
 
             this.dbContext.Remove(deploymentPlan);
             this.dbContext.Remove(deploymentPlan2);

@@ -21,6 +21,9 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
+            this.dbContext.RemoveRange(this.dbContext.FcmTokens);
+            this.dbContext.SaveChanges();
+
             this.firebaseTokenManager = new FirebaseTokenManager(
                 this.dbContext,
                 Substitute.For<ILogger<FirebaseTokenManager>>());
@@ -162,14 +165,14 @@ namespace Tests.TestDataAccess.TestManagers
         [Fact]
         public async void TestGetDepartmentTokensNone()
         {
-            var department = await this.dbContext.Departments.FirstAsync();
+            const int virtualDepartmentId = 5;
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), this.dbContext.Users.First());
             this.dbContext.FcmTokens.Add(testToken);
             await this.dbContext.SaveChangesAsync();
 
             var result = await this.firebaseTokenManager
-                .GetDepartmentFcmToken(department.Id).ToListAsync();
+                .GetDepartmentFcmToken(virtualDepartmentId).ToListAsync();
 
             Assert.Empty(result);
 
@@ -224,10 +227,9 @@ namespace Tests.TestDataAccess.TestManagers
 
             Assert.Equal(2, result.Count());
 
-            this.dbContext.Users.RemoveRange(this.dbContext.Users);
+            this.dbContext.Users.RemoveRange(user, user2);
             this.dbContext.FcmTokens.RemoveRange(this.dbContext.FcmTokens);
             await this.dbContext.SaveChangesAsync();
-            TestDataProvider.InsertTestData(this.dbContext);
         }
     }
 }

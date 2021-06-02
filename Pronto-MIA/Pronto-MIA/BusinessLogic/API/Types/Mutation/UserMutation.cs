@@ -7,6 +7,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.Execution;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.Logging;
+    using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
@@ -43,7 +44,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// PasswordTooWeak exception if the provided password does not meet the
         /// policy requirements.
         /// </exception>
-        [Authorize(Policy = "CanEditUsers")]
+        [Authorize(Policy = "EditUser")]
+        [AccessObjectIdArgument("departmentId", true)]
         public async Task<User> CreateUser(
             [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
@@ -81,7 +83,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <exception cref="QueryException">Returns UserNotFound
         /// exception if the user with the given id could not be found.
         /// </exception>
-        [Authorize(Policy = "CanEditUsers")]
+        [Authorize(Policy = "EditUser")]
+        [AccessObjectIdArgument("id")]
         public async Task<int> RemoveUser(
             [Service] IUserManager userManager,
             int id)
@@ -116,7 +119,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// Alternatively returns PasswordTooWeak exception if the
         /// provided password does not meet the policy requirements.
         /// </exception>
-        [Authorize(Policy = "CanEditUsers")]
+        [Authorize(Policy = "EditUser")]
+        [AccessObjectIdArgument("id")]
         [Sensitive("password")]
         public async Task<User> UpdateUser(
             [Service] ProntoMiaDbContext dbContext,

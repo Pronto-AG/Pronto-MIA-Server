@@ -44,4 +44,8 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="TestBusinessLogic\TestSecurity\TestAuthorization" />
+    </ItemGroup>
+
 </Project>
