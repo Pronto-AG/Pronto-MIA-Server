@@ -20,7 +20,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestUserManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.userManager = new UserManager(

@@ -22,7 +22,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestDepartmentManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.departmentManager = new DepartmentManager(

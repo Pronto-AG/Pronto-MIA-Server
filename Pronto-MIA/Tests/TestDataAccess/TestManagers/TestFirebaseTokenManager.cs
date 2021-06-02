@@ -18,7 +18,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestFirebaseTokenManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.firebaseTokenManager = new FirebaseTokenManager(

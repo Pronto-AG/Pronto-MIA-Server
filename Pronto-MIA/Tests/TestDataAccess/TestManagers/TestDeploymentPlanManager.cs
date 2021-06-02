@@ -26,7 +26,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestDeploymentPlanManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
 
             this.fileManager = Substitute.For<IFileManager>();

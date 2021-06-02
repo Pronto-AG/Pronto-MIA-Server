@@ -1,12 +1,16 @@
 namespace Pronto_MIA.BusinessLogic.Security.Authorization
 {
+    using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using HotChocolate.Resolvers;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
     using Pronto_MIA.DataAccess;
+    using Pronto_MIA.Domain.Entities;
     using Pronto_MIA.Domain.EntityExtensions;
+    using Pronto_MIA.Services;
 
     /// <summary>
     /// Class responsible for handling user authorization
@@ -15,18 +19,30 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
     public class AccessControlListAuthorizationHandler
         : AuthorizationHandler<AccessControlListRequirement, IResolverContext>
     {
-        private readonly ProntoMiaDbContext dbContext;
+        private DbContextOptions<ProntoMiaDbContext> options;
 
         /// <summary>
         /// Initializes a new instance of the
         /// <see cref="AccessControlListAuthorizationHandler"/> class.
         /// </summary>
-        /// <param name="dbContext">The database context used to retrieve
-        /// up to date permission information.</param>
+        /// <param name="cfg">The configuration of the current
+        /// application.</param>
         public AccessControlListAuthorizationHandler(
-            ProntoMiaDbContext dbContext)
+            IConfiguration cfg)
         {
-            this.dbContext = dbContext;
+            this.options = DatabaseService.GetOptions(cfg);
+        }
+
+        /// <summary>
+        /// Method to overwrite the configured db context options.
+        /// This method can be used for testing or in general if other
+        /// options should be necessary.
+        /// </summary>
+        /// <param name="options">The options to be used within the
+        /// db context.</param>
+        public void SetDbOptions(DbContextOptions<ProntoMiaDbContext> options)
+        {
+            this.options = options;
         }
 
         /// <summary>
@@ -45,9 +61,15 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         {
             var userId = int.Parse(
                 context.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            var accessControlList = await this.dbContext
-                .AccessControlLists.SingleOrDefaultAsync(
-                    acl => acl.UserId == userId);
+            AccessControlList accessControlList;
+
+            await using (var dbContext = new ProntoMiaDbContext(this.options))
+            {
+                accessControlList = dbContext
+                    .AccessControlLists.SingleOrDefault(
+                        acl => acl.UserId == userId);
+            }
+
             if (
                 accessControlList != default &&
                 accessControlList.HasControl(requirement.Control))

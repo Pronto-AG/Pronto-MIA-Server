@@ -1,5 +1,6 @@
 namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 {
+    using System;
     using System.Collections.Generic;
     using System.Security.Claims;
     using System.Threading.Tasks;
@@ -18,10 +19,12 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 
         public TestAccessControlListAuthorizationHandler()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            var name = Guid.NewGuid().ToString();
+            this.dbContext = TestHelpers.InMemoryDbContext(name);
             TestDataProvider.InsertTestData(this.dbContext);
             this.handler = new AccessControlListAuthorizationHandler(
-                this.dbContext);
+                TestHelpers.TestConfiguration);
+            this.handler.SetDbOptions(TestHelpers.GetInMemoryDbOptions(name));
         }
 
         [Fact]

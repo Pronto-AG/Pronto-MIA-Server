@@ -11,7 +11,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestEntityExtensions
 
         public TestErrorExtension()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
         }
 

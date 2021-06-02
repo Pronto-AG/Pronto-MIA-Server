@@ -67,7 +67,7 @@ namespace Pronto_MIA.Domain.Entities
         public int? DepartmentId { get; set; }
 
         /// <summary>
-        /// Gets or sets the access control list associated with this
+        /// Gets or sets the department associated with this
         /// user.
         /// </summary>
         [Authorize(Policy = "CanViewDepartments")]

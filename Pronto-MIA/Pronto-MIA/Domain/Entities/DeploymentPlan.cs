@@ -2,6 +2,7 @@ namespace Pronto_MIA.Domain.Entities
 {
     using System;
     using HotChocolate;
+    using HotChocolate.AspNetCore.Authorization;
 
     /// <summary>
     /// Class which represents a deployment plan object.
@@ -108,6 +109,7 @@ namespace Pronto_MIA.Domain.Entities
         /// Gets or sets the department associated with this deployment
         /// plan.
         /// </summary>
+        [Authorize(Policy = "CanViewDepartments")]
         public virtual Department Department { get; set; }
     }
 }

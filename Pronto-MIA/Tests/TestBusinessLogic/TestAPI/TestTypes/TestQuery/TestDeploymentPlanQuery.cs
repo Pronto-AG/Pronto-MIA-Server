@@ -14,7 +14,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 
         public TestDeploymentPlanQuery()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.deploymentPlanQuery = new DeploymentPlanQuery();
         }

@@ -24,7 +24,7 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestFirebaseMessagingManager()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.firebaseMessagingAdapter =
                 Substitute.For<IFirebaseMessagingAdapter>();

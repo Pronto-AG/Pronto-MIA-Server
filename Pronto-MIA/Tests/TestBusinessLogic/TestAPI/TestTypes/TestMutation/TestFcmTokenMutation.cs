@@ -19,7 +19,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 
         public TestFcmTokenMutation()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.fcmTokenMutation = new FcmTokenMutation();
         }

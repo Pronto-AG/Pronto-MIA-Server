@@ -14,7 +14,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 
         public TestDepartmentQuery()
         {
-            this.dbContext = TestHelpers.InMemoryDbContext;
+            this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.departmentQuery = new DepartmentQuery();
         }
