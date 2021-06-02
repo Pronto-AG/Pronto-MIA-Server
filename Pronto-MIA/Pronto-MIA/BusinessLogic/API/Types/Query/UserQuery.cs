@@ -55,7 +55,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
-            if (userState.User.AccessControlList.CanViewDeploymentPlans)
+            if (userState.User.AccessControlList.CanViewUsers)
             {
                 return userManager.GetAll();
             }

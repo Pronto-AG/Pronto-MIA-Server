@@ -8,6 +8,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
     using Pronto_MIA.BusinessLogic.API.Types.Query;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestUserQuery
@@ -34,17 +35,45 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
-        public async Task TestUsers()
+        public async Task TestUsersUnlimited()
+        {
+            var acl = new AccessControlList(-1)
+                { CanViewUsers = true };
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(this.dbContext, "Fredi", acl);
+            var userState = new ApiUserState(user);
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetAll().Returns(this.dbContext.Users);
+            var userCount = await this.dbContext.Users.CountAsync();
+
+            var result = this.userQuery.Users(userManager, userState);
+
+            userManager.Received().GetAll();
+            Assert.Equal(userCount, await result.CountAsync());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestUsersLimited()
         {
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi");
             var userState = new ApiUserState(user);
             var userManager =
                 Substitute.For<IUserManager>();
+            userManager.GetAll().Returns(this.dbContext.Users);
+            var userCount = await this.dbContext.Users.CountAsync();
 
-            this.userQuery.Users(userManager, userState);
+            var result = this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
+            Assert.Equal(1, await result.CountAsync());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }

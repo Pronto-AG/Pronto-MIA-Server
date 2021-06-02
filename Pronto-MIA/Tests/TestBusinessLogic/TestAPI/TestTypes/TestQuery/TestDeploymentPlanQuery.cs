@@ -8,6 +8,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
     using Pronto_MIA.BusinessLogic.API.Types.Query;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
+    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestDeploymentPlanQuery
@@ -23,18 +24,54 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
-        public async Task TestDeploymentPlans()
+        public async Task TestDeploymentPlansUnlimited()
         {
+            var acl = new AccessControlList(-1)
+                { CanViewDeploymentPlans = true };
             var user = await QueryTestHelpers
-                .CreateUserWithAcl(this.dbContext, "Fredi");
+                .CreateUserWithAcl(this.dbContext, "Fredi", acl);
             var userState = new ApiUserState(user);
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
+            deploymentPlanManager.GetAll().Returns(
+                this.dbContext.DeploymentPlans);
+            var deploymentPlanCount =
+                await this.dbContext.DeploymentPlans.CountAsync();
 
-            this.deploymentPlanQuery.DeploymentPlans(
+            var result = this.deploymentPlanQuery.DeploymentPlans(
                deploymentPlanManager, userState);
 
             deploymentPlanManager.Received().GetAll();
+            Assert.Equal(deploymentPlanCount, await result.CountAsync());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
+        }
+
+        [Fact]
+        public async Task TestDeploymentPlansLimited()
+        {
+            var user = await QueryTestHelpers
+                .CreateUserWithAcl(this.dbContext, "Fredi");
+            user.DepartmentId =
+                (await this.dbContext.Departments
+                    .SingleAsync(d => d.Name == "Finance")).Id;
+            var userState = new ApiUserState(user);
+            var deploymentPlanManager =
+                Substitute.For<IDeploymentPlanManager>();
+            deploymentPlanManager.GetAll().Returns(
+                this.dbContext.DeploymentPlans);
+            var deploymentPlanCount =
+                await this.dbContext.DeploymentPlans.CountAsync();
+
+            var result = this.deploymentPlanQuery.DeploymentPlans(
+                deploymentPlanManager, userState);
+
+            deploymentPlanManager.Received().GetAll();
+            Assert.Equal(2, await result.CountAsync());
+
+            this.dbContext.Remove(user);
+            await this.dbContext.SaveChangesAsync();
         }
     }
 }
