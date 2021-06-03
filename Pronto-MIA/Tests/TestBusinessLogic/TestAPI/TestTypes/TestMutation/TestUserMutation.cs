@@ -1,7 +1,9 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 {
+    using System.Threading.Tasks;
     using NSubstitute;
+    using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.BusinessLogic.API.Types.Mutation;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
@@ -18,6 +20,26 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             this.dbContext = TestHelpers.InMemoryDbContext();
             TestDataProvider.InsertTestData(this.dbContext);
             this.userMutation = new UserMutation();
+        }
+
+        [Fact]
+        public async Task TestPasswordChange()
+        {
+            var userManager = this.CreateUserManager();
+            var user = new User("ChangeTest", new byte[5], "{}", "{}")
+            {
+                Id = -5,
+            };
+            var userState = new ApiUserState(user);
+
+            await this.userMutation.ChangePassword(
+                userManager,
+                userState,
+                "old",
+                "new");
+
+            await userManager.Received()
+                .ChangePassword(-5, "old", "new");
         }
 
         [Fact]
