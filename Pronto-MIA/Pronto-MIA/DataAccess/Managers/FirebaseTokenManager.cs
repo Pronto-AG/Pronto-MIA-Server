@@ -101,6 +101,7 @@
         {
             var fcmTokenObject = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == fcmToken);
+            user = await this.dbContext.Users.FindAsync(user.Id);
 
             if (fcmTokenObject == default)
             {
