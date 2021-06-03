@@ -16,12 +16,12 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Method to register a new fcm token for a user. If the token is
         /// already registered the owner will be adjusted.
         /// </summary>
-        /// <param name="user"> The owner of the fcm token.
+        /// <param name="userId"> The id of the owner of the fcm token.
         /// </param>
         /// <param name="fcmToken">The token to be added.</param>
         /// <returns>The created fcm token.</returns>
         public Task<IQueryable<FcmToken>> RegisterFcmToken(
-            User user, string fcmToken);
+            int userId, string fcmToken);
 
         /// <summary>
         /// Method to remove a fcm token from the database.

@@ -36,9 +36,9 @@
 
         /// <inheritdoc/>
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            User user, string fcmToken)
+            int userId, string fcmToken)
         {
-            await this.MoveOrCreateFcmToken(user, fcmToken);
+            await this.MoveOrCreateFcmToken(userId, fcmToken);
 
             return this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
@@ -97,11 +97,11 @@
         /// If a fcm token already exists it will be moved else a new token will
         /// be created.
         /// </summary>
-        private async Task MoveOrCreateFcmToken(User user, string fcmToken)
+        private async Task MoveOrCreateFcmToken(int userId, string fcmToken)
         {
             var fcmTokenObject = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == fcmToken);
-            user = await this.dbContext.Users.FindAsync(user.Id);
+            var user = await this.dbContext.Users.FindAsync(userId);
 
             if (fcmTokenObject == default)
             {

@@ -40,7 +40,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         {
             var user = userState.User;
             return
-                await firebaseTokenManager.RegisterFcmToken(user, fcmToken);
+                await firebaseTokenManager.RegisterFcmToken(user.Id, fcmToken);
         }
 
         /// <summary>
