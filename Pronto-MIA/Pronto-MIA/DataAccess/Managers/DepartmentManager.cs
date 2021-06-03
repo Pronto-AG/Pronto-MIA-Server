@@ -78,7 +78,7 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             var department = await this.GetById(id);
 
-            if (department.Users != null)
+            if (department.Users is { Count: > 0 })
             {
                 throw Error.DepartmentInUse.AsQueryException();
             }
