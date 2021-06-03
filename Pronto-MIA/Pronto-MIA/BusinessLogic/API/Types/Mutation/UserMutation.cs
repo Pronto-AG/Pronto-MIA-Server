@@ -21,6 +21,33 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     public class UserMutation
     {
         /// <summary>
+        /// Change the password of an existing user.
+        /// </summary>
+        /// <param name="userManager">The user manager responsible for
+        /// managing application users.</param>
+        /// <param name="userState">Information about the current user.</param>
+        /// <param name="oldPassword">The current password of the user.</param>
+        /// <param name="newPassword">The new password of the user.</param>
+        /// <returns>The newly valid jwt token for the user.</returns>
+        /// <exception cref="QueryException">Returns UserNotFound exception
+        /// if the user could not be found. Additionally returns
+        /// PasswordTooWeak exception if the provided password does not meet the
+        /// policy requirements. If the oldPassword argument does not match the
+        /// users current password a WrongPassword exception will be thrown.
+        /// </exception>
+        [Authorize]
+        public async Task<string> ChangePassword(
+            [Service] IUserManager userManager,
+            [ApiUserGlobalState] ApiUserState userState,
+            string oldPassword,
+            string newPassword)
+        {
+            var user = userState.User;
+            return await userManager.ChangePassword(
+                user.Id, oldPassword, newPassword);
+        }
+
+        /// <summary>
         /// Creates a new User.
         /// </summary>
         /// <param name="dbContext">The database context that will be

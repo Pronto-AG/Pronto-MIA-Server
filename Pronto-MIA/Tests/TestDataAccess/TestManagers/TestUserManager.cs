@@ -1,5 +1,6 @@
 namespace Tests.TestDataAccess.TestManagers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -13,6 +14,10 @@ namespace Tests.TestDataAccess.TestManagers
     using Pronto_MIA.Domain.Entities;
     using Xunit;
 
+    [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN005",
+        Justification = "Tests for a single class.")]
     public class TestUserManager
     {
         private readonly UserManager userManager;
@@ -77,6 +82,70 @@ namespace Tests.TestDataAccess.TestManagers
             var error = await Assert.ThrowsAsync<QueryException>(async () =>
                 await this.userManager.Authenticate("Bob", "Hello"));
             Assert.Equal(Error.WrongPassword.ToString(), error.Errors[0].Code);
+        }
+
+        [Fact]
+        public async Task TestPasswordChange()
+        {
+            var user = await this.dbContext.Users.SingleAsync(
+                u => u.UserName == "Bob");
+            var oldHash = user.PasswordHash;
+            var newPassword = "H1-zkr.3";
+
+            await this.userManager.ChangePassword(
+                user.Id, "Hello Alice", newPassword);
+
+            Assert.NotEqual(oldHash, user.PasswordHash);
+
+            // Would throw if password where incorrect.
+            await this.userManager.Authenticate("Bob", newPassword);
+
+            this.dbContext.RemoveRange(this.dbContext.Users);
+            await this.dbContext.SaveChangesAsync();
+            TestDataProvider.InsertTestData(this.dbContext);
+        }
+
+        [Fact]
+        public async Task TestPasswordChangeInvalidUser()
+        {
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.userManager.ChangePassword(
+                    -5, "Hello Alice", "newPassword");
+            });
+
+            Assert.Equal(Error.UserNotFound.ToString(), error.Errors[0].Code);
+        }
+
+        [Fact]
+        public async Task TestPasswordChangeWrongPassword()
+        {
+            var user = await this.dbContext.Users.SingleAsync(
+                u => u.UserName == "Bob");
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.userManager.ChangePassword(
+                    user.Id, "Hello Alice-", "newPassword");
+            });
+
+            Assert.Equal(Error.WrongPassword.ToString(), error.Errors[0].Code);
+        }
+
+        [Fact]
+        public async Task TestPasswordChangePasswordToWeak()
+        {
+            var user = await this.dbContext.Users.SingleAsync(
+                u => u.UserName == "Bob");
+
+            var error = await Assert.ThrowsAsync<QueryException>(async () =>
+            {
+                await this.userManager.ChangePassword(
+                    user.Id, "Hello Alice", "newPassword");
+            });
+
+            Assert.Equal(
+                Error.PasswordTooWeak.ToString(), error.Errors[0].Code);
         }
 
         [Fact]
