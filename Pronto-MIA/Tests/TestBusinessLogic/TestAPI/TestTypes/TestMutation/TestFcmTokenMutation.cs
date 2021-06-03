@@ -29,16 +29,16 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         {
             var firebaseTokenManager =
                 Substitute.For<IFirebaseTokenManager>();
-            var userTask = this.dbContext.Users
+            var user = await this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
 
             await this.fcmTokenMutation.RegisterFcmToken(
                 firebaseTokenManager,
-                new ApiUserState(await userTask),
+                new ApiUserState(user),
                 "Hello World");
 
             await firebaseTokenManager.Received()
-                .RegisterFcmToken(await userTask, "Hello World");
+                .RegisterFcmToken(user.Id, "Hello World");
         }
 
         [Fact]
