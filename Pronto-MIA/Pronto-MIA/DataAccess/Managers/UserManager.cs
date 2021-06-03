@@ -301,7 +301,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.CheckPasswordPolicy(password);
             var generator = HashGeneratorFactory.GetGeneratorForUser(user);
             user.PasswordHash = generator.HashPassword(password);
-            user.LastInvalidated = DateTime.UtcNow;
+            user.LastInvalidated = DateTime.UtcNow.AddSeconds(-1);
         }
 
         /// <summary>

@@ -3,9 +3,7 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
     using System;
     using System.Globalization;
     using System.Linq;
-    using System.Security.Authentication;
     using System.Security.Claims;
-    using System.Threading;
     using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.Execution;
@@ -31,10 +29,10 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
         /// to create a dbContext.</param>
         /// <param name="context">The httpContext of the current request.
         /// </param>
-        /// <param name="executor">The executor of the current request.</param>
         /// <param name="builder">The query request builder which will be
         /// extended by the <see cref="ApiUserState"/>.</param>
-        /// <param name="token">The cancellation token of the request.</param>
+        /// <param name="dbContext">The database context to be used if no new
+        /// context should be created. Primarily used for testing.</param>
         /// <returns>A task that can be awaited.</returns>
         /// <exception cref="QueryException">Throws a query exception if
         /// the user could not be found or the token used for authentication
@@ -42,15 +40,14 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
         public static async ValueTask AddUserState(
             IConfiguration cfg,
             HttpContext context,
-            IRequestExecutor executor,
             IQueryRequestBuilder builder,
-            CancellationToken token)
+            ProntoMiaDbContext dbContext = null)
         {
             ApiUserState apiUserState = default;
             var identity = context.User.Identity;
             if (identity is { IsAuthenticated: true })
             {
-                var user = await GetUser(cfg, context);
+                var user = await GetUser(cfg, context, dbContext);
                 CheckIfTokenRevoked(context, user.LastInvalidated);
                 apiUserState = new ApiUserState(user.Id, user.UserName);
             }
@@ -62,15 +59,16 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
 
         private static async Task<User> GetUser(
             IConfiguration cfg,
-            HttpContext context)
+            HttpContext context,
+            ProntoMiaDbContext dbContext = null)
         {
-            await using (var dbContext = new ProntoMiaDbContext(
-                DatabaseService.GetOptions(cfg)))
+            dbContext ??= new ProntoMiaDbContext(
+                DatabaseService.GetOptions(cfg));
+
+            await using (dbContext)
             {
                 var userId = int.Parse(context
                     .User.FindFirstValue(ClaimTypes.NameIdentifier));
-                var userName = context
-                    .User.FindFirstValue(ClaimTypes.Name);
                 var user = dbContext.Users
                     .SingleOrDefault(u => u.Id == userId);
                 if (user == null)
@@ -97,16 +95,23 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
                 issuedAt, CultureInfo.InvariantCulture);
             if (lastInvalidated > issuedAtTime)
             {
-                throw new AuthenticationException();
+                throw GetAuthorizationException(
+                    "The token used has been previously invalidated.");
             }
         }
 
-        private static GraphQLException GetAuthorizationException()
+        private static GraphQLException GetAuthorizationException(
+            string message = null)
         {
+            if (message == null)
+            {
+                message = "The current user is not authorized " +
+                          "to access this resource.";
+            }
+
             return new (
                 ErrorBuilder.New()
-                    .SetMessage("The current user is not authorized " +
-                                "to access this resource.")
+                    .SetMessage(message)
                     .SetCode("AUTH_NOT_AUTHORIZED").Build());
         }
     }

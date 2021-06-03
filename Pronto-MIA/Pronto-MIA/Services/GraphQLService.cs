@@ -39,7 +39,7 @@ namespace Pronto_MIA.Services
                 .AddHttpRequestInterceptor(
                     (context, executor, builder, token) =>
                         UserStateRequestInterceptor.AddUserState(
-                            config, context, executor, builder, token))
+                            config, context, builder))
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
                 .AddType<AccessControlListInputType>()
