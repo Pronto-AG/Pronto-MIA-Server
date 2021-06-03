@@ -24,6 +24,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// already exists it will be overwritten with the currently
         /// authenticated user.
         /// </summary>
+        /// <param name="userManager">The manager responsible
+        /// for managing application users.</param>
         /// <param name="firebaseTokenManager">The manager responsible for
         /// firebase token operations.</param>
         /// <param name="userState">Information about the current user.</param>
@@ -34,13 +36,15 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
+            [Service] IUserManager userManager,
             [Service] IFirebaseTokenManager firebaseTokenManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
-            var user = userState.User;
+            var user = await userManager.GetById(userState.UserId);
             return
-                await firebaseTokenManager.RegisterFcmToken(user, fcmToken);
+                await firebaseTokenManager.RegisterFcmToken(
+                    user, fcmToken);
         }
 
         /// <summary>

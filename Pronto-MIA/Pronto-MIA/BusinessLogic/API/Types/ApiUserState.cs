@@ -1,8 +1,6 @@
 #nullable enable
 namespace Pronto_MIA.BusinessLogic.API.Types
 {
-    using Pronto_MIA.Domain.Entities;
-
     /// <summary>
     /// Class representing the state of an api user.
     /// </summary>
@@ -11,15 +9,24 @@ namespace Pronto_MIA.BusinessLogic.API.Types
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiUserState"/> class.
         /// </summary>
-        /// <param name="user">The user currently using the api.</param>
-        public ApiUserState(User user)
+        /// <param name="userId">The id of the user currently using the api.
+        /// </param>
+        /// <param name="userName">The username of the user currently using the
+        /// api.</param>
+        public ApiUserState(int userId, string userName)
         {
-            this.User = user;
+            this.UserId = userId;
+            this.UserName = userName;
         }
 
         /// <summary>
-        /// Gets the user currently working with the api.
+        /// Gets the id of the user currently working with the api.
         /// </summary>
-        public User User { get; }
+        public int UserId { get; }
+
+        /// <summary>
+        /// Gets the name of the user currently working with the api.
+        /// </summary>
+        public string UserName { get;  }
     }
 }

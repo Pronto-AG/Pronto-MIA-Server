@@ -2,11 +2,11 @@
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
     using System.Linq;
+    using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
     using HotChocolate.Types;
-    using Pronto_MIA.BusinessLogic.Security.Authorization;
     using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
@@ -24,6 +24,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// on the requesting users access rights only a fraction of the
         /// available departments might be returned.
         /// </summary>
+        /// <param name="userManager">The manager responsible
+        /// for managing application users.</param>
         /// <param name="departmentManager">The department manager responsible
         /// for managing application departments.</param>
         /// <param name="userState">Provides information about the user
@@ -34,17 +36,19 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Department> Departments(
+        public async Task<IQueryable<Department>> Departments(
+            [Service] IUserManager userManager,
             [Service] IDepartmentManager departmentManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
-            if (userState.User.AccessControlList.CanViewDepartments)
+            var user = await userManager.GetById(userState.UserId);
+            if (user.AccessControlList.CanViewDepartments)
             {
                 return departmentManager.GetAll();
             }
 
             return departmentManager.GetAll().Where(
-                d => d.Id == userState.User.DepartmentId);
+                d => d.Id == user.DepartmentId);
         }
     }
 }

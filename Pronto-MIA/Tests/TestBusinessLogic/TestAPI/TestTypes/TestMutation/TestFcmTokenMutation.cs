@@ -1,15 +1,12 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
 {
-    using System.Threading.Tasks;
-    using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
     using NSubstitute;
     using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.BusinessLogic.API.Types.Mutation;
     using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
-    using Pronto_MIA.Domain.Entities;
     using Xunit;
 
     public class TestFcmTokenMutation
@@ -29,16 +26,20 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
         {
             var firebaseTokenManager =
                 Substitute.For<IFirebaseTokenManager>();
-            var userTask = this.dbContext.Users
+            var user = await this.dbContext.Users
                 .SingleOrDefaultAsync(u => u.UserName == "Bob");
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
 
             await this.fcmTokenMutation.RegisterFcmToken(
+                userManager,
                 firebaseTokenManager,
-                new ApiUserState(await userTask),
+                new ApiUserState(user.Id, user.UserName),
                 "Hello World");
 
             await firebaseTokenManager.Received()
-                .RegisterFcmToken(await userTask, "Hello World");
+                .RegisterFcmToken(user, "Hello World");
         }
 
         [Fact]

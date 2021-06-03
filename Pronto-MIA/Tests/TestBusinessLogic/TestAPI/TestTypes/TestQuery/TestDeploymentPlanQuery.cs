@@ -30,7 +30,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
                 { CanViewDeploymentPlans = true };
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi", acl);
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
             deploymentPlanManager.GetAll().Returns(
@@ -38,8 +41,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var deploymentPlanCount =
                 await this.dbContext.DeploymentPlans.CountAsync();
 
-            var result = this.deploymentPlanQuery.DeploymentPlans(
-               deploymentPlanManager, userState);
+            var result = await this.deploymentPlanQuery.DeploymentPlans(
+               userManager, deploymentPlanManager, userState);
 
             deploymentPlanManager.Received().GetAll();
             Assert.Equal(deploymentPlanCount, await result.CountAsync());
@@ -56,7 +59,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             user.DepartmentId =
                 (await this.dbContext.Departments
                     .SingleAsync(d => d.Name == "Finance")).Id;
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();
             deploymentPlanManager.GetAll().Returns(
@@ -64,8 +70,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var deploymentPlanCount =
                 await this.dbContext.DeploymentPlans.CountAsync();
 
-            var result = this.deploymentPlanQuery.DeploymentPlans(
-                deploymentPlanManager, userState);
+            var result = await this.deploymentPlanQuery.DeploymentPlans(
+                userManager, deploymentPlanManager, userState);
 
             deploymentPlanManager.Received().GetAll();
             Assert.Equal(2, await result.CountAsync());

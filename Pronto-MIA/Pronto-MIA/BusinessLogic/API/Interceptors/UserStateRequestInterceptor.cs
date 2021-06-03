@@ -10,7 +10,6 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
     using HotChocolate;
     using HotChocolate.Execution;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Pronto_MIA.BusinessLogic.API.Types;
     using Pronto_MIA.DataAccess;
@@ -53,7 +52,7 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
             {
                 var user = await GetUser(cfg, context);
                 CheckIfTokenRevoked(context, user.LastInvalidated);
-                apiUserState = new ApiUserState(user);
+                apiUserState = new ApiUserState(user.Id, user.UserName);
             }
 
             builder.SetProperty(
@@ -73,8 +72,6 @@ namespace Pronto_MIA.BusinessLogic.API.Interceptors
                 var userName = context
                     .User.FindFirstValue(ClaimTypes.Name);
                 var user = dbContext.Users
-                    .Include(u => u.Department)
-                    .Include(u => u.AccessControlList)
                     .SingleOrDefault(u => u.Id == userId);
                 if (user == null)
                 {

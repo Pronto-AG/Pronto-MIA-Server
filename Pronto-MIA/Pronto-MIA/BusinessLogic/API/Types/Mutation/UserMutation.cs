@@ -42,9 +42,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             string oldPassword,
             string newPassword)
         {
-            var user = userState.User;
             return await userManager.ChangePassword(
-                user.Id, oldPassword, newPassword);
+                userState.UserId, oldPassword, newPassword);
         }
 
         /// <summary>
