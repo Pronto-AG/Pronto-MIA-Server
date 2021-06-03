@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Domain.Entities
 {
+    using System;
     using System.Collections.Generic;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
@@ -102,5 +103,11 @@ namespace Pronto_MIA.Domain.Entities
         /// </summary>
         [GraphQLIgnore]
         public virtual ICollection<FcmToken> FcmTokens { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time the users jwt-tokens were last invalidated.
+        /// </summary>
+        [GraphQLIgnore]
+        public DateTime LastInvalidated { get; set; }
     }
 }
