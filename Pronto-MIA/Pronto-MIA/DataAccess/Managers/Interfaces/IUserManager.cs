@@ -34,6 +34,17 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
             string userName, string password);
 
         /// <summary>
+        /// Method to change the password of an existing user.
+        /// </summary>
+        /// <param name="userId">The id of the user requesting the
+        /// password change.</param>
+        /// <param name="oldPassword">The current password of the user.</param>
+        /// <param name="newPassword">The new password of the user.</param>
+        /// <returns>The newly valid jwt token for the user.</returns>
+        public Task<string> ChangePassword(
+            int userId, string oldPassword, string newPassword);
+
+        /// <summary>
         /// Method that returns a User object for the given username.
         /// </summary>
         /// <param name="userName">The name of the user to be found.</param>

@@ -5,6 +5,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
+    using HotChocolate.Execution;
     using HotChocolate.Types;
     using Pronto_MIA.BusinessLogic.API.Logging;
     using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;
@@ -30,6 +31,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// <param name="password">The password of the user.</param>
         /// <returns>A JWT-Bearer-Token which can be used within the
         /// authentication header in order to authenticate the user.</returns>
+        /// <exception cref="QueryException">
+        /// If the password argument does not match the
+        /// users current password a WrongPassword exception will be thrown.
+        /// </exception>
         [Sensitive("password")]
         public async Task<string> Authenticate(
             [Service] IUserManager userManager,

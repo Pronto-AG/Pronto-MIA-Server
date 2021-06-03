@@ -3,6 +3,7 @@ namespace Pronto_MIA.DataAccess.Managers
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Security.Claims;
@@ -23,6 +24,10 @@ namespace Pronto_MIA.DataAccess.Managers
     /// <summary>
     /// Class responsible for the lifecycle of a user within the application.
     /// </summary>
+    [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN005",
+        Justification = "Many comments.")]
     public class UserManager : IUserManager
     {
         private static readonly IHashGeneratorOptions
@@ -85,24 +90,25 @@ namespace Pronto_MIA.DataAccess.Managers
                 throw DataAccess.Error.UserNotFound.AsQueryException();
             }
 
-            var hashGenerator = HashGeneratorFactory.GetGeneratorForUser(user);
-
-            if (!hashGenerator.ValidatePassword(
-                password, user.PasswordHash))
-            {
-                this.logger.LogWarning(
-                    "Invalid password for user {UserName}", userName);
-                throw DataAccess.Error.WrongPassword.AsQueryException();
-            }
-
-            if (hashGenerator.GetIdentifier() !=
-                DefaultHashGenerator.GetIdentifier())
-            {
-                await this.UpdateHash(password, user);
-            }
+            await this.CheckPassword(password, user);
 
             this.logger.LogDebug(
                 "User {UserName} has been authenticated", userName);
+            return this.GenerateToken(user);
+        }
+
+        /// <inheritdoc/>
+        public async Task<string> ChangePassword(
+            int userId, string oldPassword, string newPassword)
+        {
+            var user = await this.GetById(userId);
+
+            await this.CheckPassword(oldPassword, user);
+            this.UpdatePassword(newPassword, user);
+
+            this.dbContext.Update(user);
+            await this.dbContext.SaveChangesAsync();
+
             return this.GenerateToken(user);
         }
 
@@ -292,6 +298,34 @@ namespace Pronto_MIA.DataAccess.Managers
             this.CheckPasswordPolicy(password);
             var generator = HashGeneratorFactory.GetGeneratorForUser(user);
             user.PasswordHash = generator.HashPassword(password);
+        }
+
+        /// <summary>
+        /// Method to check the provided password against the password saved
+        /// within the database.
+        /// </summary>
+        /// <param name="password">The password provided.</param>
+        /// <param name="user">The user to be checked against.</param>
+        /// <exception cref="QueryException">If the password provided does
+        /// not match with the users password a WrongPassword exception will
+        /// be thrown.</exception>
+        private async Task CheckPassword(string password, User user)
+        {
+            var hashGenerator = HashGeneratorFactory.GetGeneratorForUser(user);
+
+            if (!hashGenerator.ValidatePassword(
+                password, user.PasswordHash))
+            {
+                this.logger.LogWarning(
+                    "Invalid password for user {UserName}", user.UserName);
+                throw DataAccess.Error.WrongPassword.AsQueryException();
+            }
+
+            if (hashGenerator.GetIdentifier() !=
+                DefaultHashGenerator.GetIdentifier())
+            {
+                await this.UpdateHash(password, user);
+            }
         }
     }
 }
