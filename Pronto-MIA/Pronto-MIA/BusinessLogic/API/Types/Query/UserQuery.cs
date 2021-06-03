@@ -45,6 +45,22 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         }
 
         /// <summary>
+        /// Method which returns the user making the request.
+        /// </summary>
+        /// <param name="userManager">The manager responsible for user
+        /// operations.</param>
+        /// <param name="userState">Provides information about the user
+        /// requesting this endpoint.</param>
+        /// <returns>The user requesting this endpoint.</returns>
+        [Authorize]
+        public async Task<User> User(
+            [Service] IUserManager userManager,
+            [ApiUserGlobalState] ApiUserState userState)
+        {
+            return await userManager.GetById(userState.User.Id);
+        }
+
+        /// <summary>
         /// Method which retrieves the available users. Depending
         /// on the requesting users access rights only a fraction of the
         /// available users might be returned.
