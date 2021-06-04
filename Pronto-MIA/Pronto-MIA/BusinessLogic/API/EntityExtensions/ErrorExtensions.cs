@@ -120,8 +120,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                         "passwordPolicyViolation",
                         arguments["passwordPolicyViolation"])
                     .SetExtension(
-                        "minLenght",
-                        arguments["minLenght"])
+                        "minLength",
+                        arguments["minLength"])
                     .Build());
         }
     }
