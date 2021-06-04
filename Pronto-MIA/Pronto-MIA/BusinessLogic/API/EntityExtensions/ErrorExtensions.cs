@@ -57,7 +57,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             {
                 case DataAccess.Error.PasswordTooWeak:
                     return "Minimum password requirement not met:" +
-                           " Min. {{MinLenght}} characters, 1 lowercase, " +
+                           " Min. {{MinLength}} characters, 1 lowercase, " +
                            "1 uppercase, 1 number and 1 non alphanumeric";
                 case DataAccess.Error.UserAlreadyExists:
                     return "Username already taken";
@@ -108,8 +108,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             DataAccess.Error error, Dictionary<string, string> arguments)
         {
             var message = error.Message().Replace(
-                "{{MinLenght}}",
-                arguments["minLenght"]);
+                "{{MinLength}}",
+                arguments["minLength"]);
             return new QueryException(
                 ErrorBuilder
                     .New()
