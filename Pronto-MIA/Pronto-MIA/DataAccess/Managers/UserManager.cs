@@ -59,8 +59,8 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger = logger;
         }
 
-        private int MinPasswordLenght =>
-            this.cfg.GetValue<int>("User:MIN_PASSWORD_LENGHT");
+        private int MinPasswordLength =>
+            this.cfg.GetValue<int>("User:MIN_PASSWORD_LENGTH");
 
         private string SigningKey =>
             this.cfg.GetValue<string>("JWT:SIGNING_KEY");
@@ -269,12 +269,12 @@ namespace Pronto_MIA.DataAccess.Managers
         private void CheckPasswordPolicy(string password)
         {
             var checkPassword = PasswordHelper
-                .PasswordPolicyMet(password, this.MinPasswordLenght);
+                .PasswordPolicyMet(password, this.MinPasswordLength);
             if (checkPassword != PasswordHelper.PasswordPolicyViolation.None)
             {
                 var arguments = new Dictionary<string, string>
                 {
-                    ["minLenght"] = this.MinPasswordLenght.ToString(),
+                    ["minLength"] = this.MinPasswordLength.ToString(),
                     ["passwordPolicyViolation"] = checkPassword.ToString(),
                 };
                 throw DataAccess.Error.PasswordTooWeak
@@ -329,3 +329,4 @@ namespace Pronto_MIA.DataAccess.Managers
         }
     }
 }
+
