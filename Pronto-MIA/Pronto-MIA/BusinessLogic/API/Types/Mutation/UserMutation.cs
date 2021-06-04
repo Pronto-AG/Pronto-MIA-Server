@@ -36,6 +36,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// users current password a WrongPassword exception will be thrown.
         /// </exception>
         [Authorize]
+        [Sensitive("oldPassword")]
+        [Sensitive("newPassword")]
         public async Task<string> ChangePassword(
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState,
