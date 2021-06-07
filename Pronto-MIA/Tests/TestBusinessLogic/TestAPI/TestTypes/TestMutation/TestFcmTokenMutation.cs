@@ -33,11 +33,14 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             userManager.GetById(default).ReturnsForAnyArgs(user);
 
             await this.fcmTokenMutation.RegisterFcmToken(
+                this.dbContext,
                 userManager,
                 firebaseTokenManager,
                 new ApiUserState(user.Id, user.UserName),
                 "Hello World");
 
+            userManager.Received().SetDbContext(this.dbContext);
+            firebaseTokenManager.Received().SetDbContext(this.dbContext);
             await firebaseTokenManager.Received()
                 .RegisterFcmToken(user, "Hello World");
         }

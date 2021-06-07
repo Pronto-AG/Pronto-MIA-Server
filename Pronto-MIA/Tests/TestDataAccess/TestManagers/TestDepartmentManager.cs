@@ -240,6 +240,29 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
+        public async Task TestRemoveWithUserRemoved()
+        {
+            var departmentName = "HR";
+            var department = new Department(departmentName);
+            this.dbContext.Departments.Add(department);
+            await this.dbContext.SaveChangesAsync();
+            var user = await this.AddUserToDb();
+            user.DepartmentId = department.Id;
+            this.dbContext.Update(user);
+            await this.dbContext.SaveChangesAsync();
+            await this.RemoveUserFromDb(user);
+            var countBefore = await this.dbContext.Departments.CountAsync();
+
+            await this.departmentManager.Remove(department.Id);
+
+            var countAfter = await this.dbContext.Departments.CountAsync();
+            Assert.Equal(countBefore - 1, countAfter);
+            var departmentAfter = await this.dbContext.Departments
+                .FindAsync(department.Id);
+            Assert.Null(departmentAfter);
+        }
+
+        [Fact]
         public async Task TestGetAllSingle()
         {
             var departmentName = "HR";

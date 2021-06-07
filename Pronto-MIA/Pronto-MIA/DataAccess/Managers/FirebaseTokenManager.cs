@@ -3,8 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Castle.Core.Configuration;
-    using FirebaseAdmin.Messaging;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
@@ -15,7 +13,7 @@
     /// </summary>
     public class FirebaseTokenManager : IFirebaseTokenManager
     {
-        private readonly ProntoMiaDbContext dbContext;
+        private ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
 
         /// <summary>
@@ -32,6 +30,12 @@
         {
             this.dbContext = dbContext;
             this.logger = logger;
+        }
+
+        /// <inheritdoc/>
+        public void SetDbContext(ProntoMiaDbContext context)
+        {
+            this.dbContext = context;
         }
 
         /// <inheritdoc/>
@@ -101,7 +105,6 @@
         {
             var fcmTokenObject = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == fcmToken);
-            user = await this.dbContext.Users.FindAsync(user.Id);
 
             if (fcmTokenObject == default)
             {

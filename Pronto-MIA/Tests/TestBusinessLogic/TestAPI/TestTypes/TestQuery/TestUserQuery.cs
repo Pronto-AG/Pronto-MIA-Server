@@ -35,6 +35,22 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         }
 
         [Fact]
+        public async void TestUser()
+        {
+            var user =
+                await this.dbContext.Users
+                    .SingleAsync(u => u.UserName == "Bob");
+            var userManager = Substitute.For<IUserManager>();
+            var userState = new ApiUserState(user.Id, user.UserName);
+
+            await this.userQuery.User(
+                userManager,
+                userState);
+
+            await userManager.Received().GetById(user.Id);
+        }
+
+        [Fact]
         public async Task TestUsersUnlimited()
         {
             var acl = new AccessControlList(-1)

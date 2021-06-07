@@ -104,9 +104,17 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
                 return null;
             }
 
+            var attributes = method.GetCustomAttributes(
+                typeof(AccessObjectIdArgumentAttribute),
+                false);
+
+            if (attributes.Length == 0 || attributes.Length > 1)
+            {
+                return null;
+            }
+
             var accessObjectIdArgument =
-                (AccessObjectIdArgumentAttribute?)method.GetCustomAttribute(
-                    typeof(AccessObjectIdArgumentAttribute), false);
+                (AccessObjectIdArgumentAttribute?)attributes[0];
 
             return accessObjectIdArgument;
         }

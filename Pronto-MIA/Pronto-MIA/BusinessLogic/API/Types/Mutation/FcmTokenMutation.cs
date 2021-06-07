@@ -1,3 +1,5 @@
+using Pronto_MIA.DataAccess;
+
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
     using System.Linq;
@@ -24,6 +26,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// already exists it will be overwritten with the currently
         /// authenticated user.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure that the user can be changed
+        /// in all managers.</param>
         /// <param name="userManager">The manager responsible
         /// for managing application users.</param>
         /// <param name="firebaseTokenManager">The manager responsible for
@@ -36,14 +42,17 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
+            [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
             [Service] IFirebaseTokenManager firebaseTokenManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
+            userManager.SetDbContext(dbContext);
+            firebaseTokenManager.SetDbContext(dbContext);
+
             var user = await userManager.GetById(userState.UserId);
-            return
-                await firebaseTokenManager.RegisterFcmToken(
+            return await firebaseTokenManager.RegisterFcmToken(
                     user, fcmToken);
         }
 
