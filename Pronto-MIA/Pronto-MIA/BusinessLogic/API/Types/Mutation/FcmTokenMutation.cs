@@ -1,5 +1,3 @@
-using Pronto_MIA.DataAccess;
-
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
     using System.Linq;
@@ -8,8 +6,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
     using HotChocolate.Types;
-    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
+    using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 

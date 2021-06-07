@@ -13,8 +13,8 @@
     /// </summary>
     public class FirebaseTokenManager : IFirebaseTokenManager
     {
-        private ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseTokenManager"/>
