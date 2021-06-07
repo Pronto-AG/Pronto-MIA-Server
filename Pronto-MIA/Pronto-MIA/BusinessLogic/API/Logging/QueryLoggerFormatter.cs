@@ -60,7 +60,6 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
             }
             catch
             {
-                // all input type records will land here.
                 stringBuilder.Append(
                     "  Formatting Variables Error. Continuing...");
                 stringBuilder.AppendLine();
