@@ -52,7 +52,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         public async Task<Department> UpdateDepartment(
             [Service] IDepartmentManager departmentManager,
             int id,
-            string name)
+            string? name)
         {
             return await departmentManager.Update(id, name);
         }
