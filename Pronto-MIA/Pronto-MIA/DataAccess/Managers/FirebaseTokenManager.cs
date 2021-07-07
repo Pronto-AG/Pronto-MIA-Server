@@ -3,8 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Castle.Core.Configuration;
-    using FirebaseAdmin.Messaging;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
@@ -15,8 +13,8 @@
     /// </summary>
     public class FirebaseTokenManager : IFirebaseTokenManager
     {
-        private readonly ProntoMiaDbContext dbContext;
         private readonly ILogger logger;
+        private ProntoMiaDbContext dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FirebaseTokenManager"/>
@@ -35,10 +33,16 @@
         }
 
         /// <inheritdoc/>
-        public async Task<IQueryable<FcmToken>> RegisterFcmToken(
-            int userId, string fcmToken)
+        public void SetDbContext(ProntoMiaDbContext context)
         {
-            await this.MoveOrCreateFcmToken(userId, fcmToken);
+            this.dbContext = context;
+        }
+
+        /// <inheritdoc/>
+        public async Task<IQueryable<FcmToken>> RegisterFcmToken(
+            User user, string fcmToken)
+        {
+            await this.MoveOrCreateFcmToken(user, fcmToken);
 
             return this.dbContext.FcmTokens.Where(
                 fcmTokenDb => fcmTokenDb.Id == fcmToken);
@@ -97,11 +101,10 @@
         /// If a fcm token already exists it will be moved else a new token will
         /// be created.
         /// </summary>
-        private async Task MoveOrCreateFcmToken(int userId, string fcmToken)
+        private async Task MoveOrCreateFcmToken(User user, string fcmToken)
         {
             var fcmTokenObject = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == fcmToken);
-            var user = await this.dbContext.Users.FindAsync(userId);
 
             if (fcmTokenObject == default)
             {

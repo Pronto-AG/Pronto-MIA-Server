@@ -4,6 +4,7 @@ namespace Pronto_MIA.DataAccess.Managers
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Security.Claims;
@@ -220,6 +221,8 @@ namespace Pronto_MIA.DataAccess.Managers
                 new Claim(
                     ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("issuedAt", DateTime.UtcNow.ToString(
+                    CultureInfo.InvariantCulture)),
             };
 
             var token = new JwtSecurityToken(
@@ -298,6 +301,7 @@ namespace Pronto_MIA.DataAccess.Managers
             this.CheckPasswordPolicy(password);
             var generator = HashGeneratorFactory.GetGeneratorForUser(user);
             user.PasswordHash = generator.HashPassword(password);
+            user.LastInvalidated = DateTime.UtcNow.AddSeconds(-1);
         }
 
         /// <summary>

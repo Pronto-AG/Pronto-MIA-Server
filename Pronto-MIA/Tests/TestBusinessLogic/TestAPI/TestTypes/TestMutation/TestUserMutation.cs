@@ -30,7 +30,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             {
                 Id = -5,
             };
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
 
             await this.userMutation.ChangePassword(
                 userManager,

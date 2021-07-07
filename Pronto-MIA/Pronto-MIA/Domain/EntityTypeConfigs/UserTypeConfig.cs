@@ -1,5 +1,6 @@
 namespace Pronto_MIA.Domain.EntityTypeConfigs
 {
+    using System;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using Pronto_MIA.Domain.Entities;
@@ -25,6 +26,9 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.Property(u => u.HashGeneratorOptions)
                 .IsRequired()
                 .HasColumnType("jsonb");
+            builder.Property(u => u.LastInvalidated)
+                .IsRequired()
+                .HasDefaultValue(default(DateTime));
             builder.HasMany<FcmToken>(u => u.FcmTokens)
                 .WithOne(t => t.Owner);
             builder.HasOne<AccessControlList>(u => u.AccessControlList)

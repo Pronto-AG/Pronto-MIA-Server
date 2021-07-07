@@ -57,7 +57,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
-            return await userManager.GetById(userState.User.Id);
+            return await userManager.GetById(userState.UserId);
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// on the requesting users access rights only a fraction of the
         /// available users might be returned.
         /// </summary>
-        /// <param name="userManager">The user manager responsible for
-        /// managing application users.</param>
+        /// <param name="userManager">The manager responsible
+        /// for managing application users.</param>
         /// <param name="userState">Provides information about the user
         /// requesting this endpoint.</param>
         /// <returns>Queryable of all users available to the requesting
@@ -75,17 +75,18 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<User> Users(
+        public async Task<IQueryable<User>> Users(
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
-            if (userState.User.AccessControlList.CanViewUsers)
+            var user = await userManager.GetById(userState.UserId);
+            if (user.AccessControlList.CanViewUsers)
             {
                 return userManager.GetAll();
             }
 
             return userManager.GetAll().Where(
-                u => u.DepartmentId == userState.User.DepartmentId);
+                u => u.DepartmentId == user.DepartmentId);
         }
     }
 }

@@ -13,15 +13,24 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     public interface IFirebaseTokenManager
     {
         /// <summary>
+        /// Method to overwrite the <see cref="ProntoMiaDbContext"/>
+        /// used by the manager. This can be used if transactions
+        /// over multiple managers have to be implemented.
+        /// </summary>
+        /// <param name="dbContext">The db context to be used by the
+        /// manager.</param>
+        public void SetDbContext(ProntoMiaDbContext dbContext);
+
+        /// <summary>
         /// Method to register a new fcm token for a user. If the token is
         /// already registered the owner will be adjusted.
         /// </summary>
-        /// <param name="userId"> The id of the owner of the fcm token.
+        /// <param name="user"> The owner of the fcm token.
         /// </param>
         /// <param name="fcmToken">The token to be added.</param>
         /// <returns>The created fcm token.</returns>
         public Task<IQueryable<FcmToken>> RegisterFcmToken(
-            int userId, string fcmToken);
+            User user, string fcmToken);
 
         /// <summary>
         /// Method to remove a fcm token from the database.

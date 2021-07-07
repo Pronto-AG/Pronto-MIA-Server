@@ -31,7 +31,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(
                     this.dbContext, "Eric", acl);
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             var departmentManager =
                 Substitute.For<IDepartmentManager>();
             departmentManager.GetAll().Returns(
@@ -39,7 +42,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var departmentCount = await this.dbContext.Departments.CountAsync();
 
             var result =
-                this.departmentQuery.Departments(departmentManager, userState);
+                await this.departmentQuery.Departments(
+                    userManager, departmentManager, userState);
 
             departmentManager.Received().GetAll();
             Assert.Equal(departmentCount, await result.CountAsync());
@@ -56,14 +60,18 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
                     this.dbContext, "Eric");
             user.DepartmentId =
                 (await this.dbContext.Departments.FirstAsync()).Id;
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
+            var userManager =
+                Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             var departmentManager =
                 Substitute.For<IDepartmentManager>();
             departmentManager.GetAll().Returns(
                 this.dbContext.Departments);
 
             var result =
-                this.departmentQuery.Departments(departmentManager, userState);
+                await this.departmentQuery.Departments(
+                    userManager, departmentManager, userState);
 
             departmentManager.Received().GetAll();
             Assert.Equal(1, result.Count());

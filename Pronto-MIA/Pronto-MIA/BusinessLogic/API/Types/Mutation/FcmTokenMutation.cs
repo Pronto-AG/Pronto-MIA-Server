@@ -6,8 +6,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
     using HotChocolate.Types;
-    using Pronto_MIA.BusinessLogic.API.EntityExtensions;
     using Pronto_MIA.BusinessLogic.API.Logging;
+    using Pronto_MIA.DataAccess;
     using Pronto_MIA.DataAccess.Managers.Interfaces;
     using Pronto_MIA.Domain.Entities;
 
@@ -24,6 +24,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// already exists it will be overwritten with the currently
         /// authenticated user.
         /// </summary>
+        /// <param name="dbContext">The database context that will be
+        /// used. Using the same <see cref="ProntoMiaDbContext"/> over
+        /// multiple managers will ensure that the user can be changed
+        /// in all managers.</param>
+        /// <param name="userManager">The manager responsible
+        /// for managing application users.</param>
         /// <param name="firebaseTokenManager">The manager responsible for
         /// firebase token operations.</param>
         /// <param name="userState">Information about the current user.</param>
@@ -34,13 +40,18 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         [UseProjection]
         [Sensitive("fcmToken")]
         public async Task<IQueryable<FcmToken>> RegisterFcmToken(
+            [Service] ProntoMiaDbContext dbContext,
+            [Service] IUserManager userManager,
             [Service] IFirebaseTokenManager firebaseTokenManager,
             [ApiUserGlobalState] ApiUserState userState,
             string fcmToken)
         {
-            var user = userState.User;
-            return
-                await firebaseTokenManager.RegisterFcmToken(user.Id, fcmToken);
+            userManager.SetDbContext(dbContext);
+            firebaseTokenManager.SetDbContext(dbContext);
+
+            var user = await userManager.GetById(userState.UserId);
+            return await firebaseTokenManager.RegisterFcmToken(
+                    user, fcmToken);
         }
 
         /// <summary>

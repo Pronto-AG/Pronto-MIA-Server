@@ -37,7 +37,7 @@ namespace Tests.TestDataAccess.TestManagers
                     u.UserName == "Bob");
 
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, "Hello World");
+                .RegisterFcmToken(bob, "Hello World");
 
             var token = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == "Hello World");
@@ -54,13 +54,13 @@ namespace Tests.TestDataAccess.TestManagers
                 await this.dbContext.Users.SingleOrDefaultAsync(u =>
                     u.UserName == "Bob");
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, "Hello World");
+                .RegisterFcmToken(bob, "Hello World");
             var alice =
                 await this.dbContext.Users.SingleOrDefaultAsync(u =>
                     u.UserName == "Alice");
 
             await this.firebaseTokenManager
-                .RegisterFcmToken(alice.Id, "Hello World");
+                .RegisterFcmToken(alice, "Hello World");
 
             var token = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == "Hello World");
@@ -77,10 +77,10 @@ namespace Tests.TestDataAccess.TestManagers
                 await this.dbContext.Users.SingleOrDefaultAsync(u =>
                     u.UserName == "Bob");
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, "Hello World");
+                .RegisterFcmToken(bob, "Hello World");
 
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, "Hello World");
+                .RegisterFcmToken(bob, "Hello World");
 
             var token = await this.dbContext.FcmTokens
                 .SingleOrDefaultAsync(t => t.Id == "Hello World");
@@ -97,7 +97,7 @@ namespace Tests.TestDataAccess.TestManagers
                 await this.dbContext.Users.SingleOrDefaultAsync(u =>
                     u.UserName == "Bob");
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, "Hello World");
+                .RegisterFcmToken(bob, "Hello World");
 
             var result = await this.firebaseTokenManager.UnregisterFcmToken(
                 "Hello World");
@@ -117,9 +117,9 @@ namespace Tests.TestDataAccess.TestManagers
                 await this.dbContext.Users.SingleOrDefaultAsync(u =>
                     u.UserName == "Bob");
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, tokenString1);
+                .RegisterFcmToken(bob, tokenString1);
             await this.firebaseTokenManager
-                .RegisterFcmToken(bob.Id, tokenString2);
+                .RegisterFcmToken(bob, tokenString2);
 
             await this.firebaseTokenManager
                 .UnregisterMultipleFcmToken(

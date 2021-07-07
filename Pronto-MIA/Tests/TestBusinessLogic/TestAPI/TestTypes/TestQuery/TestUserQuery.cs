@@ -41,7 +41,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
                 await this.dbContext.Users
                     .SingleAsync(u => u.UserName == "Bob");
             var userManager = Substitute.For<IUserManager>();
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
 
             await this.userQuery.User(
                 userManager,
@@ -57,13 +57,14 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
                 { CanViewUsers = true };
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi", acl);
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
             var userManager =
                 Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             userManager.GetAll().Returns(this.dbContext.Users);
             var userCount = await this.dbContext.Users.CountAsync();
 
-            var result = this.userQuery.Users(userManager, userState);
+            var result = await this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
             Assert.Equal(userCount, await result.CountAsync());
@@ -77,13 +78,14 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         {
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi");
-            var userState = new ApiUserState(user);
+            var userState = new ApiUserState(user.Id, user.UserName);
             var userManager =
                 Substitute.For<IUserManager>();
+            userManager.GetById(default).ReturnsForAnyArgs(user);
             userManager.GetAll().Returns(this.dbContext.Users);
             var userCount = await this.dbContext.Users.CountAsync();
 
-            var result = this.userQuery.Users(userManager, userState);
+            var result = await this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
             Assert.Equal(1, await result.CountAsync());

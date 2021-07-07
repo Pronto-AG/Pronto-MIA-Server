@@ -1,6 +1,7 @@
 namespace Pronto_MIA.BusinessLogic.API.Types.Query
 {
     using System.Linq;
+    using System.Threading.Tasks;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using HotChocolate.Data;
@@ -22,6 +23,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// on the requesting users access rights only a fraction of the
         /// available plans might be returned.
         /// </summary>
+        /// <param name="userManager">The manager responsible
+        /// for managing application users.</param>
         /// <param name="deploymentPlanManager">The deployment plan manager
         /// responsible for managing deployment plans.</param>
         /// <param name="userState">Provides information about the user
@@ -32,17 +35,19 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<DeploymentPlan> DeploymentPlans(
+        public async Task<IQueryable<DeploymentPlan>> DeploymentPlans(
+            [Service] IUserManager userManager,
             [Service] IDeploymentPlanManager deploymentPlanManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
-            if (userState.User.AccessControlList.CanViewDeploymentPlans)
+            var user = await userManager.GetById(userState.UserId);
+            if (user.AccessControlList.CanViewDeploymentPlans)
             {
                 return deploymentPlanManager.GetAll();
             }
 
             return deploymentPlanManager.GetAll().Where(
-                dP => dP.DepartmentId == userState.User.DepartmentId);
+                dP => dP.DepartmentId == user.DepartmentId);
         }
     }
 }
