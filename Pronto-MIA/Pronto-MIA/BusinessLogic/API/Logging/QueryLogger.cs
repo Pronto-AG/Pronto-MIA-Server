@@ -1,5 +1,6 @@
 namespace Pronto_MIA.BusinessLogic.API.Logging
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -13,7 +14,7 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
     /// <summary>
     /// Logs the query request to the console.
     /// </summary>
-    public class QueryLogger : DiagnosticEventListener
+    public class QueryLogger : ExecutionDiagnosticEventListener
     {
         private static readonly string[] SensitiveParameters;
         private static Stopwatch queryTimer;
@@ -56,12 +57,12 @@ namespace Pronto_MIA.BusinessLogic.API.Logging
         /// </summary>
         /// <param name="context">The Context of the request.</param>
         /// <returns>An object that will live as long as the request.</returns>
-        public override IActivityScope ExecuteRequest(IRequestContext context)
+        public override IDisposable ExecuteRequest(IRequestContext context)
         {
             return new RequestScope(this.logger, context);
         }
 
-        private class RequestScope : IActivityScope
+        private class RequestScope : IDisposable
         {
             private readonly IRequestContext context;
             private readonly ILogger<QueryLogger> logger;
