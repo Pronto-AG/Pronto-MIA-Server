@@ -82,7 +82,7 @@ namespace Pronto_MIA.DataAccess
         FirebaseOperationError,
 
         /// <summary>
-        /// Error code representing that the deployment plan searched for could
+        /// Error code representing that the external news searched for could
         /// not be found.
         /// </summary>
         ExternalNewsNotFound,

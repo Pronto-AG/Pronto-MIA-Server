@@ -85,6 +85,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Firebase operation failed";
                 case DataAccess.Error.FileOperationError:
                     return "A file operation error occured";
+                case DataAccess.Error.ExternalNewsNotFound:
+                    return "Could not find external news";
                 case DataAccess.Error.UnknownError:
                     return "An unknown internal error occured";
                 default:
