@@ -98,7 +98,7 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         private static AccessObjectIdArgumentAttribute?
             GetAccessObjectIdArgument(IResolverContext resource)
         {
-            var method = resource.Field.ResolverMember;
+            var method = resource.Selection.Field.ResolverMember;
             if (method == null)
             {
                 return null;

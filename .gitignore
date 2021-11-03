@@ -90,4 +90,7 @@ doc/
 ## Environment variables
 .env
 ## Production buildlog
-Pronto-MIA/buildlog.txt 
+Pronto-MIA/buildlog.txt
+
+## Exclude Visual Studio
+Pronto-MIA/.vs/
