@@ -91,7 +91,6 @@ doc/
 .env
 ## Production buildlog
 Pronto-MIA/buildlog.txt
-Pronto-MIA/Pronto-MIA/buildlog.txt
 
 ## Exclude Visual Studio
 Pronto-MIA/.vs/
