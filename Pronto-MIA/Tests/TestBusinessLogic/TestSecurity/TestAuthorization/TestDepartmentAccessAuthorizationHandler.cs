@@ -113,7 +113,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
             });
             var resource = Substitute.For<IResolverContext>();
             var method = CreateArgumentAttributeMethodInfo();
-            resource.Field.ResolverMember.Returns(method);
+            resource.Selection.Field.ResolverMember.Returns(method);
             var requirement = CreateRequirement(
                 AccessControl.CanViewOwnDepartment, AccessMode.Department);
             var context = new AuthorizationHandlerContext(
@@ -324,7 +324,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
             var resource = Substitute.For<IResolverContext>();
             var method = CreateArgumentAttributeMethodInfo(
                 argumentName, isDepartmentId);
-            resource.Field.ResolverMember.Returns(method);
+            resource.Selection.Field.ResolverMember.Returns(method);
 
             var argumentList = new List<ArgumentNode>();
             if (argumentName != null && argumentValue != null)
