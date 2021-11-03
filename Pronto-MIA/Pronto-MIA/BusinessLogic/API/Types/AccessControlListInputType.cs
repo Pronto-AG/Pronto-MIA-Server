@@ -39,6 +39,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanViewDepartmentDeploymentPlans)
                 .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewExternalNews)
+                .Type<BooleanType>().DefaultValue(true);
+            descriptor.Field(t => t.CanEditExternalNews)
+                .Type<BooleanType>().DefaultValue(false);
         }
 
         private static void IgnoreFields(
