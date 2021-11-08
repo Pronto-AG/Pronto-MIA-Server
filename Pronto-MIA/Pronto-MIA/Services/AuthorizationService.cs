@@ -33,6 +33,8 @@ namespace Pronto_MIA.Services
                 AddViewUser(options);
                 AddEditDeploymentPlan(options);
                 AddViewDeploymentPlan(options);
+                AddEditExternalNews(options);
+                AddViewExternalNews();
             });
             services.AddScoped<IAuthorizationHandler,
                 DepartmentAccessAuthorizationHandler>();
@@ -190,6 +192,36 @@ namespace Pronto_MIA.Services
                             typeof(DeploymentPlan),
                             viewDeploymentPlanControls));
                 });
+        }
+
+        private static void AddEditExternalNews(AuthorizationOptions options)
+        {
+            var editExternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditExternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditExternalNews",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+        }
+
+        private static void AddViewExternalNews()
+        {
+            var viewExternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewExternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
         }
     }
 }

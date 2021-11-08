@@ -113,5 +113,17 @@ namespace Pronto_MIA.Domain.Entities
         /// edit all deployment plans of his department.
         /// </summary>
         public bool CanEditDepartmentDeploymentPlans { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// view all external news.
+        /// </summary>
+        public bool CanViewExternalNews { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all external news.
+        /// </summary>
+        public bool CanEditExternalNews { get; set; }
     }
 }

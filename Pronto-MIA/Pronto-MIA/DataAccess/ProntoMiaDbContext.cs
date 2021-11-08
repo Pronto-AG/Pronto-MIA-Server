@@ -47,6 +47,11 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<Department> Departments { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing external news.
+        /// </summary>
+        public DbSet<ExternalNews> ExternalNews { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
        {
@@ -57,6 +62,7 @@ namespace Pronto_MIA.DataAccess
            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
            modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
            modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
+           modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
 
            this.AddAdminUser(modelBuilder);
        }
@@ -97,6 +103,8 @@ namespace Pronto_MIA.DataAccess
                 CanEditDepartments = true,
                 CanEditDeploymentPlans = true,
                 CanViewDeploymentPlans = true,
+                CanViewExternalNews = true,
+                CanEditExternalNews = true,
             };
         }
     }

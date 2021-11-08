@@ -69,5 +69,15 @@ namespace Pronto_MIA.Domain.Entities
         /// of the own department.
         /// </summary>
         CanEditDepartmentDeploymentPlans,
+
+        /// <summary>
+        /// Permission to view all external news.
+        /// </summary>
+        CanViewExternalNews,
+
+        /// <summary>
+        /// Permission to edit all external news.
+        /// </summary>
+        CanEditExternalNews,
     }
 }
