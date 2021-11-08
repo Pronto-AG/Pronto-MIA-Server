@@ -59,7 +59,6 @@ namespace Pronto_MIA.DataAccess.Managers
                 DateTime availableFrom,
                 IFile file)
         {
-
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(
                 IExternalNewsManager.FileDirectory, uuid.ToString(), file);

@@ -75,7 +75,7 @@ namespace Pronto_MIA.Domain.Entities
         /// treated as active.
         /// </summary>
         public DateTime AvailableFrom { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the uuid used as file name for the file associated with
         /// this deployment plan.
