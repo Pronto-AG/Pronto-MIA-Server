@@ -46,6 +46,7 @@ namespace Pronto_MIA.Services
                         AddUserState(config, context, executor, builder, token))
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
+                .AddType<ExternalNewsResolvers>()
                 .AddType<AccessControlListInputType>()
                 .AddQueryType<Query>()
                 .AddTypeExtension<DeploymentPlanQuery>()

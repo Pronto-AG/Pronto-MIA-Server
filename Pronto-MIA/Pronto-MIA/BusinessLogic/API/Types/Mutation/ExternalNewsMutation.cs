@@ -39,6 +39,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// article.</param>
         /// <param name="availableFrom">The moment from which the external
         /// news will be treated as active.</param>
+        /// <param name="file">The file to be associated with the new external
+        /// news.</param>
         /// <returns>The newly generated external news.</returns>
         [Authorize(Policy = "EditExternalNews")]
         [UseSingleOrDefault]
@@ -47,7 +49,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             [Service] IExternalNewsManager externalNewsManager,
             string title,
             string description,
-            DateTime availableFrom)
+            DateTime availableFrom,
+            IFile file)
         {
             externalNewsManager.SetDbContext(dbContext);
             await using (var dbContextTransaction = await
@@ -56,7 +59,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 var externalNews = await externalNewsManager.Create(
                     title,
                     description,
-                    availableFrom);
+                    availableFrom,
+                    file);
 
                 await dbContextTransaction.CommitAsync();
                 return externalNews;
@@ -80,6 +84,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// article.</param>
         /// <param name="availableFrom">The moment from which the external
         /// news will be treated as active.</param>
+        /// <param name="file">The file to be associated with the new external
+        /// news.</param>
         /// <returns>The updated external news.</returns>
         /// <exception cref="QueryException">Returns ExternalNewsNotFound
         /// exception if the external news with given id could not be found.
@@ -92,7 +98,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             int id,
             string? title,
             string? description,
-            DateTime? availableFrom)
+            DateTime? availableFrom,
+            IFile? file)
         {
             externalNewsManager.SetDbContext(dbContext);
             await using (var dbContextTransaction = await
@@ -102,7 +109,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                     id,
                     title,
                     description,
-                    availableFrom);
+                    availableFrom,
+                    file);
                 await dbContextTransaction.CommitAsync();
                 return externalNews;
             }

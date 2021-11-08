@@ -15,12 +15,13 @@ namespace Pronto_MIA.DataAccess.Managers
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
-    /// Class responsible for the lifecycle of a deployment plan within the
+    /// Class responsible for the lifecycle of a external news within the
     /// application.
     /// </summary>
     public class ExternalNewsManager : IExternalNewsManager
     {
         private readonly ILogger logger;
+        private readonly IFileManager fileManager;
         private ProntoMiaDbContext dbContext;
 
         /// <summary>
@@ -31,12 +32,17 @@ namespace Pronto_MIA.DataAccess.Managers
         /// events regarding this manager.</param>
         /// <param name="dbContext">The database context where object are
         /// persisted.</param>
+        /// <param name="fileManager">The file manager which handles the
+        /// persistence of the file associated with the external news object.
+        /// </param>
         public ExternalNewsManager(
             ProntoMiaDbContext dbContext,
-            ILogger<ExternalNewsManager> logger)
+            ILogger<ExternalNewsManager> logger,
+            IFileManager fileManager)
         {
             this.logger = logger;
             this.dbContext = dbContext;
+            this.fileManager = fileManager;
         }
 
         /// <inheritdoc/>
@@ -50,12 +56,20 @@ namespace Pronto_MIA.DataAccess.Managers
             Create(
                 string title,
                 string description,
-                DateTime availableFrom)
+                DateTime availableFrom,
+                IFile file)
         {
+
+            var uuid = Guid.NewGuid();
+            await this.fileManager.Create(
+                IExternalNewsManager.FileDirectory, uuid.ToString(), file);
+
             var externalNews = new ExternalNews(
                 title,
                 description,
-                availableFrom);
+                availableFrom,
+                uuid,
+                IFileManager.GetFileExtension(file));
             this.dbContext.ExternalNews.Add(externalNews);
             await this.dbContext.SaveChangesAsync();
             this.logger.LogInformation(
@@ -70,7 +84,8 @@ namespace Pronto_MIA.DataAccess.Managers
                 int id,
                 string? title,
                 string? description,
-                DateTime? availableFrom)
+                DateTime? availableFrom,
+                IFile? file)
         {
             var externalNews = await this.GetById(id);
 
@@ -80,7 +95,7 @@ namespace Pronto_MIA.DataAccess.Managers
                 externalNews, description);
             externalNews = this.UpdateAvailableFrom(
                 externalNews, availableFrom);
-
+            externalNews = await this.UpdateFile(externalNews, file);
             await this.dbContext.SaveChangesAsync();
             this.logger.LogInformation(
                 "External news with id {Id} has been updated",
@@ -126,6 +141,11 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             var externalNews = await this.GetById(id);
 
+            this.fileManager.Remove(
+                IExternalNewsManager.FileDirectory,
+                externalNews.FileUuid.ToString(),
+                externalNews.FileExtension);
+
             this.dbContext.Remove(externalNews);
             await this.dbContext.SaveChangesAsync();
 
@@ -152,6 +172,37 @@ namespace Pronto_MIA.DataAccess.Managers
                 "Invalid external news id {Id}", id);
             throw DataAccess.Error.ExternalNewsNotFound
                 .AsQueryException();
+        }
+
+        /// <summary>
+        /// Updates the file of a given external news.
+        /// </summary>
+        /// <param name="externalNews">The external news to be updated.
+        /// </param>
+        /// <param name="file">The new file to be associated with the external
+        /// news.</param>
+        private async Task<ExternalNews> UpdateFile(
+            ExternalNews externalNews, IFile? file)
+        {
+            if (file == null)
+            {
+                return externalNews;
+            }
+
+            var uuid = Guid.NewGuid();
+            await this.fileManager.Create(
+                IExternalNewsManager.FileDirectory, uuid.ToString(), file);
+
+            externalNews.FileUuid = uuid;
+            externalNews.FileExtension =
+                IFileManager.GetFileExtension(file);
+
+            this.fileManager.Remove(
+                IExternalNewsManager.FileDirectory,
+                externalNews.FileUuid.ToString(),
+                externalNews.FileExtension);
+
+            return externalNews;
         }
 
         /// <summary>

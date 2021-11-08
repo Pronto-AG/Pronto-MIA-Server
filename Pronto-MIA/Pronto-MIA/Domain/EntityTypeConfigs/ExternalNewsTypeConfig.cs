@@ -25,6 +25,13 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.Property(eN => eN.Description).IsRequired();
             builder.Property(eN => eN.AvailableFrom).IsRequired();
             builder.Property(eN => eN.Published).IsRequired();
+            builder.Property(eN => eN.FileUuid).IsRequired();
+            builder.HasIndex(eN => eN.FileUuid).IsUnique();
+            builder.Property(eN => eN.FileUuid)
+                .HasConversion(
+                    uuid => uuid.ToString(),
+                    uuid => Guid.Parse(uuid));
+            builder.Property(eN => eN.FileExtension).IsRequired();
         }
     }
 }

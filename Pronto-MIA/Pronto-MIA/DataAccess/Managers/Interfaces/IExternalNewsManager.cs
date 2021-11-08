@@ -33,17 +33,20 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Method which creates a new external news object.
         /// </summary>
         /// <param name="title">A short description to identify the
-        /// deployment plan.</param>
+        /// external news.</param>
         /// <param name="description">A description of the external news
         /// article.</param>
-        /// <param name="availableFrom">Moment from which the deployment plan
+        /// <param name="availableFrom">Moment from which the external news
         /// should be treated as active.</param>
+        /// <param name="file">The file to be associated with the new external
+        /// news.</param>
         /// <returns>The new external news.</returns>
         public Task<ExternalNews>
             Create(
                 string title,
                 string description,
-                DateTime availableFrom);
+                DateTime availableFrom,
+                IFile file);
 
         /// <summary>
         /// Updates the external news identified by the given id.
@@ -51,11 +54,13 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// <param name="id">The id of the external news to be updated.
         /// </param>
         /// <param name="title">A short description to identify the
-        /// deployment plan.</param>
+        /// external news.</param>
         /// <param name="description">A description of the external news
         /// article.</param>
-        /// <param name="availableFrom">Moment from which the deployment plan
+        /// <param name="availableFrom">Moment from which the external news
         /// should be treated as active.</param>
+        /// <param name="file">The new file associated with the external news.
+        /// </param>
         /// <returns>The updated external news.</returns>
         /// <exception cref="QueryException">If the external news to be
         /// updated could not be found.</exception>
@@ -64,7 +69,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
                 int id,
                 string? title,
                 string? description,
-                DateTime? availableFrom);
+                DateTime? availableFrom,
+                IFile? file);
 
         /// <summary>
         /// Sets the status of the external news identified by the given id to

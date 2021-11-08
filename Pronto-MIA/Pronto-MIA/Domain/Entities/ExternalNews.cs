@@ -20,14 +20,22 @@ namespace Pronto_MIA.Domain.Entities
         /// <see cref="Title"/> property.</param>
         /// <param name="description">The
         /// <see cref="Description"/> property.</param>
+        /// <param name="fileUuid">The
+        /// <see cref="FileUuid"/> property.</param>
+        /// <param name="fileExtension">The
+        /// <see cref="FileExtension"/> property.</param>
         public ExternalNews(
             string title,
             string description,
-            DateTime availableFrom)
+            DateTime availableFrom,
+            Guid fileUuid,
+            string fileExtension)
         {
             this.AvailableFrom = availableFrom;
             this.Title = title;
             this.Description = description;
+            this.FileUuid = fileUuid;
+            this.FileExtension = fileExtension;
             this.Published = false;
         }
 
@@ -42,6 +50,8 @@ namespace Pronto_MIA.Domain.Entities
             this.AvailableFrom = default;
             this.Title = null;
             this.Description = null;
+            this.FileUuid = Guid.Empty;
+            this.FileExtension = string.Empty;
             this.Published = false;
         }
 
@@ -65,6 +75,20 @@ namespace Pronto_MIA.Domain.Entities
         /// treated as active.
         /// </summary>
         public DateTime AvailableFrom { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the uuid used as file name for the file associated with
+        /// this deployment plan.
+        /// </summary>
+        [GraphQLIgnore]
+        public Guid FileUuid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file extension of the file associated with this
+        /// deployment plan.
+        /// </summary>
+        [GraphQLIgnore]
+        public string FileExtension { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the external news is in

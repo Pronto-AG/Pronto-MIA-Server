@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pronto_MIA.DataAccess;
@@ -9,9 +10,10 @@ using Pronto_MIA.DataAccess;
 namespace Pronto_MIA.DataAccess.Migrations
 {
     [DbContext(typeof(ProntoMiaDbContext))]
-    partial class ProntoMiaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211104085927_External-news-add")]
+    partial class Externalnewsadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,14 +175,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FileExtension")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FileUuid")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<bool>("Published")
                         .HasColumnType("boolean");
 
@@ -189,9 +183,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FileUuid")
-                        .IsUnique();
 
                     b.ToTable("ExternalNews");
                 });

@@ -24,6 +24,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// responsible for managing external news.</param>
         /// <returns>Queryable of all external news available to the user.
         /// </returns>
+        [UseFiltering]
+        [UseSorting]
         public IQueryable<ExternalNews> ExternalNews(
             [Service] IExternalNewsManager externalNewsManager)
         {
