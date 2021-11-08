@@ -35,7 +35,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
             }
 
             var request = httpContext.HttpContext.Request;
-            var baseUrl = "http://" +
+            var baseUrl = "http://" + // TODO
                           $"{request.Host.Value}" +
                           $"{request.PathBase.Value}";
             var staticFileRoot =

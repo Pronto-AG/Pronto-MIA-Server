@@ -163,7 +163,9 @@ namespace Pronto_MIA
                 OnPrepareResponse = ctx =>
                 {
                     if (ctx.Context.User.Identity == null ||
-                        ctx.Context.User.Identity.IsAuthenticated)
+                        ctx.Context.User.Identity.IsAuthenticated ||
+                        ctx.Context.Request.Path
+                        .StartsWithSegments("/StaticFiles/external_news"))
                     {
                         return;
                     }
