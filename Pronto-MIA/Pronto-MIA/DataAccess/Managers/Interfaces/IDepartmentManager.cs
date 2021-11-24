@@ -61,6 +61,14 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         public IQueryable<Department> GetAll();
 
         /// <summary>
+        /// Method to get Department by id.
+        /// </summary>
+        /// <returns>Department by id.</returns>
+        /// /// <param name="id">Id of the department to be found.</param>
+        /// <returns>The id of the department that was found.</returns>
+        public Task<Department> GetById(int id);
+
+        /// <summary>
         /// Adds a given user to a department. The current department of the
         /// user will be overwritten.
         /// </summary>

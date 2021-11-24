@@ -78,8 +78,9 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             var department = await this.GetById(id);
 
-            if (department.Users is { Count: > 0 })
-            {
+            // if (department.Users is { Count: > 0 })
+            if (department.UserDepartments is { Count: > 0 })
+                {
                 throw Error.DepartmentInUse.AsQueryException();
             }
 
@@ -101,7 +102,8 @@ namespace Pronto_MIA.DataAccess.Managers
             // Check if id exists
             await this.GetById(departmentId);
 
-            user.DepartmentId = departmentId;
+            // user.DepartmentId = departmentId;
+            user.Department.Id = departmentId;
             this.dbContext.Update(user);
             await this.dbContext.SaveChangesAsync();
         }
@@ -118,7 +120,8 @@ namespace Pronto_MIA.DataAccess.Managers
             await this.dbContext.SaveChangesAsync();
         }
 
-        private async Task<Department> GetById(int id)
+        /// <inheritdoc/>
+        public async Task<Department> GetById(int id)
         {
             var department = await this.dbContext.Departments
                 .SingleOrDefaultAsync(dP => dP.Id == id);

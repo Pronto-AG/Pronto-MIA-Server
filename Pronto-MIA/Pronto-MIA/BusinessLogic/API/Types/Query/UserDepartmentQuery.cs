@@ -14,11 +14,11 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
 
     /// <summary>
     /// Class representing the mutation operation of graphql.
-    /// Contains all mutations that concern <see cref="User"/>
+    /// Contains all mutations that concern <see cref="UserDepartment"/>
     /// objects.
     /// </summary>
     [ExtendObjectType(typeof(API.Query))]
-    public class UserQuery
+    public class UserDepartmentQuery
     {
         /// <summary>
         /// Method which allows the user to retrieve a token which may then be
@@ -53,7 +53,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// requesting this endpoint.</param>
         /// <returns>The user requesting this endpoint.</returns>
         [Authorize]
-        public async Task<User> User(
+        public async Task<User> UserDepartment(
             [Service] IUserManager userManager,
             [ApiUserGlobalState] ApiUserState userState)
         {
@@ -85,9 +85,9 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
             }
 
             return userManager.GetAll().Where(
-                u => u.Departments
-                .Any(d1 => userState.User.Departments
-                    .Any(d2 => d1 == d2)));
+                u => u.Departments.c == userState.User.UserDepartments);
+
+            // u => u.DepartmentId == userState.User.DepartmentId);
         }
     }
 }
