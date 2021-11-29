@@ -1,3 +1,4 @@
+#pragma warning disable SA1009
 namespace Tests.TestBusinessLogic.TestAPI.TestLogging
 {
     using System.Collections.Generic;

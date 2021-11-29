@@ -1,7 +1,7 @@
 namespace Tests.TestDataAccess.TestManagers
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
@@ -324,7 +324,8 @@ namespace Tests.TestDataAccess.TestManagers
             var user = await this.dbContext.Users
                 .FirstAsync(u => u.UserName == "Bob");
 
-            await this.departmentManager.AddUser(new int[department.Id], user);
+            await this.departmentManager
+                .AddUser(new int[] { department.Id }, user);
 
             Assert.Contains(department, user.Departments);
 

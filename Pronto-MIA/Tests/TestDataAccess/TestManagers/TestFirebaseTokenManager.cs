@@ -165,7 +165,7 @@ namespace Tests.TestDataAccess.TestManagers
         [Fact]
         public async void TestGetDepartmentTokensNone()
         {
-            const int virtualDepartmentId = 1;
+            const int virtualDepartmentId = 0;
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), this.dbContext.Users.First());
             this.dbContext.FcmTokens.Add(testToken);

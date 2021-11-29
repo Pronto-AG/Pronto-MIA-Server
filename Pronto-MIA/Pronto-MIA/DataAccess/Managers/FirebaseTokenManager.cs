@@ -89,7 +89,7 @@
             var users =
                 this.dbContext.Users
                 .Where(u => u.Departments
-                    .Any(d => d.DepartmentId == departmentId));
+                    .Any(d => d.Id == departmentId));
             var tokens = this.dbContext.FcmTokens
                 .Where(fcmToken => users.Contains(fcmToken.Owner));
             return tokens;

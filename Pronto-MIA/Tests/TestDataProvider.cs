@@ -52,7 +52,7 @@ namespace Tests
                     "{\"SaltSize\":128,\"HashIterations\":500,\"HashSize\":512,\"Salt\":\"tGnRdutheZwbKKAz0I0YqsUPiWU4AVAndLvLfH5hYLFnVR0cn9FQzGj+Z88gcfopw0SWA8IjzLSksSADt+SZILaIM57pPC2KoPMfuS6iSXv9i/+pKxBN5EaZS36s/k4lHbTqc9sy2vMXhr0J5GvL68oJbgMZchXx6zaYSkoABX0=\"}")
                 {
                     Departments = context.Departments
-                        .Where(d => d.Name == "Administration").ToArray(),
+                        .Where(d => d.Name == "Administration").ToList(),
                 };
 
                 // Password: Hello Bob
@@ -63,7 +63,7 @@ namespace Tests
                     "{\"SaltSize\":128,\"HashIterations\":500,\"HashSize\":512,\"Salt\":\"qXcYhSEgpE6lBpofTVk2SosdJUswxiXl+5asVtKFlH18iUcdmc/1lGqIyCDwp1ZBX1WpEOXhI6QzWMIcayuKotU+1it79ojyuTiIONOpHkzzv63BYeS5D8M5KxAzQoTJ1QMmvNVWf9tIJ/YBpQ2oCwPn0Zx72A4d2fyKbOhdtEQ=\"}")
                 {
                     Departments = context.Departments
-                        .Where(d => d.Name == "Administration").ToArray(),
+                        .Where(d => d.Name == "Administration").ToList(),
                 };
 
                 context.Users.AddRange(bob, alice);
