@@ -126,7 +126,7 @@ namespace Pronto_MIA.DataAccess.Managers
 
             if (userId != null)
             {
-                this.UpdateUserId(userId, userDepartment);
+                await this.UpdateUserId(userId.Value, userDepartment);
             }
 
             this.dbContext.UserDepartments.Update(userDepartment);
@@ -138,7 +138,7 @@ namespace Pronto_MIA.DataAccess.Managers
         public async Task<UserDepartment> GetById(int id)
         {
             var userDepartment = await this.dbContext.UserDepartments
-                .SingleOrDefaultAsync(u => u.Id == id);
+                .SingleOrDefaultAsync(ud => ud.Id == id);
             if (userDepartment != default)
             {
                 return userDepartment;
@@ -154,7 +154,7 @@ namespace Pronto_MIA.DataAccess.Managers
         public async Task<UserDepartment?> GetByDepartmentId(int departmentId)
         {
             var userDepartment = await this.dbContext.UserDepartments
-                .SingleOrDefaultAsync(d => d.Id == departmentId);
+                .SingleOrDefaultAsync(ud => ud.DepartmentId == departmentId);
             if (userDepartment != default)
             {
                 return userDepartment;
@@ -170,7 +170,7 @@ namespace Pronto_MIA.DataAccess.Managers
         public async Task<UserDepartment?> GetByUserId(int userId)
         {
             var userDepartment = await this.dbContext.UserDepartments
-                .SingleOrDefaultAsync(u => u.Id == userId);
+                .SingleOrDefaultAsync(ud => ud.UserId == userId);
             if (userDepartment != default)
             {
                 return userDepartment;
@@ -186,15 +186,12 @@ namespace Pronto_MIA.DataAccess.Managers
         public async Task<UserDepartment?> GetByDepartmentAndUserId(
             int departmentId, int userId)
         {
-            var userDepartmentUser = await this.dbContext.UserDepartments
-                .SingleOrDefaultAsync(u => u.Id == userId);
-            var userDepartmentDepartment = await this.dbContext.UserDepartments
-                .SingleOrDefaultAsync(d => d.Id == departmentId);
-            if (userDepartmentUser != default &&
-                userDepartmentDepartment != default &&
-                userDepartmentUser.Equals(userDepartmentDepartment))
+            var userDepartment = await this.dbContext.UserDepartments
+                .SingleOrDefaultAsync(ud => ud.UserId == userId &&
+                ud.DepartmentId == departmentId);
+            if (userDepartment != default)
             {
-                return userDepartmentUser;
+                return userDepartment;
             }
 
             this.logger.LogWarning(
