@@ -87,7 +87,9 @@
         public IQueryable<FcmToken> GetDepartmentFcmToken(int departmentId)
         {
             var users =
-                this.dbContext.Users.Where(u => u.DepartmentId == departmentId);
+                this.dbContext.Users
+                .Where(u => u.Departments
+                    .Any(d => d.Id == departmentId));
             var tokens = this.dbContext.FcmTokens
                 .Where(fcmToken => users.Contains(fcmToken.Owner));
             return tokens;

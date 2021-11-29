@@ -54,18 +54,18 @@ namespace Pronto_MIA.DataAccess
 
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-       {
-           base.OnModelCreating(modelBuilder);
+        {
+            base.OnModelCreating(modelBuilder);
 
-           modelBuilder.ApplyConfiguration(new UserTypeConfig());
-           modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
-           modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
-           modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
-           modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
-           modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
+            modelBuilder.ApplyConfiguration(new UserTypeConfig());
+            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
+            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
+            modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
+            modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
+            modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
 
-           this.AddAdminUser(modelBuilder);
-       }
+            this.AddAdminUser(modelBuilder);
+        }
 
         private void AddAdminUser(ModelBuilder modelBuilder)
         {

@@ -9,7 +9,7 @@ namespace Pronto_MIA.Domain.Entities
     /// <summary>
     /// Class representing a user of the application.
     /// </summary>
-    public class User : IDepartmentComparable
+    public class User
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="User"/> class.
@@ -29,6 +29,7 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = passwordHash;
             this.HashGenerator = hashGenerator;
             this.HashGeneratorOptions = hashGeneratorOptions;
+            this.Departments = new List<Department>();
         }
 
         /// <summary>
@@ -63,18 +64,12 @@ namespace Pronto_MIA.Domain.Entities
         public virtual AccessControlList AccessControlList { get; set; }
 
         /// <summary>
-        /// Gets or sets the id of the department associated with this user.
-        /// </summary>
-        [GraphQLIgnore]
-        public int? DepartmentId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the department associated with this
+        /// Gets or sets list of <see cref="Departments"/> belonging to this
         /// user.
         /// </summary>
         [Authorize(Policy = "ViewDepartment")]
         [AccessObjectIdArgument("IGNORED")]
-        public virtual Department Department { get; set; }
+        public virtual ICollection<Department> Departments { get; set; }
 
         /// <summary>
         /// Gets or sets the hash of the password the user would like to use in

@@ -26,8 +26,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
         /// plan is statically served.</returns>
         public Uri Link(
             [Parent] DeploymentPlan deploymentPlan,
-            [Service]IConfiguration cfg,
-            [Service]IHttpContextAccessor httpContext)
+            [Service] IConfiguration cfg,
+            [Service] IHttpContextAccessor httpContext)
         {
             if (httpContext.HttpContext == null)
             {

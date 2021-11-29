@@ -63,9 +63,9 @@ namespace Tests.TestDataAccess.TestManagers
                 this.accessControlListManager.
                     LinkAccessControlList(
                         user.Id, new AccessControlList(user.Id)
-                    {
-                        CanEditUsers = true,
-                    });
+                        {
+                            CanEditUsers = true,
+                        });
 
             var accessControlList =
                 await this.dbContext.AccessControlLists

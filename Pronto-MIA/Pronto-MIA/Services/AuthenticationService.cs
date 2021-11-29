@@ -35,18 +35,18 @@ namespace Pronto_MIA.Services
                 {
                     options.TokenValidationParameters =
                         new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = issuer,
+                        {
+                            ValidateIssuer = true,
+                            ValidIssuer = issuer,
 
-                        ValidateAudience = true,
-                        ValidAudience = audience,
+                            ValidateAudience = true,
+                            ValidAudience = audience,
 
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
 
-                        ValidateLifetime = true,
-                    };
+                            ValidateLifetime = true,
+                        };
                     options.RequireHttpsMetadata = requiresHttps;
                     options.SaveToken = true;
                 });

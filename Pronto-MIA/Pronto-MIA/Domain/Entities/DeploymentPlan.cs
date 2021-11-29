@@ -1,6 +1,7 @@
 namespace Pronto_MIA.Domain.Entities
 {
     using System;
+    using System.Collections.Generic;
     using HotChocolate;
     using HotChocolate.AspNetCore.Authorization;
     using Pronto_MIA.BusinessLogic.Security.Authorization.Attributes;

@@ -248,7 +248,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         {
             return new ()
             {
-                { "Action", "publish" }, { "TargetType", "deploymentPlan" },
+                { "Action", "publish" },
+                { "TargetType", "deploymentPlan" },
                 { "TargetId", deploymentPlanId.ToString() },
             };
         }

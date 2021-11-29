@@ -1,4 +1,5 @@
 #nullable enable
+#pragma warning disable SA1011
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
     using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <param name="password">The password of the new user.</param>
         /// <param name="accessControlList">The access control list
         /// that should be linked to the new user.</param>
-        /// <param name="departmentId">The id of the department the user
+        /// <param name="departmentIds">The ids of the department the user
         /// should be added to.</param>
         /// <returns>The newly created user.</returns>
         /// <exception cref="QueryException">Returns UserAlreadyExists exception
@@ -74,7 +75,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// policy requirements.
         /// </exception>
         [Authorize(Policy = "EditUser")]
-        [AccessObjectIdArgument("departmentId", true)]
+        [AccessObjectIdArgument("departmentIds", true)]
         public async Task<User> CreateUser(
             [Service] ProntoMiaDbContext dbContext,
             [Service] IUserManager userManager,
@@ -83,7 +84,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             string userName,
             string password,
             AccessControlList accessControlList,
-            int departmentId)
+            int[]? departmentIds)
         {
             userManager.SetDbContext(dbContext);
             departmentManager.SetDbContext(dbContext);
@@ -93,7 +94,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 dbContext.Database.BeginTransactionAsync())
             {
                 var user = await userManager.Create(userName, password);
-                await departmentManager.AddUser(departmentId, user);
+
+                if (departmentIds != null)
+                {
+                    await departmentManager.AddUser(departmentIds, user);
+                }
+
                 await aclManager.LinkAccessControlList(
                     user.Id, accessControlList);
                 await dbContextTransaction.CommitAsync();
@@ -141,7 +147,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <param name="accessControlList">The new
         /// <see cref="AccessControlList"/> that will be linked to the user.
         /// </param>
-        /// <param name="departmentId">The id of the new department of the
+        /// <param name="departmentIds">The ids of the new department of the
         /// user.</param>
         /// <exception cref="QueryException">Returns UserNotFound
         /// exception if the user with the given id could not be found.
@@ -160,7 +166,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             string? userName,
             string? password,
             AccessControlList? accessControlList,
-            int? departmentId)
+            int[]? departmentIds)
         {
             userManager.SetDbContext(dbContext);
             departmentManager.SetDbContext(dbContext);
@@ -172,7 +178,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 await this.UpdateUserAcl(aclManager, accessControlList, user);
                 await this.UpdateUserDepartment(
                     departmentManager,
-                    departmentId,
+                    departmentIds,
                     user);
                 await dbContextTransaction.CommitAsync();
                 return user;
@@ -193,12 +199,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 
         private async Task UpdateUserDepartment(
             IDepartmentManager departmentManager,
-            int? departmentId,
+            int[]? departmentIds,
             User user)
         {
-            if (departmentId != null)
+            if (departmentIds != null)
             {
-                await departmentManager.AddUser(departmentId.Value, user);
+                await departmentManager.AddUser(departmentIds, user);
             }
         }
     }

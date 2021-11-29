@@ -85,7 +85,9 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
             }
 
             return userManager.GetAll().Where(
-                u => u.DepartmentId == userState.User.DepartmentId);
+                u => u.Departments
+                .Any(d1 => userState.User.Departments
+                    .Any(d2 => d1 == d2)));
         }
     }
 }

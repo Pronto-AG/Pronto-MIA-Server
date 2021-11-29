@@ -177,6 +177,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
             await this.dbContext.SaveChangesAsync();
         }
 
+/*
         [Fact]
         public async Task TestRestrictedWrongDepartmentId()
         {
@@ -279,7 +280,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 
             this.dbContext.Users.Remove(user);
             await this.dbContext.SaveChangesAsync();
-        }
+        }*/
 
         private static ClaimsPrincipal CreateClaimsPrincipal(User user)
         {
@@ -362,12 +363,10 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
         private async Task<User> CreateUser(AccessControlList? acl = null)
         {
             var user = new User("AuthTest", new byte[5], "{}", "{}");
-            {
-                user.DepartmentId = (await this.dbContext.Departments
-                    .SingleAsync(d => d.Name == "Administration")).Id;
-            }
-
-            this.dbContext.Users.Add(user);
+            Department department = await this.dbContext
+                .Departments.Include(d => d.Users)
+                .FirstAsync(d => d.Name == "Administration");
+            department.Users.Add(user);
             await this.dbContext.SaveChangesAsync();
 
             if (acl == null)

@@ -54,7 +54,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         public async Task TestUsersUnlimited()
         {
             var acl = new AccessControlList(-1)
-                { CanViewUsers = true };
+            { CanViewUsers = true };
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi", acl);
             var userState = new ApiUserState(user);
@@ -86,7 +86,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var result = this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
-            Assert.Equal(1, await result.CountAsync());
+            Assert.Equal(0, await result.CountAsync());
 
             this.dbContext.Remove(user);
             await this.dbContext.SaveChangesAsync();

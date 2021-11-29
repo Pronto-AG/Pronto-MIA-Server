@@ -96,12 +96,17 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-        public async Task AddUser(int departmentId, User user)
+        public async Task AddUser(int[] departmentIds, User user)
         {
-            // Check if id exists
-            await this.GetById(departmentId);
+            user.Departments.Clear();
+            foreach (int departmentId in departmentIds)
+            {
+                // Check if id exists
+                Department department = await this.GetById(departmentId);
 
-            user.DepartmentId = departmentId;
+                user.Departments.Add(department);
+            }
+
             this.dbContext.Update(user);
             await this.dbContext.SaveChangesAsync();
         }
@@ -118,7 +123,8 @@ namespace Pronto_MIA.DataAccess.Managers
             await this.dbContext.SaveChangesAsync();
         }
 
-        private async Task<Department> GetById(int id)
+        /// <inheritdoc/>
+        public async Task<Department> GetById(int id)
         {
             var department = await this.dbContext.Departments
                 .SingleOrDefaultAsync(dP => dP.Id == id);

@@ -17,15 +17,5 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 
             Assert.NotNull(requirement);
         }
-
-        [Fact]
-        public void TestIDepartmentComparableError()
-        {
-            Assert.Throws<ArgumentException>(() =>
-            {
-                var requirement = new AccessObjectRequirement(
-                    typeof(int), new Dictionary<AccessControl, AccessMode>());
-            });
-        }
     }
 }

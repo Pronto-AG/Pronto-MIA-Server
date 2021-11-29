@@ -60,7 +60,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 "Ruedi",
                 "HelloWorld1-",
                 acl,
-                5);
+                new int[1]);
 
             userManager.Received().SetDbContext(this.dbContext);
             aclManager.Received().SetDbContext(this.dbContext);
@@ -70,7 +70,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             await aclManager.Received()
                 .LinkAccessControlList(user.Id, acl);
             await departmentManager.Received()
-                .AddUser(5, user);
+                .AddUser(Arg.Any<int[]>(), user);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 "Ruedi",
                 "HelloWorld1-",
                 acl,
-                5);
+                new int[1]);
 
             userManager.Received().SetDbContext(this.dbContext);
             aclManager.Received().SetDbContext(this.dbContext);
@@ -100,7 +100,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
             await userManager.Received()
                 .Update(1, "Ruedi", "HelloWorld1-");
             await aclManager.Received().LinkAccessControlList(1, acl);
-            await departmentManager.Received().AddUser(5, Arg.Any<User>());
+            await departmentManager.Received()
+                .AddUser(Arg.Any<int[]>(), Arg.Any<User>());
         }
 
         [Fact]
@@ -122,7 +123,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 "Ruedi",
                 "HelloWorld1-",
                 null,
-                5);
+                new int[1]);
 
             userManager.Received().SetDbContext(this.dbContext);
             departmentManager.Received().SetDbContext(this.dbContext);
@@ -130,7 +131,8 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 .Update(1, "Ruedi", "HelloWorld1-");
             await aclManager.DidNotReceiveWithAnyArgs()
                 .LinkAccessControlList(Arg.Any<int>(), default);
-            await departmentManager.Received().AddUser(5, Arg.Any<User>());
+            await departmentManager.Received()
+                .AddUser(Arg.Any<int[]>(), Arg.Any<User>());
         }
 
         [Fact]
@@ -161,7 +163,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestMutation
                 .LinkAccessControlList(
                     Arg.Any<int>(), Arg.Any<AccessControlList>());
             await departmentManager.DidNotReceiveWithAnyArgs()
-                .AddUser(Arg.Any<int>(), Arg.Any<User>());
+                .AddUser(Arg.Any<int[]>(), Arg.Any<User>());
         }
 
         [Fact]
