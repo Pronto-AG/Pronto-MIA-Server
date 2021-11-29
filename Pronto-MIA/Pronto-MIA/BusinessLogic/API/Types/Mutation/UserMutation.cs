@@ -1,4 +1,5 @@
 #nullable enable
+#pragma warning disable SA1011
 namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 {
     using System.Threading.Tasks;
