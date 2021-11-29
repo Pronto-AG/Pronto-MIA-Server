@@ -44,7 +44,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         [Fact]
@@ -80,10 +80,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
             Assert.Contains(
                 "Bob",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         [Fact]
@@ -101,10 +101,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
             Assert.DoesNotContain(
                 "Bob",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         [Fact]
@@ -123,10 +123,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
             Assert.Contains(
                 "Bob",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         [Fact]
@@ -145,10 +145,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestLogging
             var call = this.logger.ReceivedCalls().Last();
             Assert.Contains(
                 "Request ended.",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
             Assert.DoesNotContain(
                 "Bob",
-                call.GetArguments()[2].ToString() !);
+                call.GetArguments()[2].ToString()!);
         }
 
         private DocumentNode CreateDocument(

@@ -42,6 +42,6 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization.Attributes
         /// Gets a value indicating whether the argument does contain a
         /// department id directly.
         /// </summary>
-        public bool IsDepartmentId { get;  }
+        public bool IsDepartmentId { get; }
     }
 }

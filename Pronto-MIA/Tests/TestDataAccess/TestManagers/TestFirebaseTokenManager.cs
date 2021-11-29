@@ -165,7 +165,7 @@ namespace Tests.TestDataAccess.TestManagers
         [Fact]
         public async void TestGetDepartmentTokensNone()
         {
-            const int virtualDepartmentId = 5;
+            const int virtualDepartmentId = 1;
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), this.dbContext.Users.First());
             this.dbContext.FcmTokens.Add(testToken);
@@ -185,7 +185,9 @@ namespace Tests.TestDataAccess.TestManagers
         {
             var department = await this.dbContext.Departments.FirstAsync();
             var user = await this.dbContext.Users.FirstAsync();
-            user.DepartmentId = department.Id;
+            var list = new List<Department>();
+            list.Add(department);
+            user.Departments = list;
             this.dbContext.Users.Update(user);
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), user);
@@ -197,7 +199,7 @@ namespace Tests.TestDataAccess.TestManagers
 
             Assert.Equal(testToken, result.FirstOrDefault());
 
-            user.DepartmentId = null;
+            user.Departments = null;
             this.dbContext.Update(user);
             this.dbContext.Remove(testToken);
             await this.dbContext.SaveChangesAsync();
@@ -209,8 +211,10 @@ namespace Tests.TestDataAccess.TestManagers
             var department = await this.dbContext.Departments.FirstAsync();
             var user = await this.dbContext.Users.FindAsync(1);
             var user2 = await this.dbContext.Users.FindAsync(2);
-            user.DepartmentId = department.Id;
-            user2.DepartmentId = department.Id;
+            var list = new List<Department>();
+            list.Add(department);
+            user.Departments = list;
+            user2.Departments = list;
             this.dbContext.Users.UpdateRange(user, user2);
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), user);

@@ -363,8 +363,10 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
         {
             var user = new User("AuthTest", new byte[5], "{}", "{}");
             {
-                user.DepartmentId = (await this.dbContext.Departments
-                    .SingleAsync(d => d.Name == "Administration")).Id;
+                var list = new List<Department>();
+                list.Add(await this.dbContext.Departments
+                    .FirstAsync(d => d.Name == "Administration"));
+                user.Departments = list;
             }
 
             this.dbContext.Users.Add(user);

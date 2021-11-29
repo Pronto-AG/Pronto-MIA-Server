@@ -1,6 +1,7 @@
 namespace Tests.TestDataAccess.TestManagers
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;
@@ -218,7 +219,9 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.Departments.Add(department);
             await this.dbContext.SaveChangesAsync();
             var user = await this.AddUserToDb();
-            user.DepartmentId = department.Id;
+            var list = new List<Department>();
+            list.Add(department);
+            user.Departments = list;
             this.dbContext.Update(user);
             await this.dbContext.SaveChangesAsync();
             var countBefore = await this.dbContext.Departments.CountAsync();
@@ -247,7 +250,9 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.Departments.Add(department);
             await this.dbContext.SaveChangesAsync();
             var user = await this.AddUserToDb();
-            user.DepartmentId = department.Id;
+            var list = new List<Department>();
+            list.Add(department);
+            user.Departments = list;
             this.dbContext.Update(user);
             await this.dbContext.SaveChangesAsync();
             await this.RemoveUserFromDb(user);
@@ -319,9 +324,9 @@ namespace Tests.TestDataAccess.TestManagers
             var user = await this.dbContext.Users
                 .FirstAsync(u => u.UserName == "Bob");
 
-            await this.departmentManager.AddUser(department.Id, user);
+            await this.departmentManager.AddUser(new int[department.Id], user);
 
-            Assert.Equal(department.Id, user.DepartmentId);
+            Assert.Contains(department, user.Departments);
 
             this.dbContext.Departments.Remove(department);
             await this.dbContext.SaveChangesAsync();

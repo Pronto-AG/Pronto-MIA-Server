@@ -28,11 +28,6 @@ namespace Pronto_MIA.DataAccess
         public DbSet<User> Users { get; set; }
 
         /// <summary>
-        /// Gets or sets the DBSet containing userDepartments.
-        /// </summary>
-        public DbSet<UserDepartment> UserDepartments { get; set; }
-
-        /// <summary>
         /// Gets or sets the DBSet containing deployment plans.
         /// </summary>
         public DbSet<DeploymentPlan> DeploymentPlans { get; set; }
@@ -59,19 +54,18 @@ namespace Pronto_MIA.DataAccess
 
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-       {
-           base.OnModelCreating(modelBuilder);
+        {
+            base.OnModelCreating(modelBuilder);
 
-           modelBuilder.ApplyConfiguration(new UserTypeConfig());
-           modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
-           modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
-           modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
-           modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
-           modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
-           modelBuilder.ApplyConfiguration(new UserDepartmentTypeConfig());
+            modelBuilder.ApplyConfiguration(new UserTypeConfig());
+            modelBuilder.ApplyConfiguration(new DeploymentPlanTypeConfig());
+            modelBuilder.ApplyConfiguration(new FcmTokenTypeConfig());
+            modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
+            modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
+            modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
 
-           this.AddAdminUser(modelBuilder);
-       }
+            this.AddAdminUser(modelBuilder);
+        }
 
         private void AddAdminUser(ModelBuilder modelBuilder)
         {

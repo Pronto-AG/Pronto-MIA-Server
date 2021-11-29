@@ -72,14 +72,14 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Adds a given user to a department. The current department of the
         /// user will be overwritten.
         /// </summary>
-        /// <param name="departmentId"> The id of the <see cref="Department"/>
+        /// <param name="departmentIds"> The ids of the <see cref="Department"/>
         /// to which the user will be added.</param>
         /// <param name="user">The user to add to the <see cref="Department"/>.
         /// </param>
         /// <returns>A task that can be awaited.</returns>
         /// <exception cref="QueryException">If the department to add the
         /// user to could not be found.</exception>
-        public Task AddUser(int departmentId, User user);
+        public Task AddUser(int[] departmentIds, User user);
 
         /// <summary>
         /// Adds a given deployment plan to a department. The current department
