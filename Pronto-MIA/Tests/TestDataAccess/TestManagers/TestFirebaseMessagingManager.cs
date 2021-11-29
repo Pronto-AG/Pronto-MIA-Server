@@ -119,7 +119,7 @@ namespace Tests.TestDataAccess.TestManagers
         public async void TestSendMulticastAsyncWithGlobalError()
         {
             var notification = new Notification
-                { Title = "Test", Body = "This is a test." };
+            { Title = "Test", Body = "This is a test." };
             var data = new Dictionary<string, string>() { { "score", "850" } };
             var tokens = TestHelpersFirebaseMessagingManager.CreateTokens(8);
 
@@ -142,7 +142,7 @@ namespace Tests.TestDataAccess.TestManagers
             var testToken = new FcmToken(
                 Guid.NewGuid().ToString(), this.dbContext.Users.First());
             var notification = new Notification
-                { Title = "Test", Body = "This is a test." };
+            { Title = "Test", Body = "This is a test." };
             var data = new Dictionary<string, string>() { { "score", "850" } };
             var tokens = new List<string>() { testToken.Id };
             tokens.AddRange(

@@ -26,8 +26,8 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
         /// news is statically served.</returns>
         public Uri Link(
             [Parent] ExternalNews externalNews,
-            [Service]IConfiguration cfg,
-            [Service]IHttpContextAccessor httpContext)
+            [Service] IConfiguration cfg,
+            [Service] IHttpContextAccessor httpContext)
         {
             if (httpContext.HttpContext == null)
             {

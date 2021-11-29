@@ -30,14 +30,14 @@ namespace Pronto_MIA.DataAccess
         UserIdNotFound,
 
         /// <summary>
-        /// Error code representing that the userDepartment searched for could not be
-        /// found.
+        /// Error code representing that the userDepartment searched for could
+        /// not be found.
         /// </summary>
         UserDepartmentNotFound,
 
         /// <summary>
-        /// Error code representing that the departmentId searched for could not be
-        /// found.
+        /// Error code representing that the departmentId searched for could
+        /// not be found.
         /// </summary>
         DepartmentIdNotFound,
 

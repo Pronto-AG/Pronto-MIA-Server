@@ -1,6 +1,7 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using NSubstitute;
@@ -27,7 +28,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         public async Task TestDeploymentPlansUnlimited()
         {
             var acl = new AccessControlList(-1)
-                { CanViewDeploymentPlans = true };
+            { CanViewDeploymentPlans = true };
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi", acl);
             var userState = new ApiUserState(user);
@@ -53,9 +54,10 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
         {
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(this.dbContext, "Fredi");
-            user.DepartmentId =
-                (await this.dbContext.Departments
-                    .SingleAsync(d => d.Name == "Finance")).Id;
+            var list = new List<Department>();
+            list.Add(await this.dbContext.Departments
+                    .SingleAsync(d => d.Name == "Finance"));
+            user.Departments = list;
             var userState = new ApiUserState(user);
             var deploymentPlanManager =
                 Substitute.For<IDeploymentPlanManager>();

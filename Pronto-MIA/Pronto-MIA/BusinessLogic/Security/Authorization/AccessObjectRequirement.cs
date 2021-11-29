@@ -26,11 +26,11 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
             Type objectType,
             Dictionary<AccessControl, AccessMode> controls)
         {
-            if (!typeof(IDepartmentComparable).IsAssignableFrom(objectType))
+            /*if (!typeof(IDepartmentComparable).IsAssignableFrom(objectType))
             {
                 throw new ArgumentException(
                     "Type needs to implement IDepartmentComparable.");
-            }
+            }*/
 
             this.ObjectType = objectType;
             this.Controls = controls;

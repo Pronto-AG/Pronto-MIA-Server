@@ -92,7 +92,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private static List<List<string>> SplitTokensToBatches(
             List<string> tokens)
         {
-            List<List<string>> tokenBatches = new ();
+            List<List<string>> tokenBatches = new();
             for (int i = 0; i < tokens.Count; i += maxTokensPerMessage)
             {
                 tokenBatches.Add(
@@ -157,7 +157,7 @@ namespace Pronto_MIA.DataAccess.Managers
             "Menees.Analyzers",
             "MEN003",
             Justification = "Good cohesion within method.")]
-        private async Task<HashSet<string>> SendMulticastAsyncBatch (
+        private async Task<HashSet<string>> SendMulticastAsyncBatch(
             IReadOnlyList<string> tokens,
             Notification notification,
             IReadOnlyDictionary<string, string> data)
@@ -171,13 +171,16 @@ namespace Pronto_MIA.DataAccess.Managers
             {
                 Notification = new WebpushNotification()
                 {
-                    Icon = "icons/Icon-512.png", Badge = "icons/Icon-192.png",
+                    Icon = "icons/Icon-512.png",
+                    Badge = "icons/Icon-192.png",
                 },
             };
 
             var message = new MulticastMessage()
             {
-                Notification = notification, Data = data, Tokens = tokens,
+                Notification = notification,
+                Data = data,
+                Tokens = tokens,
                 Webpush = pushConfig,
             };
             try
@@ -239,7 +242,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private HashSet<string> GetInvalidTokens(
             IReadOnlyList<string> tokens, IReadOnlyList<SendResponse> responses)
         {
-            HashSet<string> toDelete = new ();
+            HashSet<string> toDelete = new();
             for (var i = 0; i < tokens.Count; i++)
             {
                 var response = responses[i];

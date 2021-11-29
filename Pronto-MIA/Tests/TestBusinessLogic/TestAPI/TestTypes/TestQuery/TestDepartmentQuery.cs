@@ -3,6 +3,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
     using NSubstitute;
     using Pronto_MIA.BusinessLogic.API.Types;
@@ -54,8 +55,9 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var user = await QueryTestHelpers
                 .CreateUserWithAcl(
                     this.dbContext, "Eric");
-            user.DepartmentId =
-                (await this.dbContext.Departments.FirstAsync()).Id;
+            var list = new List<Department>();
+            list.Add(await this.dbContext.Departments.FirstAsync());
+            user.Departments = list;
             var userState = new ApiUserState(user);
             var departmentManager =
                 Substitute.For<IDepartmentManager>();

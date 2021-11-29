@@ -22,9 +22,7 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.HasIndex(d => d.Name).IsUnique();
             builder.Property(d => d.Name).IsRequired();
             builder.HasMany<User>(d => d.Users)
-                .WithOne(u => u.Department)
-                .HasForeignKey(u => u.DepartmentId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .WithMany(u => u.Departments);
             builder.HasMany<DeploymentPlan>(d => d.DeploymentPlans)
                 .WithOne(dp => dp.Department)
                 .HasForeignKey(dp => dp.DepartmentId)

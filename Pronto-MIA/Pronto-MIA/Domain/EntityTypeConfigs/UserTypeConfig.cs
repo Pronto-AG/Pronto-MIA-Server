@@ -30,7 +30,7 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
             builder.HasOne<AccessControlList>(u => u.AccessControlList)
                 .WithOne(a => a.User)
                 .HasForeignKey<AccessControlList>(acl => acl.UserId);
-            builder.HasOne<Department>(u => u.Department)
+            builder.HasMany<Department>(u => u.Departments)
                 .WithMany(d => d.Users);
         }
     }

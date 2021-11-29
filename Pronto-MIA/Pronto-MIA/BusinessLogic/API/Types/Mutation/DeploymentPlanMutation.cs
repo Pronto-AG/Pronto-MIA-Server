@@ -246,9 +246,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         private Dictionary<string, string> CreateNotificationData(
             int deploymentPlanId)
         {
-            return new ()
+            return new()
             {
-                { "Action", "publish" }, { "TargetType", "deploymentPlan" },
+                { "Action", "publish" },
+                { "TargetType", "deploymentPlan" },
                 { "TargetId", deploymentPlanId.ToString() },
             };
         }

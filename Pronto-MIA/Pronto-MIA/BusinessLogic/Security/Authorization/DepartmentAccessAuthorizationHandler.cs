@@ -246,14 +246,14 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
                 return false;
             }
 
-            var userDepartmentId = await this.GetUserDepartmentId(userId);
+            var userDepartmentIds = await this.GetUserDepartmentId(userId);
             var accessObjectDepartmentId = await this
                 .GetAccessObjectDepartmentId(
                     requirement.ObjectType, accessObjectId.Value);
 
-            if (userDepartmentId == null
+            if (userDepartmentIds == null
                 || accessObjectDepartmentId == null
-                || userDepartmentId != accessObjectDepartmentId)
+                || !userDepartmentIds.Contains(accessObjectDepartmentId.Value))
             {
                 return false;
             }
@@ -284,8 +284,9 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
                 return false;
             }
 
-            var userDepartmentId = await this.GetUserDepartmentId(userId);
-            if (userDepartmentId == null || userDepartmentId != departmentId)
+            var userDepartmentIds = await this.GetUserDepartmentId(userId);
+            if (userDepartmentIds == null ||
+                !userDepartmentIds.Contains(departmentId.Value))
             {
                 return false;
             }
@@ -321,7 +322,7 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         /// department should be extracted from.</param>
         /// <returns>The department id or null if no
         /// department could be found.</returns>
-        private async Task<int?> GetUserDepartmentId(int userId)
+        private async Task<List<int>> GetUserDepartmentId(int userId)
         {
             await using (var dbContext = new ProntoMiaDbContext(this.options))
             {
@@ -329,10 +330,10 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
 
                 if (user == null)
                 {
-                    return null;
+                    return new List<int>();
                 }
 
-                return user.DepartmentId;
+                return user.Departments.Select(d => d.Id).ToList();
             }
         }
 

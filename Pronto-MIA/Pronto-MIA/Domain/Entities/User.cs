@@ -29,6 +29,7 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = passwordHash;
             this.HashGenerator = hashGenerator;
             this.HashGeneratorOptions = hashGeneratorOptions;
+            this.Departments = new List<Department>();
         }
 
         /// <summary>
@@ -43,6 +44,7 @@ namespace Pronto_MIA.Domain.Entities
             this.PasswordHash = default;
             this.HashGenerator = default;
             this.HashGeneratorOptions = default;
+            this.Departments = new List<Department>();
         }
 
         /// <summary>
