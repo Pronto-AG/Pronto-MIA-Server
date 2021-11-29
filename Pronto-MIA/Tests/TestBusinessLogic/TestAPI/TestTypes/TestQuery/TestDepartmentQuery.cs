@@ -1,9 +1,9 @@
 #nullable enable
 namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
     using NSubstitute;
     using Pronto_MIA.BusinessLogic.API.Types;

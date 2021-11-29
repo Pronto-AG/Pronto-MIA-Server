@@ -1,7 +1,7 @@
 namespace Tests.TestDataAccess.TestManagers
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using Microsoft.EntityFrameworkCore;

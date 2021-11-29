@@ -86,7 +86,7 @@ namespace Tests.TestBusinessLogic.TestAPI.TestTypes.TestQuery
             var result = this.userQuery.Users(userManager, userState);
 
             userManager.Received().GetAll();
-            Assert.Equal(1, await result.CountAsync());
+            Assert.Equal(0, await result.CountAsync());
 
             this.dbContext.Remove(user);
             await this.dbContext.SaveChangesAsync();

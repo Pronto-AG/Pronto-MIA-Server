@@ -92,7 +92,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private static List<List<string>> SplitTokensToBatches(
             List<string> tokens)
         {
-            List<List<string>> tokenBatches = new();
+            List<List<string>> tokenBatches = new ();
             for (int i = 0; i < tokens.Count; i += maxTokensPerMessage)
             {
                 tokenBatches.Add(
@@ -242,7 +242,7 @@ namespace Pronto_MIA.DataAccess.Managers
         private HashSet<string> GetInvalidTokens(
             IReadOnlyList<string> tokens, IReadOnlyList<SendResponse> responses)
         {
-            HashSet<string> toDelete = new();
+            HashSet<string> toDelete = new ();
             for (var i = 0; i < tokens.Count; i++)
             {
                 var response = responses[i];
