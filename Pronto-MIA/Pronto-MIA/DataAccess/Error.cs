@@ -24,24 +24,6 @@ namespace Pronto_MIA.DataAccess
         UserNotFound,
 
         /// <summary>
-        /// Error code representing that the userId searched for could not be
-        /// found.
-        /// </summary>
-        UserIdNotFound,
-
-        /// <summary>
-        /// Error code representing that the userDepartment searched for could
-        /// not be found.
-        /// </summary>
-        UserDepartmentNotFound,
-
-        /// <summary>
-        /// Error code representing that the departmentId searched for could
-        /// not be found.
-        /// </summary>
-        DepartmentIdNotFound,
-
-        /// <summary>
         /// Error code representing that the department which should have been
         /// created already exists and can therefore not be created in a unique
         /// manner.
