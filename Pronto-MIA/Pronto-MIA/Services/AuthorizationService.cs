@@ -240,7 +240,13 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditInternalNews",
-                policy => policy.RequireAuthenticatedUser());
+                policy => {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(InternalNews),
+                            editInternalNewsControls));
+                });;
         }
 
         private static void AddViewInternalNews(AuthorizationOptions options)
@@ -271,7 +277,13 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditEducationalContent",
-                policy => policy.RequireAuthenticatedUser());
+                policy => {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(EducationalContent),
+                            editEducationalContentControls));
+                });
         }
 
         private static void AddViewEducationalContent(
