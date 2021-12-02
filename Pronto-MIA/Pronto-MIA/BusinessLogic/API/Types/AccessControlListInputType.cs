@@ -1,5 +1,6 @@
 namespace Pronto_MIA.BusinessLogic.API.Types
 {
+    using System.Diagnostics.CodeAnalysis;
     using HotChocolate.Types;
     using Pronto_MIA.Domain.Entities;
 
@@ -11,6 +12,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types
     public class AccessControlListInputType : InputObjectType<AccessControlList>
     {
         /// <inheritdoc/>
+        [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN003",
+        Justification = "Many Access Controls")]
         protected override void Configure(
             IInputObjectTypeDescriptor<AccessControlList> descriptor)
         {

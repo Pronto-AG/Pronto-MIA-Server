@@ -80,8 +80,8 @@ namespace Pronto_MIA.Domain.Entities
         public string FileExtension { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the educational content is in
-        /// published status. Unpublished external news should not be shown
+        /// Gets or sets a value indicating whether the educational content is
+        /// in published status. Unpublished external news should not be shown
         /// to users without administrative permissions.
         /// </summary>
         public bool Published { get; set; }

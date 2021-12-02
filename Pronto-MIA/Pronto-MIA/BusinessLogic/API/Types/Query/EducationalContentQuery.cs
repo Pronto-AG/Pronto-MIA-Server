@@ -20,8 +20,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// <summary>
         /// Method which retrieves the available educational content.
         /// </summary>
-        /// <param name="educationalContentManager">The educational content manager
-        /// responsible for managing educational content.</param>
+        /// <param name="educationalContentManager">The educational content
+        /// manager responsible for managing educational content.</param>
         /// <returns>Queryable of all educational content available to the user.
         /// </returns>
         [UseFiltering]

@@ -33,8 +33,8 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="dbContext">The database context where object are
         /// persisted.</param>
         /// <param name="fileManager">The file manager which handles the
-        /// persistence of the file associated with the educational content object.
-        /// </param>
+        /// persistence of the file associated with the educational content
+        /// object.</param>
         public EducationalContentManager(
             ProntoMiaDbContext dbContext,
             ILogger<EducationalContentManager> logger,
@@ -60,7 +60,9 @@ namespace Pronto_MIA.DataAccess.Managers
         {
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(
-                IEducationalContentManager.FileDirectory, uuid.ToString(), file);
+                IEducationalContentManager.FileDirectory,
+                uuid.ToString(),
+                file);
 
             var educationalContent = new EducationalContent(
                 title,
@@ -89,7 +91,8 @@ namespace Pronto_MIA.DataAccess.Managers
                 educationalContent, title);
             educationalContent = this.UpdateDescription(
                 educationalContent, description);
-            educationalContent = await this.UpdateFile(educationalContent, file);
+            educationalContent = await this.UpdateFile(
+                educationalContent, file);
             await this.dbContext.SaveChangesAsync();
             this.logger.LogInformation(
                 "educational content with id {Id} has been updated",
@@ -171,10 +174,10 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <summary>
         /// Updates the file of a given educational content.
         /// </summary>
-        /// <param name="educationalContent">The educational content to be updated.
-        /// </param>
-        /// <param name="file">The new file to be associated with the educational
-        /// news.</param>
+        /// <param name="educationalContent">The educational content to be
+        /// updated.</param>
+        /// <param name="file">The new file to be associated with the
+        /// educational content.</param>
         private async Task<EducationalContent> UpdateFile(
             EducationalContent educationalContent, IFile? file)
         {
@@ -185,7 +188,9 @@ namespace Pronto_MIA.DataAccess.Managers
 
             var uuid = Guid.NewGuid();
             await this.fileManager.Create(
-                IEducationalContentManager.FileDirectory, uuid.ToString(), file);
+                IEducationalContentManager.FileDirectory,
+                uuid.ToString(),
+                file);
 
             educationalContent.FileUuid = uuid;
             educationalContent.FileExtension =

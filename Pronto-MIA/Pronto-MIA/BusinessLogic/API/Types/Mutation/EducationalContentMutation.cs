@@ -37,8 +37,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// educational content.</param>
         /// <param name="description">A description of the educational content
         /// article.</param>
-        /// <param name="file">The file to be associated with the new educational
-        /// content.</param>
+        /// <param name="file">The file to be associated with the new
+        /// educational content.</param>
         /// <returns>The newly generated educational content.</returns>
         [Authorize(Policy = "EditEducationalContent")]
         [UseSingleOrDefault]
@@ -64,26 +64,26 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         }
 
         /// <summary>
-        /// Method that updates the educational content with the given id according
-        /// to the provided information.
+        /// Method that updates the educational content with the given id
+        /// according to the provided information.
         /// </summary>
         /// <param name="dbContext">The database context that will be
         /// used. Using the same <see cref="ProntoMiaDbContext"/> over
         /// multiple managers will ensure transactional safety.</param>
-        /// <param name="educationalContentManager">The manager responsible for
-        /// managing educational content.</param>
+        /// <param name="educationalContentManager">The manager responsible
+        /// for managing educational content.</param>
         /// <param name="id">The id of the deployment plan to be adjusted.
         /// </param>
         /// <param name="title">Short description to identify the
         /// educational content.</param>
         /// <param name="description">A description of the educational content
         /// article.</param>
-        /// <param name="file">The file to be associated with the new educational
-        /// content.</param>
+        /// <param name="file">The file to be associated with the new
+        /// educational content.</param>
         /// <returns>The updated educational content.</returns>
         /// <exception cref="QueryException">Returns EducationalContentNotFound
-        /// exception if the educational content with given id could not be found.
-        /// </exception>
+        /// exception if the educational content with given id could not be
+        /// found.</exception>
         [Authorize(Policy = "EditEducationalContent")]
         [AccessObjectIdArgument("id")]
         public async Task<EducationalContent> UpdateEducationalContent(
@@ -148,7 +148,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                 return false;
             }
 
-            var educationalContent = await educationalContentManager.GetById(id);
+            var educationalContent = await educationalContentManager
+                .GetById(id);
             var tokens = await firebaseTokenManager
                 .GetAllFcmToken()
                 .Select(token => token.Id).ToListAsync();
@@ -163,8 +164,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 
         /// <summary>
         /// Method that hides the educational content with the given id. If the
-        /// educational content is already not in the published state nothing will
-        /// be done.
+        /// educational content is already not in the published state nothing
+        /// will be done.
         /// </summary>
         /// <param name="educationalContentManager">The manager responsible for
         /// managing educational content.</param>
@@ -189,8 +190,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// </summary>
         /// <param name="educationalContentManager">The manager responsible for
         /// managing educational content.</param>
-        /// <param name="id">Id of the educational content to be removed.</param>
-        /// <returns>The id of the educational content which was removed.</returns>
+        /// <param name="id">Id of the educational content to be removed.
+        /// </param>
+        /// <returns>The id of the educational content which was removed.
+        /// </returns>
         /// <exception cref="QueryException">Returns EducationalContentNotFound
         /// exception if the educational content with the given id could not be
         /// found.

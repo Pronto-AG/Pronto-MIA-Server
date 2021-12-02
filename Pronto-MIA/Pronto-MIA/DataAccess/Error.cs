@@ -94,8 +94,8 @@ namespace Pronto_MIA.DataAccess
         InternalNewsNotFound,
 
         /// <summary>
-        /// Error code representing that the educational content searched for could
-        /// not be found.
+        /// Error code representing that the educational content searched for
+        /// could not be found.
         /// </summary>
         EducationalContentNotFound,
 

@@ -240,10 +240,7 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditInternalNews",
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                });
+                policy => policy.RequireAuthenticatedUser());
         }
 
         private static void AddViewInternalNews(AuthorizationOptions options)
@@ -258,13 +255,11 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "ViewInternalNews",
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                });
+                policy => policy.RequireAuthenticatedUser());
         }
 
-        private static void AddEditEducationalContent(AuthorizationOptions options)
+        private static void AddEditEducationalContent(
+            AuthorizationOptions options)
         {
             var editEducationalContentControls =
                 new Dictionary<AccessControl, AccessMode>()
@@ -276,13 +271,11 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditEducationalContent",
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                });
+                policy => policy.RequireAuthenticatedUser());
         }
 
-        private static void AddViewEducationalContent(AuthorizationOptions options)
+        private static void AddViewEducationalContent(
+            AuthorizationOptions options)
         {
             var viewEducationalContentControls =
                 new Dictionary<AccessControl, AccessMode>()
@@ -294,10 +287,7 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "ViewEducationalContent",
-                policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                });
+                policy => policy.RequireAuthenticatedUser());
         }
     }
 }

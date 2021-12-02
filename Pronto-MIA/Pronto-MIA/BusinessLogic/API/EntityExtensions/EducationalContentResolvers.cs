@@ -9,16 +9,16 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
-    /// Class that contains graphQL extensions for the educational content object.
-    /// </summary>
+    /// Class that contains graphQL extensions for the educational content
+    /// object.</summary>
     [ExtendObjectType(nameof(EducationalContent))]
     public class EducationalContentResolvers
     {
         /// <summary>
         /// Gets the link to the file associated with this educational content.
         /// </summary>
-        /// <param name="educationalContent">The educational content in question.
-        /// </param>
+        /// <param name="educationalContent">The educational content in
+        /// question.</param>
         /// <param name="cfg">The application configuration object.</param>
         /// <param name="httpContext">The http context used to generated
         /// the link to the file.</param>
