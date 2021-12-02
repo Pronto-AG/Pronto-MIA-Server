@@ -13,6 +13,10 @@ namespace Pronto_MIA.Services
     /// authorize incoming users depending on policies.
     /// </summary>
     [ExcludeFromCodeCoverage]
+    [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN005",
+            Justification = "Many authorization roles.")]
     public static class AuthorizationService
     {
         /// <summary>
@@ -240,13 +244,14 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditInternalNews",
-                policy => {
+                policy =>
+                {
                     policy.RequireAuthenticatedUser();
                     policy.Requirements.Add(
                         new AccessObjectRequirement(
                             typeof(InternalNews),
                             editInternalNewsControls));
-                });;
+                });
         }
 
         private static void AddViewInternalNews(AuthorizationOptions options)
@@ -277,7 +282,8 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "EditEducationalContent",
-                policy => {
+                policy =>
+                {
                     policy.RequireAuthenticatedUser();
                     policy.Requirements.Add(
                         new AccessObjectRequirement(
