@@ -19,19 +19,19 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
         /// entities of this type.</param>
         public void Configure(EntityTypeBuilder<InternalNews> builder)
         {
-            builder.HasKey(eN => eN.Id);
-            builder.Property(eN => eN.Id).ValueGeneratedOnAdd();
-            builder.Property(eN => eN.Title).IsRequired();
-            builder.Property(eN => eN.Description).IsRequired();
-            builder.Property(eN => eN.AvailableFrom).IsRequired();
-            builder.Property(eN => eN.Published).IsRequired();
-            builder.Property(eN => eN.FileUuid).IsRequired();
-            builder.HasIndex(eN => eN.FileUuid).IsUnique();
-            builder.Property(eN => eN.FileUuid)
+            builder.HasKey(iN => iN.Id);
+            builder.Property(iN => iN.Id).ValueGeneratedOnAdd();
+            builder.Property(iN => iN.Title).IsRequired();
+            builder.Property(iN => iN.Description).IsRequired();
+            builder.Property(iN => iN.AvailableFrom).IsRequired();
+            builder.Property(iN => iN.Published).IsRequired();
+            builder.Property(iN => iN.FileUuid).IsRequired();
+            builder.HasIndex(iN => iN.FileUuid).IsUnique();
+            builder.Property(iN => iN.FileUuid)
                 .HasConversion(
                     uuid => uuid.ToString(),
                     uuid => Guid.Parse(uuid));
-            builder.Property(eN => eN.FileExtension).IsRequired();
+            builder.Property(iN => iN.FileExtension).IsRequired();
         }
     }
 }

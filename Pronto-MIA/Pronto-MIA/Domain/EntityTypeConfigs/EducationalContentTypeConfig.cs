@@ -19,18 +19,18 @@ namespace Pronto_MIA.Domain.EntityTypeConfigs
         /// entities of this type.</param>
         public void Configure(EntityTypeBuilder<EducationalContent> builder)
         {
-            builder.HasKey(eN => eN.Id);
-            builder.Property(eN => eN.Id).ValueGeneratedOnAdd();
-            builder.Property(eN => eN.Title).IsRequired();
-            builder.Property(eN => eN.Description).IsRequired();
-            builder.Property(eN => eN.Published).IsRequired();
-            builder.Property(eN => eN.FileUuid).IsRequired();
-            builder.HasIndex(eN => eN.FileUuid).IsUnique();
-            builder.Property(eN => eN.FileUuid)
+            builder.HasKey(eC => eC.Id);
+            builder.Property(eC => eC.Id).ValueGeneratedOnAdd();
+            builder.Property(eC => eC.Title).IsRequired();
+            builder.Property(eC => eC.Description).IsRequired();
+            builder.Property(eC => eC.Published).IsRequired();
+            builder.Property(eC => eC.FileUuid).IsRequired();
+            builder.HasIndex(eC => eC.FileUuid).IsUnique();
+            builder.Property(eC => eC.FileUuid)
                 .HasConversion(
                     uuid => uuid.ToString(),
                     uuid => Guid.Parse(uuid));
-            builder.Property(eN => eN.FileExtension).IsRequired();
+            builder.Property(eC => eC.FileExtension).IsRequired();
         }
     }
 }
