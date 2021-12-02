@@ -56,6 +56,8 @@ namespace Pronto_MIA
             services.AddScoped<IFileManager, FileManager>();
             services.AddScoped<IDeploymentPlanManager, DeploymentPlanManager>();
             services.AddScoped<IExternalNewsManager, ExternalNewsManager>();
+            services.AddScoped<IInternalNewsManager, InternalNewsManager>();
+            services.AddScoped<IEducationalContentManager, EducationalContentManager>();
             services.AddScoped<IFirebaseTokenManager, FirebaseTokenManager>();
             services.AddScoped<IFirebaseMessagingManager,
                 FirebaseMessagingManager>();

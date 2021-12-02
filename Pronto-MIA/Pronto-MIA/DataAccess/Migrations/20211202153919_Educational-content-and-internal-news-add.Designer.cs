@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pronto_MIA.DataAccess;
@@ -9,9 +10,10 @@ using Pronto_MIA.DataAccess;
 namespace Pronto_MIA.DataAccess.Migrations
 {
     [DbContext(typeof(ProntoMiaDbContext))]
-    partial class ProntoMiaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211202153919_Educational-content-and-internal-news-add")]
+    partial class Educationalcontentandinternalnewsadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

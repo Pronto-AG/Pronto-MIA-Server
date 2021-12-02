@@ -125,5 +125,29 @@ namespace Pronto_MIA.Domain.Entities
         /// edit all external news.
         /// </summary>
         public bool CanEditExternalNews { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// view all internal news.
+        /// </summary>
+        public bool CanViewInternalNews { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all internal news.
+        /// </summary>
+        public bool CanEditInternalNews { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// view all educational content.
+        /// </summary>
+        public bool CanViewEducationalContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all educational content.
+        /// </summary>
+        public bool CanEditEducationalContent { get; set; }
     }
 }

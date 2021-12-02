@@ -35,6 +35,10 @@ namespace Pronto_MIA.Services
                 AddViewDeploymentPlan(options);
                 AddEditExternalNews(options);
                 AddViewExternalNews();
+                AddEditInternalNews(options);
+                AddViewInternalNews(options);
+                AddEditEducationalContent(options);
+                AddViewEducationalContent(options);
             });
             services.AddScoped<IAuthorizationHandler,
                 DepartmentAccessAuthorizationHandler>();
@@ -222,6 +226,78 @@ namespace Pronto_MIA.Services
                         AccessMode.Unrestricted
                     },
                 };
+        }
+
+        private static void AddEditInternalNews(AuthorizationOptions options)
+        {
+            var editInternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditInternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditInternalNews",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+        }
+
+        private static void AddViewInternalNews(AuthorizationOptions options)
+        {
+            var viewInternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewInternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewInternalNews",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+        }
+
+        private static void AddEditEducationalContent(AuthorizationOptions options)
+        {
+            var editEducationalContentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditEducationalContent,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditEducationalContent",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
+        }
+
+        private static void AddViewEducationalContent(AuthorizationOptions options)
+        {
+            var viewEducationalContentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewEducationalContent,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewEducationalContent",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                });
         }
     }
 }

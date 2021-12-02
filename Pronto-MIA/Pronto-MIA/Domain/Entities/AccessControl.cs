@@ -79,5 +79,25 @@ namespace Pronto_MIA.Domain.Entities
         /// Permission to edit all external news.
         /// </summary>
         CanEditExternalNews,
+
+        /// <summary>
+        /// Permission to view all internal news.
+        /// </summary>
+        CanViewInternalNews,
+
+        /// <summary>
+        /// Permission to edit all internal news.
+        /// </summary>
+        CanEditInternalNews,
+
+        /// <summary>
+        /// Permission to view all educational content.
+        /// </summary>
+        CanViewEducationalContent,
+
+        /// <summary>
+        /// Permission to edit all educational content.
+        /// </summary>
+        CanEditEducationalContent,
     }
 }
