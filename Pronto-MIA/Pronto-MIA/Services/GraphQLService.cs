@@ -47,6 +47,8 @@ namespace Pronto_MIA.Services
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
                 .AddType<ExternalNewsResolvers>()
+                .AddType<InternalNewsResolvers>()
+                .AddType<EducationalContentResolvers>()
                 .AddType<AccessControlListInputType>()
                 .AddQueryType<Query>()
                 .AddTypeExtension<DeploymentPlanQuery>()
