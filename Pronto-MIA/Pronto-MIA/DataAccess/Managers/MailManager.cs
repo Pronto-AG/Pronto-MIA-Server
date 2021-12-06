@@ -41,30 +41,78 @@ namespace Pronto_MIA.DataAccess.Managers
             this.logger = logger;
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> Send(string subject, string content)
+        /// <summary>
+        /// Gets the smtp server.
+        /// </summary>
+        public string GetSmtpServer
         {
-            var smtpServer =
-                this.cfg.GetValue<string>("Smtp:smtp_server");
-            var smtpUsername =
-                 this.cfg.GetValue<string>("Smtp:smtp_username");
-            var smtpPassword =
-                 this.cfg.GetValue<string>("Smtp:smtp_password");
-            var smtpPort =
-                this.cfg.GetValue<int>("Smtp:smtp_port");
-            var smtpRecipient =
-                this.cfg.GetValue<string>("Smtp:smtp_recipient");
-            var smtpSender =
-                this.cfg.GetValue<string>("Smtp:smtp_sender");
+            get => this.cfg.GetValue<string>("Smtp:smtp_server");
+        }
 
+        /// <summary>
+        /// Gets the username for the smtp server.
+        /// </summary>
+        public string GetSmtpUsername
+        {
+            get => this.cfg.GetValue<string>("Smtp:smtp_username");
+        }
+
+        /// <summary>
+        /// Gets the password for the smtp server.
+        /// </summary>
+        public string GetSmtpPassword
+        {
+            get => this.cfg.GetValue<string>("Smtp:smtp_password");
+        }
+
+        /// <summary>
+        /// Gets the port of the smtp server to send.
+        /// </summary>
+        public int GetSmtpPort
+        {
+            get => this.cfg.GetValue<int>("Smtp:smtp_port");
+        }
+
+        /// <summary>
+        /// Gets the recipient of the mail to send.
+        /// </summary>
+        public string GetSmtpRecipient
+        {
+            get => this.cfg.GetValue<string>("Smtp:smtp_recipient");
+        }
+
+        /// <summary>
+        /// Gets the sender of the mail to send.
+        /// </summary>
+        public string GetSmtpSender
+        {
+            get => this.cfg.GetValue<string>("Smtp:smtp_sender");
+        }
+
+        /// <summary>
+        /// Generates the Message to send.
+        /// </summary>
+        /// <param name="subject">The subject of the message.</param>
+        /// <param name="content">The content of the message.</param>
+        /// <returns> [MimeMessage] message.</returns>
+        public MimeMessage GenerateMessage(string subject, string content)
+        {
             MimeMessage message = new ();
             message.From.Add(
-                MailboxAddress.Parse(smtpSender));
+                MailboxAddress.Parse(this.GetSmtpSender));
             message.To.Add(
-                MailboxAddress.Parse(smtpRecipient));
+                MailboxAddress.Parse(this.GetSmtpRecipient));
             message.Subject = subject;
             message.Body =
                 new TextPart("html") { Text = content };
+            return message;
+        }
+
+        /// <inheritdoc/>
+#pragma warning disable MEN003 // Method is too long
+        public async Task<bool> Send(string subject, string content)
+        {
+            MimeMessage message = this.GenerateMessage(subject, content);
 
             using (var client = new SmtpClient())
             {
@@ -73,8 +121,8 @@ namespace Pronto_MIA.DataAccess.Managers
                     ServicePointManager.ServerCertificateValidationCallback =
                           (sender, certificate, chain, sslPolicyErrors) => true;
                     client.Connect(
-                        smtpServer,
-                        smtpPort,
+                        this.GetSmtpServer,
+                        this.GetSmtpPort,
                         SecureSocketOptions.SslOnConnect);
                 }
                 catch (SmtpCommandException ex)
@@ -98,7 +146,7 @@ namespace Pronto_MIA.DataAccess.Managers
                     try
                     {
                         client.Authenticate(
-                            smtpUsername, smtpPassword);
+                            this.GetSmtpUsername, this.GetSmtpPassword);
                     }
                     catch (AuthenticationException ex)
                     {
