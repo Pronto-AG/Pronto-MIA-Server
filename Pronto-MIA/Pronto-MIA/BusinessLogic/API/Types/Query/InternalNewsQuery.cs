@@ -24,6 +24,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// responsible for managing internal news.</param>
         /// <returns>Queryable of all internal news available to the user.
         /// </returns>
+        [Authorize(Policy = "ViewInternalNews")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<InternalNews> InternalNews(

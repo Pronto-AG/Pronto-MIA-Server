@@ -24,6 +24,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Query
         /// manager responsible for managing educational content.</param>
         /// <returns>Queryable of all educational content available to the user.
         /// </returns>
+        [Authorize(Policy = "ViewEducationalContent")]
+        [AccessObjectIdArgument("IGNORED")]
         [UseFiltering]
         [UseSorting]
         public IQueryable<EducationalContent> EducationalContent(
