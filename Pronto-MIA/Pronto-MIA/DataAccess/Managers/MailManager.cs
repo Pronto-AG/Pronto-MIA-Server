@@ -109,100 +109,132 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <inheritdoc/>
-#pragma warning disable MEN003 // Method is too long
         public async Task<bool> Send(string subject, string content)
         {
             MimeMessage message = this.GenerateMessage(subject, content);
 
             using (var client = new SmtpClient())
             {
-                try
+                if (this.SmtpConnection(client))
                 {
-                    ServicePointManager.ServerCertificateValidationCallback =
-                          (sender, certificate, chain, sslPolicyErrors) => true;
-                    client.Connect(
-                        this.GetSmtpServer,
-                        this.GetSmtpPort,
-                        SecureSocketOptions.SslOnConnect);
-                }
-                catch (SmtpCommandException ex)
-                {
-                    Console.WriteLine(
-                        "Error trying to connect: {0}", ex.Message);
-                    Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
-                    return false;
-                }
-                catch (SmtpProtocolException ex)
-                {
-                    Console.WriteLine(
-                        "Protocol error while trying to connect: {0}",
-                        ex.Message);
-                    return false;
-                }
-
-                if (client.Capabilities.HasFlag(
-                    SmtpCapabilities.Authentication))
-                {
-                    try
-                    {
-                        client.Authenticate(
-                            this.GetSmtpUsername, this.GetSmtpPassword);
-                    }
-                    catch (AuthenticationException ex)
-                    {
-                        Console.WriteLine("Invalid user name or password.", ex);
-                        return false;
-                    }
-                    catch (SmtpCommandException ex)
-                    {
-                        Console.WriteLine(
-                            "Error trying to authenticate: {0}", ex.Message);
-                        Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
-                        return false;
-                    }
-                    catch (SmtpProtocolException ex)
-                    {
-                        Console.WriteLine(
-                            "Protocol error while trying to authenticate: {0}",
-                            ex.Message);
-                        return false;
-                    }
-                }
-
-                try
-                {
-                    await client.SendAsync(message);
-                }
-                catch (SmtpCommandException ex)
-                {
-                    Console.WriteLine("Error sending message: {0}", ex.Message);
-                    Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
-
-                    switch (ex.ErrorCode)
-                    {
-                        case SmtpErrorCode.RecipientNotAccepted:
-                            Console.WriteLine(
-                                "\tRecipient not accepted: {0}", ex.Mailbox);
-                            break;
-                        case SmtpErrorCode.SenderNotAccepted:
-                            Console.WriteLine(
-                                "\tSender not accepted: {0}", ex.Mailbox);
-                            break;
-                        case SmtpErrorCode.MessageNotAccepted:
-                            Console.WriteLine("\tMessage not accepted.");
-                            break;
-                    }
-                }
-                catch (SmtpProtocolException ex)
-                {
-                    Console.WriteLine(
-                        "Protocol error while sending message: {0}",
-                        ex.Message);
+                    await SendMail(message, client);
                 }
 
                 client.Disconnect(true);
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Sends the generated message.
+        /// </summary>
+        /// <param name="message">The Message to send.</param>
+        /// <param name="client">The smtp client from which the mail
+        /// should be send.</param>
+        /// <returns> [bool] indicates if the mail could be send.</returns>
+        public static async Task<bool> SendMail(
+            MimeMessage message,
+            SmtpClient client)
+        {
+            try
+            {
+                await client.SendAsync(message);
+            }
+            catch (SmtpCommandException ex)
+            {
+                Console.WriteLine("Error sending message: {0}", ex.Message);
+                Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
+                return false;
+            }
+            catch (SmtpProtocolException ex)
+            {
+                Console.WriteLine(
+                    "Protocol error while sending message: {0}",
+                    ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Established the connection to the smtp server.
+        /// </summary>
+        /// <param name="client">The smtp client from which the mail
+        /// should be send.</param>
+        /// <returns> [bool] indicates if the connection could be
+        /// established.</returns>
+        public bool SmtpConnection(SmtpClient client)
+        {
+            try
+            {
+                ServicePointManager.ServerCertificateValidationCallback =
+                      (sender, certificate, chain, sslPolicyErrors) => true;
+                client.Connect(
+                    this.GetSmtpServer,
+                    this.GetSmtpPort,
+                    SecureSocketOptions.SslOnConnect);
+
+            }
+            catch (SmtpCommandException ex)
+            {
+                Console.WriteLine(
+                    "Error trying to connect: {0}", ex.Message);
+                Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
+                return false;
+            }
+            catch (SmtpProtocolException ex)
+            {
+                Console.WriteLine(
+                    "Protocol error while trying to connect: {0}",
+                    ex.Message);
+                return false;
+            }
+
+            return this.SmtpAuthentication(client);
+        }
+
+        /// <summary>
+        /// Authentication on the smtp server
+        /// </summary>
+        /// <param name="client">The smtp client from which the mail
+        /// should be send.</param>
+        /// <returns> [bool] indicates if the authentication was 
+        /// successful.</returns>
+        public bool SmtpAuthentication(SmtpClient client)
+        {
+            if (client.Capabilities.HasFlag(
+                            SmtpCapabilities.Authentication))
+            {
+                try
+                {
+                    client.Authenticate(
+                        this.GetSmtpUsername, this.GetSmtpPassword);
+                }
+                catch (AuthenticationException ex)
+                {
+                    Console.WriteLine("Invalid user name or password.", ex);
+                    return false;
+                }
+                catch (SmtpCommandException ex)
+                {
+                    Console.WriteLine(
+                        "Error trying to authenticate: {0}", ex.Message);
+                    Console.WriteLine("\tStatusCode: {0}", ex.StatusCode);
+                    return false;
+                }
+                catch (SmtpProtocolException ex)
+                {
+                    Console.WriteLine(
+                        "Protocol error while trying to authenticate: {0}",
+                        ex.Message);
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

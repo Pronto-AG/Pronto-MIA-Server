@@ -6,6 +6,8 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
     using System.Threading.Tasks;
     using HotChocolate.Execution;
     using HotChocolate.Types;
+    using MailKit.Net.Smtp;
+    using MimeKit;
     using Pronto_MIA.Domain.Entities;
 
     /// <summary>
