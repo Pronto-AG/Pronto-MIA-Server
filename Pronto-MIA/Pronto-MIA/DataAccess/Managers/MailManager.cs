@@ -95,23 +95,23 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="subject">The subject of the message.</param>
         /// <param name="content">The content of the message.</param>
         /// <returns> [MimeMessage] message.</returns>
-        public Task<MimeMessage> GenerateMessage(string subject, string content)
+        public MimeMessage GenerateMessage(string subject, string content)
         {
             MimeMessage message = new ();
             message.From.Add(
-                MailboxAddress.Parse(this.GetSmtpSender));
+                 MailboxAddress.Parse(this.GetSmtpSender));
             message.To.Add(
-                MailboxAddress.Parse(this.GetSmtpRecipient));
+                 MailboxAddress.Parse(this.GetSmtpRecipient));
             message.Subject = subject;
             message.Body =
-                new TextPart("html") { Text = content };
+                 new TextPart("html") { Text = content };
             return message;
         }
 
         /// <inheritdoc/>
         public async Task<bool> Send(string subject, string content)
         {
-            MimeMessage message = await this.GenerateMessage(subject, content);
+            MimeMessage message = this.GenerateMessage(subject, content);
 
             using (var client = new SmtpClient())
             {

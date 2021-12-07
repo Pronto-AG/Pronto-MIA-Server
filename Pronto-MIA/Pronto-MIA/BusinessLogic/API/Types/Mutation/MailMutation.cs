@@ -19,8 +19,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
 
     /// <summary>
     /// Class representing the mutation operation of graphql.
-    /// Contains all mutations that concern <see cref="Mail"/>
-    /// objects.
+    /// Contains all mutations that concern to the mail to send.
     /// </summary>
     [ExtendObjectType(typeof(API.Mutation))]
     public class MailMutation
