@@ -25,7 +25,6 @@ namespace Tests.TestDataAccess.TestManagers
 
         public TestMailManager()
         {
-
             this.mailManager = new MailManager(
                 TestHelpers.TestConfiguration,
                 Substitute.For<ILogger<MailManager>>());
@@ -40,7 +39,7 @@ namespace Tests.TestDataAccess.TestManagers
             expected.Subject = "Subject";
             expected.Body = new TextPart("html") { Text = "Content" };
             var result =
-                this.mailManager.GenerateMessage("Subject", "Content");
+                await this.mailManager.GenerateMessage("Subject", "Content");
             Assert.NotNull(result);
             Assert.IsType<MimeMessage>(result);
             Assert.Equal(result.GetType(), expected.GetType());
@@ -51,12 +50,12 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
-        public async Task SmtpAuthentication()
+        public void TestSmtpAuthentication()
         {
             var client = new SmtpClient();
             var checkAuth = this.mailManager.SmtpAuthentication(client);
+            Assert.IsType<bool>(checkAuth);
             Assert.False(checkAuth);
-
         }
     }
 }
