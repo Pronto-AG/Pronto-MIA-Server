@@ -117,7 +117,7 @@ namespace Pronto_MIA.DataAccess.Managers
             {
                 if (this.SmtpConnection(client))
                 {
-                    await SendMail(message, client);
+                    await this.SendMail(message, client);
                 }
 
                 client.Disconnect(true);
@@ -132,7 +132,7 @@ namespace Pronto_MIA.DataAccess.Managers
         /// <param name="client">The smtp client from which the mail
         /// should be send.</param>
         /// <returns> [bool] indicates if the mail could be send.</returns>
-        public static async Task<bool> SendMail(
+        public async Task<bool> SendMail(
             MimeMessage message,
             SmtpClient client)
         {
@@ -174,7 +174,6 @@ namespace Pronto_MIA.DataAccess.Managers
                     this.GetSmtpServer,
                     this.GetSmtpPort,
                     SecureSocketOptions.SslOnConnect);
-
             }
             catch (SmtpCommandException ex)
             {
@@ -195,11 +194,11 @@ namespace Pronto_MIA.DataAccess.Managers
         }
 
         /// <summary>
-        /// Authentication on the smtp server
+        /// Authentication on the smtp server.
         /// </summary>
         /// <param name="client">The smtp client from which the mail
         /// should be send.</param>
-        /// <returns> [bool] indicates if the authentication was 
+        /// <returns> [bool] indicates if the authentication was
         /// successful.</returns>
         public bool SmtpAuthentication(SmtpClient client)
         {
