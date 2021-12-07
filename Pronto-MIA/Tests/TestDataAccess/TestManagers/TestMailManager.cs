@@ -31,7 +31,7 @@ namespace Tests.TestDataAccess.TestManagers
         }
 
         [Fact]
-        public async Task TestGenerateMessage()
+        public void TestGenerateMessage()
         {
             var expected = new MimeMessage();
             expected.From.Add(MailboxAddress.Parse("noreply@test.ch"));
@@ -39,7 +39,7 @@ namespace Tests.TestDataAccess.TestManagers
             expected.Subject = "Subject";
             expected.Body = new TextPart("html") { Text = "Content" };
             var result =
-                await this.mailManager.GenerateMessage("Subject", "Content");
+                this.mailManager.GenerateMessage("Subject", "Content");
             Assert.NotNull(result);
             Assert.IsType<MimeMessage>(result);
             Assert.Equal(result.GetType(), expected.GetType());
