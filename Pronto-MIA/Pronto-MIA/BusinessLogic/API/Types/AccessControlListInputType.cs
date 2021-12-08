@@ -56,6 +56,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types
                 .Type<BooleanType>().DefaultValue(false);
             descriptor.Field(t => t.CanEditEducationalContent)
                 .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewAppointment)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditAppointment)
+                .Type<BooleanType>().DefaultValue(false);
         }
 
         private static void IgnoreFields(

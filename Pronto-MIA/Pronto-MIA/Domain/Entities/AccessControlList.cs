@@ -149,5 +149,17 @@ namespace Pronto_MIA.Domain.Entities
         /// edit all educational content.
         /// </summary>
         public bool CanEditEducationalContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// view all appointments.
+        /// </summary>
+        public bool CanViewAppointment { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has permission to
+        /// edit all appointments.
+        /// </summary>
+        public bool CanEditAppointment { get; set; }
     }
 }

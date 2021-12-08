@@ -62,6 +62,11 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<EducationalContent> EducationalContent { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing appointments.
+        /// </summary>
+        public DbSet<Appointment> Appointments { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +80,7 @@ namespace Pronto_MIA.DataAccess
             modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
             modelBuilder.ApplyConfiguration(new InternalNewsTypeConfig());
             modelBuilder.ApplyConfiguration(new EducationalContentTypeConfig());
+            modelBuilder.ApplyConfiguration(new AppointmentTypeConfig());
 
             this.AddAdminUser(modelBuilder);
         }
@@ -121,6 +127,8 @@ namespace Pronto_MIA.DataAccess
                 CanEditInternalNews = true,
                 CanViewEducationalContent = true,
                 CanEditEducationalContent = true,
+                CanViewAppointment = true,
+                CanEditAppointment = true,
             };
         }
     }

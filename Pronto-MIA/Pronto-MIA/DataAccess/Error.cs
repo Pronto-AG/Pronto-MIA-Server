@@ -100,6 +100,18 @@ namespace Pronto_MIA.DataAccess
         EducationalContentNotFound,
 
         /// <summary>
+        /// Error code representing that the event searched for
+        /// could not be found.
+        /// </summary>
+        AppointmentNotFound,
+
+        /// <summary>
+        /// Error code representing that the times defined within the event
+        /// do not match up.
+        /// </summary>
+        AppointmentImpossibleTime,
+
+        /// <summary>
         /// Error code representing that the error which occured could not be
         /// identified.
         /// </summary>

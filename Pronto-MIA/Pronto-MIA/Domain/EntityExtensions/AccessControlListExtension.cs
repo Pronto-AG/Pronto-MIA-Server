@@ -67,6 +67,10 @@ namespace Pronto_MIA.Domain.EntityExtensions
                     return acl.CanViewEducationalContent;
                 case AccessControl.CanEditEducationalContent:
                     return acl.CanEditEducationalContent;
+                case AccessControl.CanViewAppointment:
+                    return acl.CanViewAppointment;
+                case AccessControl.CanEditAppointment:
+                    return acl.CanEditAppointment;
                 default:
                     throw new ArgumentException(
                         $"Unknown AccessControl \"{control.ToString()}\"");

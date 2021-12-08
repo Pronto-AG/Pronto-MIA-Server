@@ -99,5 +99,15 @@ namespace Pronto_MIA.Domain.Entities
         /// Permission to edit all educational content.
         /// </summary>
         CanEditEducationalContent,
+
+        /// <summary>
+        /// Permission to view all appointments.
+        /// </summary>
+        CanViewAppointment,
+
+        /// <summary>
+        /// Permission to edit all appointments.
+        /// </summary>
+        CanEditAppointment,
     }
 }

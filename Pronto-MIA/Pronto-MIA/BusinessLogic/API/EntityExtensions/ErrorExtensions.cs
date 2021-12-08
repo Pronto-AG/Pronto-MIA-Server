@@ -91,6 +91,11 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
                     return "Could not find interal news";
                 case DataAccess.Error.EducationalContentNotFound:
                     return "Could not find educational content";
+                case DataAccess.Error.AppointmentNotFound:
+                    return "Could not find appointment";
+                case DataAccess.Error.AppointmentImpossibleTime:
+                    return "from time cannot be earlier than " +
+                           "to value";
                 case DataAccess.Error.UnknownError:
                     return "An unknown internal error occured";
                 default:

@@ -43,6 +43,8 @@ namespace Pronto_MIA.Services
                 AddViewInternalNews(options);
                 AddEditEducationalContent(options);
                 AddViewEducationalContent(options);
+                AddEditAppointment(options);
+                AddViewAppointment(options);
             });
             services.AddScoped<IAuthorizationHandler,
                 DepartmentAccessAuthorizationHandler>();
@@ -305,6 +307,45 @@ namespace Pronto_MIA.Services
                 };
             options.AddPolicy(
                 "ViewEducationalContent",
+                policy => policy.RequireAuthenticatedUser());
+        }
+
+        private static void AddEditAppointment(
+            AuthorizationOptions options)
+        {
+            var editAppointmentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditAppointment,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditAppointment",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(Appointment),
+                            editAppointmentControls));
+                });
+        }
+
+        private static void AddViewAppointment(
+            AuthorizationOptions options)
+        {
+            var viewAppointmentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewAppointment,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewAppointment",
                 policy => policy.RequireAuthenticatedUser());
         }
     }
