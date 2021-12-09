@@ -127,6 +127,7 @@ namespace Tests.TestDataAccess.TestManagers
             this.dbContext.DeploymentPlans.Add(deploymentPlan);
             await this.dbContext.SaveChangesAsync();
             var oldFileUuid = deploymentPlan.FileUuid.ToString();
+            var oldFileExtension = deploymentPlan.FileExtension;
 
             await this.deploymentPlanManager.Update(
                 deploymentPlan.Id, file, null, null, null);
@@ -135,8 +136,8 @@ namespace Tests.TestDataAccess.TestManagers
                 IDeploymentPlanManager.FileDirectory, Arg.Any<string>(), file);
             this.fileManager.Received().Remove(
                 IDeploymentPlanManager.FileDirectory,
-                deploymentPlan.FileUuid.ToString(),
-                deploymentPlan.FileExtension);
+                oldFileUuid.ToString(),
+                oldFileExtension);
             Assert.NotEqual(
                 oldFileUuid, deploymentPlan.FileUuid.ToString());
             Assert.Equal(
