@@ -57,6 +57,10 @@ namespace Pronto_MIA
             services.AddScoped<IDeploymentPlanManager, DeploymentPlanManager>();
             services.AddScoped<IExternalNewsManager, ExternalNewsManager>();
             services.AddScoped<IMailManager, MailManager>();
+            services.AddScoped<IInternalNewsManager, InternalNewsManager>();
+            services.AddScoped<IEducationalContentManager,
+                EducationalContentManager>();
+            services.AddScoped<IAppointmentManager, AppointmentManager>();
             services.AddScoped<IFirebaseTokenManager, FirebaseTokenManager>();
             services.AddScoped<IFirebaseMessagingManager,
                 FirebaseMessagingManager>();
@@ -163,7 +167,7 @@ namespace Pronto_MIA
             {
                 OnPrepareResponse = ctx =>
                 {
-                    if (ctx.Context.User.Identity == null ||
+                    if (ctx.Context.User.Identity != null ||
                         ctx.Context.User.Identity.IsAuthenticated ||
                         ctx.Context.Request.Path
                         .StartsWithSegments("/StaticFiles/external_news"))

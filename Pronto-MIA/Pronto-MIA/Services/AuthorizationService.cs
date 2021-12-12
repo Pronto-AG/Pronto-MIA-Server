@@ -13,6 +13,10 @@ namespace Pronto_MIA.Services
     /// authorize incoming users depending on policies.
     /// </summary>
     [ExcludeFromCodeCoverage]
+    [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN005",
+            Justification = "Many authorization roles.")]
     public static class AuthorizationService
     {
         /// <summary>
@@ -35,6 +39,12 @@ namespace Pronto_MIA.Services
                 AddViewDeploymentPlan(options);
                 AddEditExternalNews(options);
                 AddViewExternalNews();
+                AddEditInternalNews(options);
+                AddViewInternalNews(options);
+                AddEditEducationalContent(options);
+                AddViewEducationalContent(options);
+                AddEditAppointment(options);
+                AddViewAppointment(options);
             });
             services.AddScoped<IAuthorizationHandler,
                 DepartmentAccessAuthorizationHandler>();
@@ -222,6 +232,121 @@ namespace Pronto_MIA.Services
                         AccessMode.Unrestricted
                     },
                 };
+        }
+
+        private static void AddEditInternalNews(AuthorizationOptions options)
+        {
+            var editInternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditInternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditInternalNews",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(InternalNews),
+                            editInternalNewsControls));
+                });
+        }
+
+        private static void AddViewInternalNews(AuthorizationOptions options)
+        {
+            var viewInternalNewsControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewInternalNews,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewInternalNews",
+                policy => policy.RequireAuthenticatedUser());
+        }
+
+        private static void AddEditEducationalContent(
+            AuthorizationOptions options)
+        {
+            var editEducationalContentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditEducationalContent,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditEducationalContent",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(EducationalContent),
+                            editEducationalContentControls));
+                });
+        }
+
+        private static void AddViewEducationalContent(
+            AuthorizationOptions options)
+        {
+            var viewEducationalContentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewEducationalContent,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewEducationalContent",
+                policy => policy.RequireAuthenticatedUser());
+        }
+
+        private static void AddEditAppointment(
+            AuthorizationOptions options)
+        {
+            var editAppointmentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanEditAppointment,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "EditAppointment",
+                policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(
+                        new AccessObjectRequirement(
+                            typeof(Appointment),
+                            editAppointmentControls));
+                });
+        }
+
+        private static void AddViewAppointment(
+            AuthorizationOptions options)
+        {
+            var viewAppointmentControls =
+                new Dictionary<AccessControl, AccessMode>()
+                {
+                    {
+                        AccessControl.CanViewAppointment,
+                        AccessMode.Unrestricted
+                    },
+                };
+            options.AddPolicy(
+                "ViewAppointment",
+                policy => policy.RequireAuthenticatedUser());
         }
     }
 }

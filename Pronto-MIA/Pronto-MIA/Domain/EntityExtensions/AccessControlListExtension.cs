@@ -59,6 +59,18 @@ namespace Pronto_MIA.Domain.EntityExtensions
                     return acl.CanViewExternalNews;
                 case AccessControl.CanEditExternalNews:
                     return acl.CanEditExternalNews;
+                case AccessControl.CanViewInternalNews:
+                    return acl.CanViewInternalNews;
+                case AccessControl.CanEditInternalNews:
+                    return acl.CanEditInternalNews;
+                case AccessControl.CanViewEducationalContent:
+                    return acl.CanViewEducationalContent;
+                case AccessControl.CanEditEducationalContent:
+                    return acl.CanEditEducationalContent;
+                case AccessControl.CanViewAppointment:
+                    return acl.CanViewAppointment;
+                case AccessControl.CanEditAppointment:
+                    return acl.CanEditAppointment;
                 default:
                     throw new ArgumentException(
                         $"Unknown AccessControl \"{control.ToString()}\"");

@@ -1,5 +1,6 @@
 namespace Pronto_MIA.BusinessLogic.API.Types
 {
+    using System.Diagnostics.CodeAnalysis;
     using HotChocolate.Types;
     using Pronto_MIA.Domain.Entities;
 
@@ -11,6 +12,10 @@ namespace Pronto_MIA.BusinessLogic.API.Types
     public class AccessControlListInputType : InputObjectType<AccessControlList>
     {
         /// <inheritdoc/>
+        [SuppressMessage(
+        "Menees.Analyzers",
+        "MEN003",
+        Justification = "Many Access Controls")]
         protected override void Configure(
             IInputObjectTypeDescriptor<AccessControlList> descriptor)
         {
@@ -42,6 +47,18 @@ namespace Pronto_MIA.BusinessLogic.API.Types
             descriptor.Field(t => t.CanViewExternalNews)
                 .Type<BooleanType>().DefaultValue(true);
             descriptor.Field(t => t.CanEditExternalNews)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewInternalNews)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditInternalNews)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewEducationalContent)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditEducationalContent)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanViewAppointment)
+                .Type<BooleanType>().DefaultValue(false);
+            descriptor.Field(t => t.CanEditAppointment)
                 .Type<BooleanType>().DefaultValue(false);
         }
 
