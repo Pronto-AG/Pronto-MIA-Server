@@ -88,6 +88,30 @@ namespace Pronto_MIA.DataAccess
         ExternalNewsNotFound,
 
         /// <summary>
+        /// Error code representing that the internal news searched for could
+        /// not be found.
+        /// </summary>
+        InternalNewsNotFound,
+
+        /// <summary>
+        /// Error code representing that the educational content searched for
+        /// could not be found.
+        /// </summary>
+        EducationalContentNotFound,
+
+        /// <summary>
+        /// Error code representing that the event searched for
+        /// could not be found.
+        /// </summary>
+        AppointmentNotFound,
+
+        /// <summary>
+        /// Error code representing that the times defined within the event
+        /// do not match up.
+        /// </summary>
+        AppointmentImpossibleTime,
+
+        /// <summary>
         /// Error code representing that the error which occured could not be
         /// identified.
         /// </summary>
