@@ -56,6 +56,7 @@ namespace Pronto_MIA
             services.AddScoped<IFileManager, FileManager>();
             services.AddScoped<IDeploymentPlanManager, DeploymentPlanManager>();
             services.AddScoped<IExternalNewsManager, ExternalNewsManager>();
+            services.AddScoped<IMailManager, MailManager>();
             services.AddScoped<IInternalNewsManager, InternalNewsManager>();
             services.AddScoped<IEducationalContentManager,
                 EducationalContentManager>();

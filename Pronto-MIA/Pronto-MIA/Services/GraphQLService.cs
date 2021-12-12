@@ -67,6 +67,7 @@ namespace Pronto_MIA.Services
                 .AddTypeExtension<UserMutation>()
                 .AddTypeExtension<DepartmentMutation>()
                 .AddTypeExtension<ExternalNewsMutation>()
+                .AddTypeExtension<MailMutation>()
                 .AddTypeExtension<InternalNewsMutation>()
                 .AddTypeExtension<EducationalContentMutation>()
                 .AddTypeExtension<AppointmentMutation>()
