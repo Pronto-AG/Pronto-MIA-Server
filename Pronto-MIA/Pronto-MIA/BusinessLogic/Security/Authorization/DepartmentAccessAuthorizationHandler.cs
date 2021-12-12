@@ -132,16 +132,7 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
             IResolverContext resource,
             string argumentName)
         {
-            var idArgumentNode = resource.Selection.SyntaxNode.Arguments
-                .SingleOrDefault(
-                    a => a.Name.Value == argumentName);
-
-            if (idArgumentNode == null)
-            {
-                return null;
-            }
-
-            return int.Parse((string)idArgumentNode.Value.Value!);
+            return resource.ArgumentValue<int?>(argumentName);
         }
 
         /// <summary>

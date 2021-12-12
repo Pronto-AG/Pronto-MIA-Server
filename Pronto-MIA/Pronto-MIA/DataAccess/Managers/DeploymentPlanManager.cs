@@ -220,14 +220,14 @@ namespace Pronto_MIA.DataAccess.Managers
             await this.fileManager.Create(
                 IDeploymentPlanManager.FileDirectory, uuid.ToString(), file);
 
-            deploymentPlan.FileUuid = uuid;
-            deploymentPlan.FileExtension =
-                IFileManager.GetFileExtension(file);
-
             this.fileManager.Remove(
                 IDeploymentPlanManager.FileDirectory,
                 deploymentPlan.FileUuid.ToString(),
                 deploymentPlan.FileExtension);
+
+            deploymentPlan.FileUuid = uuid;
+            deploymentPlan.FileExtension =
+                IFileManager.GetFileExtension(file);
 
             return deploymentPlan;
         }

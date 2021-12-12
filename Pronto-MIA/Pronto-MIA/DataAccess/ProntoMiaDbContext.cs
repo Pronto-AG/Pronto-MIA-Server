@@ -52,6 +52,21 @@ namespace Pronto_MIA.DataAccess
         /// </summary>
         public DbSet<ExternalNews> ExternalNews { get; set; }
 
+        /// <summary>
+        /// Gets or sets the DBSet containing internal news.
+        /// </summary>
+        public DbSet<InternalNews> InternalNews { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DBSet containing educational content.
+        /// </summary>
+        public DbSet<EducationalContent> EducationalContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DBSet containing appointments.
+        /// </summary>
+        public DbSet<Appointment> Appointments { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +78,9 @@ namespace Pronto_MIA.DataAccess
             modelBuilder.ApplyConfiguration(new AccessControlListTypeConfig());
             modelBuilder.ApplyConfiguration(new DepartmentTypeConfig());
             modelBuilder.ApplyConfiguration(new ExternalNewsTypeConfig());
+            modelBuilder.ApplyConfiguration(new InternalNewsTypeConfig());
+            modelBuilder.ApplyConfiguration(new EducationalContentTypeConfig());
+            modelBuilder.ApplyConfiguration(new AppointmentTypeConfig());
 
             this.AddAdminUser(modelBuilder);
         }
@@ -105,6 +123,12 @@ namespace Pronto_MIA.DataAccess
                 CanViewDeploymentPlans = true,
                 CanViewExternalNews = true,
                 CanEditExternalNews = true,
+                CanViewInternalNews = true,
+                CanEditInternalNews = true,
+                CanViewEducationalContent = true,
+                CanEditEducationalContent = true,
+                CanViewAppointment = true,
+                CanEditAppointment = true,
             };
         }
     }

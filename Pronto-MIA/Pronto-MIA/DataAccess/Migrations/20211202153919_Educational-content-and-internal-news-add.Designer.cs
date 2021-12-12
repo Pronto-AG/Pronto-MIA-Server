@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pronto_MIA.DataAccess;
@@ -9,9 +10,10 @@ using Pronto_MIA.DataAccess;
 namespace Pronto_MIA.DataAccess.Migrations
 {
     [DbContext(typeof(ProntoMiaDbContext))]
-    partial class ProntoMiaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211202153919_Educational-content-and-internal-news-add")]
+    partial class Educationalcontentandinternalnewsadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +43,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<bool>("CanEditAppointment")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("CanEditDepartmentDeploymentPlans")
                         .HasColumnType("boolean");
 
@@ -69,9 +68,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanEditUsers")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("CanViewAppointment")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("CanViewDepartmentDeploymentPlans")
@@ -115,7 +111,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                         new
                         {
                             Id = -1,
-                            CanEditAppointment = true,
                             CanEditDepartmentDeploymentPlans = false,
                             CanEditDepartmentUsers = false,
                             CanEditDepartments = true,
@@ -125,7 +120,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                             CanEditInternalNews = true,
                             CanEditOwnDepartment = false,
                             CanEditUsers = true,
-                            CanViewAppointment = true,
                             CanViewDepartmentDeploymentPlans = false,
                             CanViewDepartmentUsers = false,
                             CanViewDepartments = true,
@@ -137,37 +131,6 @@ namespace Pronto_MIA.DataAccess.Migrations
                             CanViewUsers = true,
                             UserId = -1
                         });
-                });
-
-            modelBuilder.Entity("Pronto_MIA.Domain.Entities.Appointment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("From")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsAllDay")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsYearly")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("To")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("Pronto_MIA.Domain.Entities.Department", b =>

@@ -22,9 +22,8 @@ namespace Pronto_MIA.Services
     /// Service which initializes and contains all information regarding the
     /// GraphQL-API.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-
     // ReSharper disable once InconsistentNaming
+    [ExcludeFromCodeCoverage]
     public static class GraphQLService
     {
         /// <summary>
@@ -34,6 +33,10 @@ namespace Pronto_MIA.Services
         /// <param name="services">The service collection of the application.
         /// </param>
         // ReSharper disable once InconsistentNaming
+        [SuppressMessage(
+            "Menees.Analyzers",
+            "MEN003",
+            Justification = "Many resolvers.")]
         public static void AddGraphQLService(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
@@ -47,12 +50,17 @@ namespace Pronto_MIA.Services
                 .AddType<UploadType>()
                 .AddType<DeploymentPlanResolvers>()
                 .AddType<ExternalNewsResolvers>()
+                .AddType<InternalNewsResolvers>()
+                .AddType<EducationalContentResolvers>()
                 .AddType<AccessControlListInputType>()
                 .AddQueryType<Query>()
                 .AddTypeExtension<DeploymentPlanQuery>()
                 .AddTypeExtension<UserQuery>()
                 .AddTypeExtension<DepartmentQuery>()
                 .AddTypeExtension<ExternalNewsQuery>()
+                .AddTypeExtension<InternalNewsQuery>()
+                .AddTypeExtension<EducationalContentQuery>()
+                .AddTypeExtension<AppointmentQuery>()
                 .AddMutationType<Mutation>()
                 .AddTypeExtension<DeploymentPlanMutation>()
                 .AddTypeExtension<FcmTokenMutation>()
@@ -60,6 +68,9 @@ namespace Pronto_MIA.Services
                 .AddTypeExtension<DepartmentMutation>()
                 .AddTypeExtension<ExternalNewsMutation>()
                 .AddTypeExtension<MailMutation>()
+                .AddTypeExtension<InternalNewsMutation>()
+                .AddTypeExtension<EducationalContentMutation>()
+                .AddTypeExtension<AppointmentMutation>()
                 .AddProjections()
                 .AddFiltering()
                 .AddSorting()
