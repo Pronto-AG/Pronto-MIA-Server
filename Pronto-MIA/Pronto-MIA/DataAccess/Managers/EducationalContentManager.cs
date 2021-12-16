@@ -192,14 +192,14 @@ namespace Pronto_MIA.DataAccess.Managers
                 uuid.ToString(),
                 file);
 
-            educationalContent.FileUuid = uuid;
-            educationalContent.FileExtension =
-                IFileManager.GetFileExtension(file);
-
             this.fileManager.Remove(
                 IEducationalContentManager.FileDirectory,
                 educationalContent.FileUuid.ToString(),
                 educationalContent.FileExtension);
+
+            educationalContent.FileUuid = uuid;
+            educationalContent.FileExtension =
+                IFileManager.GetFileExtension(file);
 
             return educationalContent;
         }
