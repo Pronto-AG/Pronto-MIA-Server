@@ -33,6 +33,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// multiple managers will ensure transactional safety.</param>
         /// <param name="appointmentManager">The manager responsible for
         /// managing appointment.</param>
+        /// <param name="firebaseMessagingManager">The manager used to inform
+        /// affected users that a new appointment has been created.
+        /// </param>
+        /// <param name="firebaseTokenManager">The manager responsible for the
+        /// fcm tokens used by this operation.
+        /// </param>
         /// <param name="title">Short description to identify the
         /// appointment.</param>
         /// <param name="location">A Location of the appointment.
@@ -51,6 +57,8 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         public async Task<Appointment> CreateAppointment(
             [Service] ProntoMiaDbContext dbContext,
             [Service] IAppointmentManager appointmentManager,
+            [Service] IFirebaseMessagingManager firebaseMessagingManager,
+            [Service] IFirebaseTokenManager firebaseTokenManager,
             string title,
             string location,
             DateTime from,
@@ -71,6 +79,12 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
                     isYearly);
 
                 await dbContextTransaction.CommitAsync();
+
+                await this.SendNotification(
+                    appointment,
+                    firebaseMessagingManager,
+                    firebaseTokenManager);
+
                 return appointment;
             }
         }
@@ -150,6 +164,39 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
             int id)
         {
             return await appointmentManager.Remove(id);
+        }
+
+        private Dictionary<string, string> CreateNotificationData(
+            int appointmentId)
+        {
+            return new ()
+            {
+                { "Action", "publish" },
+                { "TargetType", "appointment" },
+                { "TargetId", appointmentId.ToString() },
+            };
+        }
+
+        private async Task SendNotification(
+            Appointment appointment,
+            IFirebaseMessagingManager firebaseMessagingManager,
+            IFirebaseTokenManager firebaseTokenManager)
+        {
+            var tokens = await firebaseTokenManager
+                    .GetAllFcmToken()
+                    .Select(token => token.Id).ToListAsync();
+            var notification = new Notification
+            {
+                Title = "Kalendereintrag erstellt",
+                Body = @$"Der Kalendereintrag 
+                    {appointment.Title} wurde soeben erstellt.",
+            };
+            var data = this.CreateNotificationData(appointment.Id);
+
+            var badTokens = await firebaseMessagingManager
+                .SendMulticastAsync(tokens, notification, data);
+            await firebaseTokenManager
+                .UnregisterMultipleFcmToken(badTokens);
         }
     }
 }

@@ -192,14 +192,14 @@ namespace Pronto_MIA.DataAccess.Managers
             await this.fileManager.Create(
                 IExternalNewsManager.FileDirectory, uuid.ToString(), file);
 
-            externalNews.FileUuid = uuid;
-            externalNews.FileExtension =
-                IFileManager.GetFileExtension(file);
-
             this.fileManager.Remove(
                 IExternalNewsManager.FileDirectory,
                 externalNews.FileUuid.ToString(),
                 externalNews.FileExtension);
+
+            externalNews.FileUuid = uuid;
+            externalNews.FileExtension =
+                IFileManager.GetFileExtension(file);
 
             return externalNews;
         }
