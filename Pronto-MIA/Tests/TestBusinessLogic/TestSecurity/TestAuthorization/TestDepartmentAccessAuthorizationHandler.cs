@@ -177,7 +177,6 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
             await this.dbContext.SaveChangesAsync();
         }
 
-/*
         [Fact]
         public async Task TestRestrictedWrongDepartmentId()
         {
@@ -186,7 +185,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
                 CanViewOwnDepartment = true,
             });
             var departmentId = (await this.dbContext.Departments.SingleAsync(
-                d => d.Name == "Finance")).Id.ToString();
+                d => d.Name == "Finance")).Id;
             var resource = CreateResource(
                 "id", false, departmentId);
             var requirement = CreateRequirement(
@@ -212,7 +211,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
                 CanViewOwnDepartment = true,
             });
             var departmentId = (await this.dbContext.Departments.SingleAsync(
-                d => d.Name == "Administration")).Id.ToString();
+                d => d.Name == "Administration")).Id;
             var resource = CreateResource(
                 "id", false, departmentId);
             var requirement = CreateRequirement(
@@ -238,7 +237,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
                 CanViewOwnDepartment = true,
             });
             var departmentId = (await this.dbContext.Departments.SingleAsync(
-                d => d.Name == "Finance")).Id.ToString();
+                d => d.Name == "Finance")).Id;
             var resource = CreateResource(
                 "id", true, departmentId);
             var requirement = CreateRequirement(
@@ -264,7 +263,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
                 CanViewOwnDepartment = true,
             });
             var departmentId = (await this.dbContext.Departments.SingleAsync(
-                d => d.Name == "Administration")).Id.ToString();
+                d => d.Name == "Administration")).Id;
             var resource = CreateResource(
                 "id", true, departmentId);
             var requirement = CreateRequirement(
@@ -280,7 +279,7 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 
             this.dbContext.Users.Remove(user);
             await this.dbContext.SaveChangesAsync();
-        }*/
+        }
 
         private static ClaimsPrincipal CreateClaimsPrincipal(User user)
         {
@@ -320,28 +319,14 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
         }
 
         private static IResolverContext CreateResource(
-            string? argumentName, bool isDepartmentId, string? argumentValue)
+            string? argumentName, bool isDepartmentId, int? argumentValue)
         {
             var resource = Substitute.For<IResolverContext>();
             var method = CreateArgumentAttributeMethodInfo(
                 argumentName, isDepartmentId);
             resource.Selection.Field.ResolverMember.Returns(method);
-
-            var argumentList = new List<ArgumentNode>();
-            if (argumentName != null && argumentValue != null)
-            {
-                argumentList.Add(
-                    new ArgumentNode(argumentName, argumentValue));
-            }
-
-            resource.Selection.SyntaxNode.Returns(
-                new FieldNode(
-                    null,
-                    new NameNode(null, "Name"),
-                    null,
-                    new List<DirectiveNode>(),
-                    argumentList,
-                    null));
+            resource.ArgumentValue<int?>(argumentName!)
+                .Returns<int?>(argumentValue);
 
             return resource;
         }
@@ -362,11 +347,15 @@ namespace Tests.TestBusinessLogic.TestSecurity.TestAuthorization
 
         private async Task<User> CreateUser(AccessControlList? acl = null)
         {
-            var user = new User("AuthTest", new byte[5], "{}", "{}");
-            Department department = await this.dbContext
-                .Departments.Include(d => d.Users)
-                .FirstAsync(d => d.Name == "Administration");
-            department.Users.Add(user);
+            var user = new User("AuthTest", new byte[5], "{}", "{}")
+            {
+                Departments = new List<Department>
+                {
+                    await this.dbContext.Departments
+                        .FirstAsync(d => d.Name == "Administration"),
+                },
+            };
+            this.dbContext.Add(user);
             await this.dbContext.SaveChangesAsync();
 
             if (acl == null)
