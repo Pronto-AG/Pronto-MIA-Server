@@ -317,7 +317,8 @@ namespace Pronto_MIA.BusinessLogic.Security.Authorization
         {
             await using (var dbContext = new ProntoMiaDbContext(this.options))
             {
-                var user = dbContext.Users.Find(userId);
+                var user = dbContext.Users.Include(u => u.Departments)
+                    .Where(u => u.Id.Equals(userId)).First();
 
                 if (user == null)
                 {
