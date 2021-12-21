@@ -72,7 +72,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// multiple managers will ensure transactional safety.</param>
         /// <param name="educationalContentManager">The manager responsible
         /// for managing educational content.</param>
-        /// <param name="id">The id of the deployment plan to be adjusted.
+        /// <param name="id">The id of the educational content to be adjusted.
         /// </param>
         /// <param name="title">Short description to identify the
         /// educational content.</param>
