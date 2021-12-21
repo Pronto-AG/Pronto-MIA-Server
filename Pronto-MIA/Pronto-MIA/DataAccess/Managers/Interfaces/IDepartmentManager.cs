@@ -48,7 +48,7 @@ namespace Pronto_MIA.DataAccess.Managers.Interfaces
         /// Removes the department identified by the given id.
         /// </summary>
         /// <param name="id">Id of the department to be removed.</param>
-        /// <returns>The id of the deployment plan that was removed.</returns>
+        /// <returns>The id of the department that was removed.</returns>
         /// <exception cref="QueryException">If the department to remove
         /// could not be found or users are still linked to the specified
         /// department.</exception>

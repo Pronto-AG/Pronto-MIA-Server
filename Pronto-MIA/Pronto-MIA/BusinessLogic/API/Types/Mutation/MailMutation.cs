@@ -33,7 +33,6 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// sender.</param>
         /// <param name="content">The content of the mail.</param>
         /// <returns>The newly mail.</returns>
-        // [Authorize(Policy = "EditExternalNews")]
         [UseSingleOrDefault]
         public async Task<bool> SendMail(
             [Service] IMailManager mailManager,
