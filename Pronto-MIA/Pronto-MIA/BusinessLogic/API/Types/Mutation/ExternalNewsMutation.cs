@@ -76,7 +76,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// multiple managers will ensure transactional safety.</param>
         /// <param name="externalNewsManager">The manager responsible for
         /// managing external news.</param>
-        /// <param name="id">The id of the deployment plan to be adjusted.
+        /// <param name="id">The id of the external news to be adjusted.
         /// </param>
         /// <param name="title">Short description to identify the
         /// external news.</param>
@@ -128,7 +128,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <param name="firebaseTokenManager">The manager responsible for the
         /// fcm tokens used by this operation.
         /// </param>
-        /// <param name="id">The id of the deployment plan to be published.
+        /// <param name="id">The id of the external news to be published.
         /// </param>
         /// <param name="title">The title of the info notification to be sent.
         /// </param>

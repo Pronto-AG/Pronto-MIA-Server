@@ -98,7 +98,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// multiple managers will ensure transactional safety.</param>
         /// <param name="appointmentManager">The manager responsible for
         /// managing appointment.</param>
-        /// <param name="id">The id of the deployment plan to be adjusted.
+        /// <param name="id">The id of the appointment to be adjusted.
         /// </param>
         /// <param name="title">Short description to identify the
         /// appointment.</param>

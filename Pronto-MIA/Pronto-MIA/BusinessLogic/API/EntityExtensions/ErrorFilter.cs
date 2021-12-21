@@ -2,6 +2,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using HotChocolate;
     using Npgsql;
 
@@ -9,6 +10,7 @@ namespace Pronto_MIA.BusinessLogic.API.EntityExtensions
     /// Class which handles errors globbally before they are given to the query
     /// engine.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class ErrorFilter : IErrorFilter
     {
         /// <inheritdoc/>
