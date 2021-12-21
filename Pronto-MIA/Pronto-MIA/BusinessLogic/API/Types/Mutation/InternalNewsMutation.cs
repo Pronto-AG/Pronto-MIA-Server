@@ -128,7 +128,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types.Mutation
         /// <param name="firebaseTokenManager">The manager responsible for the
         /// fcm tokens used by this operation.
         /// </param>
-        /// <param name="id">The id of the deployment plan to be published.
+        /// <param name="id">The id of the internal news to be published.
         /// </param>
         /// <param name="title">The title of the info notification to be sent.
         /// </param>
