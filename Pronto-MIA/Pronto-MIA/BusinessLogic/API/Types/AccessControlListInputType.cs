@@ -9,6 +9,7 @@ namespace Pronto_MIA.BusinessLogic.API.Types
     /// object. This class is used to determine which fields are necessary
     /// to create a <see cref="AccessControlList"/> input.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AccessControlListInputType : InputObjectType<AccessControlList>
     {
         /// <inheritdoc/>
